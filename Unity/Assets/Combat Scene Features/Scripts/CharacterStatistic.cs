@@ -30,6 +30,11 @@ public class CharacterStatistic : MonoBehaviour
         deathAnimation = Animator.StringToHash("Death");
     }
 
+    public void SetHealthBar(UIBar healthBar)
+    {
+        this.healthBar = healthBar;
+    }
+
     private void PrepareDamageAnimations()
     {
         int lightDamage1 = Animator.StringToHash("Light Damage 1");
@@ -48,8 +53,11 @@ public class CharacterStatistic : MonoBehaviour
         currentHealth = healthLevel * 10;
         currentEndurance = enduranceLevel * 10;
 
-        healthBar.SetMaxValue(currentHealth);
-        healthBar.SetCurrentValue(currentHealth);
+        if(healthBar != null)
+        {
+            healthBar.SetMaxValue(currentHealth);
+            healthBar.SetCurrentValue(currentHealth);
+        }
     }
 
     public void ReduceEndurance(float value)

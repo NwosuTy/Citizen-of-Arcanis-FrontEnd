@@ -25,6 +25,10 @@ public class CharacterCombat : MonoBehaviour
     public float currentRecovery;
     public AttackActions currentAction;
 
+    [field: Header("Combat Character")]
+    [SerializeField] private Transform WeaponHolder;
+    [field: SerializeField] public CharacterCombatData CombatCharacter { get; private set; }
+
     [Header("Tools")]
     [SerializeField] private CharacterDamageCollider damageCollider;
     [field: SerializeField] public AttackActions[] LightActions { get; private set; }
@@ -33,24 +37,35 @@ public class CharacterCombat : MonoBehaviour
     private void Awake()
     {
         characterManager = GetComponent<CharacterManager>();
-        damageCollider = GetComponentInChildren<CharacterDamageCollider>();
     }
 
     private void Start()
     {
         PrepareActions();
-        damageCollider.SetCharacter(characterManager);
+    }
+
+    public void AssignWeapon(CharacterDamageCollider weapon)
+    {
+        damageCollider = GetComponentInChildren<CharacterDamageCollider>();
+
+        if(damageCollider  == null)
+        {
+            damageCollider = Instantiate(weapon, WeaponHolder);
+            damageCollider.SetCharacter(characterManager);
+        }
     }
 
     public void Combat_Update(float delta)
     {
-        if(characterManager.characterType == CharacterType.Player)
-        {
-            Attack(characterManager.PlayerInput);
-        }
-        else if(characterManager.characterType == CharacterType.AI)
+        CharacterType type = characterManager.characterType;
+        
+        if (type == CharacterType.AI)
         {
             HandleRecoveryTimer(delta);
+        }
+        else if (type == CharacterType.Player)
+        {
+            Attack(characterManager.PlayerInput);
         }
     }
 
