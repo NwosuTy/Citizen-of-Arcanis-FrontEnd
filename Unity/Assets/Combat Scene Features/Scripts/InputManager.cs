@@ -40,6 +40,12 @@ public class InputManager : MonoBehaviour
         characterManager.isMoving = (moveAmount > 0.0f);
     }
 
+    public void ResetInput()
+    {
+        lightAttackInput = false;
+        heavyAttackInput = false;
+    }
+
     private void HandleAttackInput()
     {
         if (Input.GetMouseButtonDown(0))
@@ -58,11 +64,6 @@ public class InputManager : MonoBehaviour
             }
         }
 
-        if(Input.GetMouseButtonUp(0))
-        {
-            lightAttackInput = false;
-            heavyAttackInput = false;
-        }
         if(Time.time - lastClickTime > doubleClickTime)
         {
             clickCount = 0;

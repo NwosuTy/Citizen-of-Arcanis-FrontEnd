@@ -118,6 +118,7 @@ public class CharacterCombat : MonoBehaviour
             currentAction = HeavyActions[random];
         }
         if(currentAction != null) { currentAction.PerformAction(characterManager); }
+        input.ResetInput();
     }
 
     private void PrepareActions()
