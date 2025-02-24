@@ -119,11 +119,6 @@ public class CharacterMovement : MonoBehaviour
 
     public void MoveToDestination(float speed, Vector3 destination)
     {
-        if(characterManager.dontMove)
-        {
-            return;
-        }
-
         NavMeshAgent agent = characterManager.Agent;
         characterManager.navMeshPath ??= new NavMeshPath();
         if (characterManager.navMeshPath.status != NavMeshPathStatus.PathComplete)

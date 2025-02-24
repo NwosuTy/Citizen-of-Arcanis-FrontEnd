@@ -25,9 +25,3 @@ public abstract class AIState : ScriptableObject
         return false;
     }
 }
-
-public enum PatrolMode
-{
-    Idle,
-    Walk
-}

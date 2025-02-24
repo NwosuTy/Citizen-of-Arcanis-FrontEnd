@@ -43,9 +43,7 @@ public class CharacterManager : MonoBehaviour
     //Status
     [HideInInspector] public bool isDead;
     [HideInInspector] public bool isMoving;
-    [HideInInspector] public bool dontMove;
     [HideInInspector] public bool isJumping;
-    [HideInInspector] public bool isTalking;
     [HideInInspector] public bool canRotate;
     [HideInInspector] public bool isGrounded;
     [HideInInspector] public bool isSprinting;
@@ -53,7 +51,6 @@ public class CharacterManager : MonoBehaviour
     [HideInInspector] public bool performingAction;
 
     [Header("Status")]
-    public bool combatMode;
     public Team currentTeam;
     public CharacterType characterType;
     [SerializeField] private float stopDistance;
@@ -62,11 +59,11 @@ public class CharacterManager : MonoBehaviour
 
     [field: Header("State Machine")]
     [SerializeField] private AIState activeState;
-    [field: SerializeField] public PatrolState Patrol { get; private set; }
     [field: SerializeField] public PursueState Pursue { get; private set; }
     [field: SerializeField] public CombatState Combat { get; private set; }
     [field: SerializeField] public AttackState Attack { get; private set; }
     
+
     private void Awake()
     {
         Anim = GetComponent<Animator>();
@@ -86,7 +83,8 @@ public class CharacterManager : MonoBehaviour
                 PlayerInput = gameObject.AddComponent<InputManager>();
             }
         }
-        else
+
+        if(characterType == CharacterType.AI)
         {
             Agent = GetComponentInChildren<NavMeshAgent>();
             if(Agent == null)
@@ -144,19 +142,12 @@ public class CharacterManager : MonoBehaviour
                 activeState = nextState;
             }
         }
-        CheckIfMoving();
         Agent.transform.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+        CheckIfMoving();
     }
 
     private void CheckIfMoving()
     {
-        if(dontMove == true)
-        {
-            Agent.enabled = false;
-            isMoving = false;
-            return;
-        }
-
         if (activeState == Combat)
         {
             return;
@@ -176,30 +167,23 @@ public class CharacterManager : MonoBehaviour
         {
             return true;
         }
-
-        if(activeState == Patrol)
-        {
-            return (Patrol.patrolMode == PatrolMode.Walk);
-        }
         return false;
     }
 
     private void InitializeStates()
     {
-        if(characterType == CharacterType.Player)
+        if(characterType != CharacterType.AI)
         {
             return;
         }
 
-        Patrol = Instantiate(Patrol);
         Pursue = Instantiate(Pursue);
         Combat = Instantiate(Combat);
         Attack = Instantiate(Attack);
 
         Combat.Initialize();
-        Patrol.Initialize();
         targetColliders = new Collider[10];
-        activeState = Pursue.SwitchState(this, Patrol);
+        activeState = Pursue.SwitchState(this, Pursue);
     }
 
     private void FindTarget()
@@ -214,7 +198,7 @@ public class CharacterManager : MonoBehaviour
             }
 
             CharacterManager potentialTarget = targetColliders[i].GetComponentInParent<CharacterManager>();
-            if(potentialTarget != null && potentialTarget.currentTeam != currentTeam)
+            if(potentialTarget.currentTeam != currentTeam)
             {
                 Target = potentialTarget;
             }
@@ -230,22 +214,12 @@ public class CharacterManager : MonoBehaviour
 
         if (Target == null)
         {
-            if (combatMode) { FindTarget(); }
+            FindTarget();
             return;
         }
 
         PositionOfTarget = Target.transform.position;
         DirectionToTarget = transform.position - PositionOfTarget;
-        DistanceToTarget = DirectionToTarget.magnitude;
-    }
-
-    public void PatrolParametersSet(Vector3 patrolDestination)
-    {
-        if(Target != null)
-        {
-            return;
-        }
-        DirectionToTarget = transform.position - patrolDestination;
         DistanceToTarget = DirectionToTarget.magnitude;
     }
 }
