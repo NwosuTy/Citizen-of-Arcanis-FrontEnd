@@ -16,7 +16,7 @@ public class PursueState : AIState
             return this;
         }
 
-        if(agent.enabled != true)
+        if(characterManager.dontMove != true && agent.enabled != true)
         {
             agent.enabled = true;
         }

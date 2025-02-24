@@ -6,6 +6,7 @@ public class CharacterAnim : MonoBehaviour
 
     private int rotateHash;
     private int movingHash;
+    private int talkingHash;
     private int groundedHash;
     private int performActionHash;
 
@@ -27,6 +28,7 @@ public class CharacterAnim : MonoBehaviour
 
         movingHash = Animator.StringToHash("isMoving");
         rotateHash = Animator.StringToHash("canRotate");
+        talkingHash = Animator.StringToHash("isTalking");
         groundedHash = Animator.StringToHash("isGrounded");
         performActionHash = Animator.StringToHash("performAction");
 
@@ -94,6 +96,7 @@ public class CharacterAnim : MonoBehaviour
     public void SetAnimatorBool(Animator animator)
     {
         animator.SetBool(movingHash, characterManager.isMoving);
+        animator.SetBool(talkingHash, characterManager.isTalking);
         animator.SetBool(groundedHash, characterManager.isGrounded);
 
         characterManager.canRotate = animator.GetBool(rotateHash);
