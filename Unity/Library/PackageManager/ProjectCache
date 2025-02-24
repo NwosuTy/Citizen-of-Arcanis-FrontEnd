@@ -5,16 +5,16 @@ m_ProjectFiles:
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638751198056335108
-    m_Hash: 197135994
+      ticks: 638759809925425868
+    m_Hash: 4034412984
   m_LockFileStatus:
     m_FilePath: C:/Users/tthom/Desktop/Projects/Open Source/Citizen-of-Arcanis-FrontEnd-main/Unity/Packages/packages-lock.json
     m_PathExists: 1
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638751198059537717
-    m_Hash: 3328390452
+      ticks: 638759809926645185
+    m_Hash: 3983940720
 m_EmbeddedPackageManifests:
   m_ManifestsStatus: {}
 m_LocalPackages:
