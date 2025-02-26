@@ -82,7 +82,12 @@ public class CharacterMovement : MonoBehaviour
     }
 
     private void HandleRotation(float delta)
-    {
+    { 
+        if(cameraObject == null )
+        {
+            cameraObject = Camera.main.transform;
+            return;
+        }
         float yawCamera = cameraObject.rotation.eulerAngles.y;
         Quaternion targetRotation = Quaternion.Euler(0f, yawCamera, 0f);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
@@ -119,6 +124,11 @@ public class CharacterMovement : MonoBehaviour
 
     public void MoveToDestination(float speed, Vector3 destination)
     {
+        if(characterManager.dontMove)
+        {
+            return;
+        }
+
         NavMeshAgent agent = characterManager.Agent;
         characterManager.navMeshPath ??= new NavMeshPath();
         if (characterManager.navMeshPath.status != NavMeshPathStatus.PathComplete)
