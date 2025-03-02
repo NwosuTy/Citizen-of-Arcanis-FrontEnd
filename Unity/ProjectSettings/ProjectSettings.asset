@@ -743,7 +743,10 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Standalone: INK_RUNTIME;INK_EDITOR
+    Android: CROSS_PLATFORM_INPUT;MOBILE_INPUT
+    Standalone: INK_RUNTIME;INK_EDITOR;CROSS_PLATFORM_INPUT
+    Windows Store Apps: MOBILE_INPUT
+    iPhone: CROSS_PLATFORM_INPUT;MOBILE_INPUT
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}

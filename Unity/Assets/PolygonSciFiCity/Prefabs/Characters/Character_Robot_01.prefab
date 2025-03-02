@@ -41,6 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4950051439177134}
   - component: {fileID: 95910397095232528}
+  - component: {fileID: 2908230284272128565}
   m_Layer: 3
   m_Name: Character_Robot_01
   m_TagString: Player
@@ -87,6 +88,31 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2908230284272128565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1025864630481856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4bae8d309c39e142a5fc181331c1410, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  doubleClickTime: 0.3
+  isAttacking: 0
+  performingAction: 0
+  attackType: 0
+  damageModifier: 1
+  currentAction: {fileID: 0}
+  lightActions:
+  - {fileID: 11400000, guid: 08803766e0459e94d819042c3535ea81, type: 2}
+  heavyActions:
+  - {fileID: 11400000, guid: d713d4458cdf69f4797ac609695c087e, type: 2}
+  handCollider: {fileID: 0}
+  damageCollider: {fileID: 0}
+  <CombatCharacter>k__BackingField: {fileID: 11400000, guid: 9222ea318d6aae74fbb17c9fb2962476, type: 2}
 --- !u!1 &1027719268642640
 GameObject:
   m_ObjectHideFlags: 0
