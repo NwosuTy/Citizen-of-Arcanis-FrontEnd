@@ -41,6 +41,17 @@ public class AttackActions : ScriptableObject
         HandleAttack(character);
     }
 
+    public void PerformAction(PlaceHolderCombatScript pcs)
+    {
+        if (pcs.performingAction)
+        {
+            return;
+        }
+        pcs.isAttacking = true;
+        pcs.attackType = attackType;
+        pcs.PlayTargetAnimation(attackHash, true);
+    }
+
     private void HandleAttack(CharacterManager character)
     {
         if (character.performingAction)

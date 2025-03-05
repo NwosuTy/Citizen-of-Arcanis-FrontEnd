@@ -10,9 +10,6 @@ public class CharacterInteractionScript : MonoBehaviour
     [SerializeField] private GameObject interactUI;
     [SerializeField] private TextMeshProUGUI interactText;
 
-    [field: Header("Combat Character")]
-    [field: SerializeField] public CharacterCombatData CombatCharacter { get; private set; }
-
     private void Awake()
     {
         characterManager = GetComponent<CharacterManager>();
@@ -26,7 +23,6 @@ public class CharacterInteractionScript : MonoBehaviour
         }
         colliderArray = new Collider[20];
         CombatManager combatManager = CombatManager.Instance;
-        if(combatManager != null ) { combatManager.AssignPlayer(CombatCharacter.characterManager); }
     }
 
     private void Update()
