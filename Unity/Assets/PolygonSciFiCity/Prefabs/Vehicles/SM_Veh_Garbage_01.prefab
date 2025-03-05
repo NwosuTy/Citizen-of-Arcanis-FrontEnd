@@ -373,7 +373,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1403180029507646}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 3
   m_Drag: 0.1
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -406,6 +406,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   turnSpeed: 7
+  wayPointColor: {r: 0, g: 0.084820986, b: 1, a: 1}
   sensorRange: 5
   avoidanceRange: 1
   obstacleLayer:
@@ -413,9 +414,8 @@ MonoBehaviour:
     m_Bits: 8
   vehicleLayer:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 0
   waypoints:
-  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}

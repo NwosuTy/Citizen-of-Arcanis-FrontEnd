@@ -1,18 +1,23 @@
 using TMPro;
 using Ink.Runtime;
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
 public class DialoguePanel : MonoBehaviour
 {
+    private bool skipFlag;
+    private bool isTyping;
+
     private Coroutine typingCoroutine;
     private WaitForSeconds typingSpeed;
     private static DialoguePanel Instance;
 
     [Header("Panel")]
     public Transform dialoguePanel;
+    [SerializeField] private Button skipButton;
 
     [Header("Speaker Panel")]
     public GameObject speakerObject;
@@ -33,6 +38,16 @@ public class DialoguePanel : MonoBehaviour
         }
         Instance = this;
         typingSpeed = new WaitForSeconds(0.05f);
+        if (skipButton != null) skipButton.onClick.AddListener(HandleSkip);
+    }
+
+    public void HandleSkip()
+    {
+        if (isTyping == false)
+        {
+            return;
+        }
+        skipFlag = true;
     }
 
     public void StopDisplayCoroutine()
@@ -61,7 +76,6 @@ public class DialoguePanel : MonoBehaviour
 
     public void DisplayChoicesUI(Story story)
     {
-        print(3);
         DisableUIChoices();
         if (story.currentChoices.Count <= 0)
         {
@@ -94,12 +108,25 @@ public class DialoguePanel : MonoBehaviour
 
     private IEnumerator StartTypingText(string text)
     {
-        DialogueManager.Instance.canContinue = false;
+        DialogueManager dialogueManager = DialogueManager.Instance;
+
+        isTyping = true;
+        dialogueManager.canContinue = false;
 
         speakerDialogue.text = "";
-        yield return typingSpeed;
+        foreach (char c in text)
+        {
+            if (skipFlag == true)
+            {
+                speakerDialogue.text = text;
+                break;
+            }
+            speakerDialogue.text += c;
+            yield return typingSpeed;
+        }
 
-        speakerDialogue.text = text;
-        DialogueManager.Instance.canContinue = true;
+        isTyping = false;
+        skipFlag = false;
+        dialogueManager.canContinue = true;
     }
 }

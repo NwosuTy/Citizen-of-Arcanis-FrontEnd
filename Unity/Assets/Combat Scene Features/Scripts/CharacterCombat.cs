@@ -51,7 +51,7 @@ public class CharacterCombat : MonoBehaviour
         if(damageCollider  == null)
         {
             damageCollider = Instantiate(weapon, WeaponHolder);
-            damageCollider.SetCharacter(characterManager);
+            damageCollider.SetCharacter(characterManager, null);
         }
     }
 

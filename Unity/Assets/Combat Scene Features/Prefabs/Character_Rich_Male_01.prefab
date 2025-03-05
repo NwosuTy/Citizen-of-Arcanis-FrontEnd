@@ -1156,7 +1156,7 @@ MonoBehaviour:
   currentRecovery: 0
   currentAction: {fileID: 0}
   WeaponHolder: {fileID: 2025877997584641993}
-  <CombatCharacter>k__BackingField: {fileID: 11400000, guid: 359f655e45202464a97d2d1137eea8a0, type: 2}
+  <CombatCharacter>k__BackingField: {fileID: 11400000, guid: 92b26e7a395795c48a119f12202731d2, type: 2}
   damageCollider: {fileID: 0}
   <LightActions>k__BackingField:
   - {fileID: 11400000, guid: 08803766e0459e94d819042c3535ea81, type: 2}
