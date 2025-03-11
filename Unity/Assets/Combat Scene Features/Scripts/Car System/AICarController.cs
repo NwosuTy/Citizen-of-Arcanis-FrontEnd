@@ -43,7 +43,7 @@ public class AICarController : MonoBehaviour
     {
         if (waypoints == null || waypoints.Length == 0)
         {
-            Debug.LogError("No waypoints assigned to AI Car! Please assign waypoints in the Inspector.");
+            //Debug.LogError("No waypoints assigned to AI Car! Please assign waypoints in the Inspector.");
             enabled = false;
             return;
         }
