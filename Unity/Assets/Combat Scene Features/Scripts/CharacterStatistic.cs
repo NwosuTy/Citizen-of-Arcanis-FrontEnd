@@ -78,8 +78,12 @@ public class CharacterStatistic : MonoBehaviour
             anim.PlayTargetAnimation(deathAnimation, true);
             return;
         }
+        PlayDamageAnimation(anim, attackType);
+    }
 
-        if(attackType == AttackType.Light)
+    public void PlayDamageAnimation(CharacterAnim anim, AttackType attackType)
+    {
+        if (attackType == AttackType.Light)
         {
             int lightRandom = Random.Range(0, lightDamageAnimationArray.Length);
             anim.PlayTargetAnimation(lightDamageAnimationArray[lightRandom], true);

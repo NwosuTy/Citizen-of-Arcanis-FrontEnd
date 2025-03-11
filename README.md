@@ -95,12 +95,6 @@ Once you're ready:
 ## Maintainers
 <table>
   <tr>
-    <td align="center">
-      <img src="Maintainers/WhatsApp Image 2024-11-18 at 15.05.31.jpeg" width="100px;" alt="Maintainer:Sebastian"/>
-      <br />
-      <a href="https://t.me/sebas_G11">Sebastian</a>
-      <br />
-    </td>
      <td align="center">
       <img src="Maintainers/WhatsApp Image 2024-11-18 at 14.59.09.jpeg" width="100px;" alt="Maintainer: Josué"/>
       <br />

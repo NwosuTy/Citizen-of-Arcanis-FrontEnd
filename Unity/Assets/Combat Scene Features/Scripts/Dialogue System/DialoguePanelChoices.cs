@@ -21,6 +21,8 @@ public class DialoguePanelChoices : MonoBehaviour
         DialogueManager.Instance.OnChoiceSelected(choiceIndex);
 
         uiPanel.speakerDialogue.text = dialoguechoice.text;
+
         uiPanel.DisableUIChoices();
+        DialogueManager.Instance.canContinue = true;
     }
 }
