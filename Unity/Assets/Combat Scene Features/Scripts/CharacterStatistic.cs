@@ -30,9 +30,10 @@ public class CharacterStatistic : MonoBehaviour
         deathAnimation = Animator.StringToHash("Death");
     }
 
-    public void SetHealthBar(UIBar healthBar)
+    public void SetBarUIs(UIBar hB, UIBar eB)
     {
-        this.healthBar = healthBar;
+        healthBar = hB;
+        enduranceBar = eB;
     }
 
     private void PrepareDamageAnimations()

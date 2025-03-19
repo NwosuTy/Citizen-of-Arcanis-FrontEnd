@@ -2,8 +2,13 @@
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
+<<<<<<< HEAD
 #/[Ll]ibrary/
 Unity/Temp/
+=======
+/[Ll]ibrary/
+/[Tt]emp/
+>>>>>>> 638df53e (Mini Duel Scene Modifications)
 /[Oo]bj/
 /[Bb]uild/
 /[Bb]uilds/

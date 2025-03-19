@@ -17,7 +17,7 @@ Or maybe I just need to steal yours.
 * [You want it? Make me an offer.] -> Barter  
 
 === Duel ===  
-#speaker: Player  
+#Mode: Duel #speaker: Player   
 Try it, and you’ll regret it.  
 
 #speaker: NPC  

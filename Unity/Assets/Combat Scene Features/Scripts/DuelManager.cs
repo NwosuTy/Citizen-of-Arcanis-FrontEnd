@@ -9,12 +9,9 @@ public class DuelManager : MonoBehaviour
     private CharacterManager enemy;
     private CharacterManager player;
 
-    [Header("Enemy Objects")]
-    [SerializeField] private UIBar enemyHealthBar;
+    [Header("Character Objects")]
+    [SerializeField] private UIManager uiManager;
     [SerializeField] private Transform enemySpawnPoint;
-
-    [Header("Player Objects")]
-    [SerializeField] private UIBar playerHealthBar;
     [SerializeField] private Transform playerSpawnPoint;
 
     [Header("General Property")]
@@ -39,14 +36,16 @@ public class DuelManager : MonoBehaviour
         SetObject(enemySpawnPoint, combatManager.OppositionCombatPrefab);
 
         SetCameraTarget();
+        uiManager.PrepareTimer();
     }
 
     private void Update()
     {
-        if(player.isDead || enemy.isDead)
+        if(player.isDead || enemy.isDead || uiManager.timeUp)
         {
             SceneManager.LoadScene("DemoPrincipalScene");
         }
+        uiManager.HandleCountdown(Time.deltaTime);
     }
 
     private void SetObject(Transform parent, CharacterManager character)
@@ -61,12 +60,13 @@ public class DuelManager : MonoBehaviour
         {
             enemy = newCharacter;
             newCharacter.currentTeam = Team.Red;
-            characterStatistic.SetHealthBar(enemyHealthBar);
-            return;
         }
-        player = newCharacter;
-        newCharacter.currentTeam = Team.Blue;
-        characterStatistic.SetHealthBar(playerHealthBar);
+        else
+        {
+            player = newCharacter;
+            newCharacter.currentTeam = Team.Blue;
+        }
+        uiManager.PrepareDuelingCharacter(newCharacter);
     }
 
     private void SetCameraTarget()

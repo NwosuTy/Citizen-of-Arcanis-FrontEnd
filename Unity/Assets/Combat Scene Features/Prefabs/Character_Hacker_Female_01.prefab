@@ -3925,6 +3925,7 @@ MonoBehaviour:
   targetMask:
     serializedVersion: 2
     m_Bits: 8
+  <CharacterImage>k__BackingField: {fileID: 21300000, guid: e71423d8930713f418ec93bf023bd5d2, type: 3}
   activeState: {fileID: 0}
   <Patrol>k__BackingField: {fileID: 11400000, guid: 57300d976c9042d448e56db1b7a31c6f, type: 2}
   <Pursue>k__BackingField: {fileID: 11400000, guid: b5779df71ed2c9a46b040a69cd8abd1d, type: 2}
