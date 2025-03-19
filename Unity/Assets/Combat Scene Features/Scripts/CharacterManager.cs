@@ -59,6 +59,7 @@ public class CharacterManager : MonoBehaviour
     [SerializeField] private float stopDistance;
     [SerializeField] private float sphereRadius;
     [SerializeField] private LayerMask targetMask;
+    [field: SerializeField] public Sprite CharacterImage { get; private set; }
 
     [field: Header("State Machine")]
     [SerializeField] private AIState activeState;

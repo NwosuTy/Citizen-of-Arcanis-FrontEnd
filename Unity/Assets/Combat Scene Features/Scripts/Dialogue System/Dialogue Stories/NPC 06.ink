@@ -11,7 +11,7 @@ True, but some folks don’t take kindly to losing. You accusing me of rigging t
 * [Just making conversation, nothing more.] -> Deescalate  
 
 === Duel ===  
-#Mode: Duel #speaker: Player  
+#Mode: Duel #speaker: Player   
 I call it how I see it. And I don’t like cheaters.  
 
 #speaker: NPC  
