@@ -9,6 +9,7 @@ public class CharacterInteractionScript : MonoBehaviour
     [Header("Interact UI")]
     [SerializeField] private GameObject interactUI;
     [SerializeField] private TextMeshProUGUI interactText;
+    [Range(0f,5.0f)] [SerializeField] private float detectRadius = 1.0f;
 
     private void Awake()
     {
@@ -59,7 +60,7 @@ public class CharacterInteractionScript : MonoBehaviour
 
     private IInteractable GetInteractableObject()
     {
-        int count = Physics.OverlapSphereNonAlloc(transform.position, 3.0f, colliderArray);
+        int count = Physics.OverlapSphereNonAlloc(transform.position, detectRadius, colliderArray);
         for (int i = 0; i < count; i++)
         {
             Transform interactObject = colliderArray[i].transform;
@@ -73,10 +74,4 @@ public class CharacterInteractionScript : MonoBehaviour
         }
         return null;
     }
-}
-
-public interface IInteractable
-{
-    public void Interact();
-    public string GetInteractText();
 }
