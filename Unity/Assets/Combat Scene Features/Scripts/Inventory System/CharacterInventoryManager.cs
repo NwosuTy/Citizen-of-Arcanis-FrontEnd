@@ -1,9 +1,19 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
+using DevionGames.InventorySystem;
 
 public class CharacterInventoryManager : MonoBehaviour
 {
     //private CharacterInteractionScript interactionScript;
+    //private PlaceHolderCombatScript placeHolderCombatScript;;
+
+    ItemClass spawnedItem;
+    InventorySlotUI slotUI;
+    private InventoryManagerPanel_UI panel;
+
+    [SerializeField] private ItemClass activeItem;
+    [SerializeField] private Transform weaponHolder;
 
     //Would Make Run On Its Own For Now But Would Change Over Time
     private const int MAX_SIZE_CURRENCY = 3;
@@ -15,29 +25,84 @@ public class CharacterInventoryManager : MonoBehaviour
     private void Awake()
     {
         //interactionScript = GetComponent<CharacterInteractionScript>();
+        //placeHolderCombatScript = GetComponent<PlaceHolderCombatScript>();
     }
 
     private void Start()
     {
-        InventoryManagerPanel_UI.Instance.SubscribeInventoryManager(this);
+        panel = InventoryManagerPanel_UI.Instance;
+
+        panel.SubscribeInventoryManager(this);
+        CombatManager.Instance.AddRewardsToInventory(this);
     }
 
     private void Update()
     {
         if(Input.GetKeyDown(KeyCode.I))
         {
-            InventoryManagerPanel_UI.Instance.EnablePanel();
+            panel.EnablePanel();
+        }
+
+        if(Input.GetKeyDown(KeyCode.U))
+        {
+            UnEquipWeapon();
         }
     }
 
-    public void HandleItemAddition(ItemClass itemClass)
+    public void EquipWeapon(ItemClass item)
     {
-        if(itemClass.ItemType == ItemType.Currency)
+        //UnEquip current selected Item before Equipping New Item
+        if(activeItem != null)
         {
-            AddItem(MAX_SIZE_CURRENCY, itemClass, currencyItems);
+            //If Item Is The Same Active Item No Need To Run Function
+            if (activeItem.ItemName == item.ItemName)
+            {
+                return;
+            }
+            UnEquipWeapon();
+        }
+
+        activeItem = item;
+        slotUI = activeItem.SlotUI;
+
+        spawnedItem = Instantiate(activeItem, weaponHolder.transform);
+        spawnedItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+        spawnedItem.RemoveRigidBody();
+        spawnedItem.gameObject.SetActive(true);
+
+        slotUI.DropItem();
+        HandleItemDeletion(item);
+        panel.DisplayNotification($"Equiped {item.ItemName}");
+    }
+
+    public void UnEquipWeapon()
+    {
+        if(activeItem == null)
+        {
             return;
         }
-        AddItem(MAX_SIZE_COLLECTIBLES, itemClass, collectibleItems);
+
+        HandleItemAddition(1, activeItem);
+        panel.DisplayNotification($"UnEquiped {activeItem.ItemName}");
+
+        Destroy(spawnedItem.gameObject);
+
+        activeItem = null;
+        spawnedItem = null;
+    }
+
+    public void HandleItemAddition(int itemCount, ItemClass itemClass)
+    {
+        InventoryManagerPanel_UI inventoryPanel = InventoryManagerPanel_UI.Instance;
+
+        InventorySlotUI existingItem = inventoryPanel.FindSlotUI(itemClass);
+        if(existingItem != null)
+        {
+            existingItem.AddItem(itemCount, itemClass);
+            return;
+        }
+        AddUnExistingItem(itemCount, itemClass, inventoryPanel);
     }
 
     public void HandleItemDeletion(ItemClass itemClass)
@@ -50,31 +115,15 @@ public class CharacterInventoryManager : MonoBehaviour
         collectibleItems.Remove(itemClass);
     }
 
-    private void AddItem(ItemClass item, List<ItemClass> itemList)
+    public void AddUnExistingItem(int count, ItemClass itemClass, InventoryManagerPanel_UI inventoryPanel)
     {
-        InventoryManagerPanel_UI panel = InventoryManagerPanel_UI.Instance;
-        InventorySlotUI existItem = InventoryManagerPanel_UI.Instance.FindSlotUI(item);
+        bool isCurrency = (itemClass.ItemType == ItemType.Currency);
 
-        panel.EnablePanel();
-
-        if (existItem != null)
+        if(isCurrency)
         {
-            existItem.itemCount++;
-            panel.HandSlotUpdate(existItem);
-            return;
+            currencyItems.Add(itemClass);
         }
-        itemList.Add(item);
-        panel.HandleSlotInitialization(item);
-    }
-
-    private void AddItem(int maxCount, ItemClass item, List<ItemClass> itemList)
-    {
-        if(itemList.Count > maxCount)
-        {
-            print(itemList.Count + " maxCount " + maxCount);     
-            InventoryManagerPanel_UI.Instance.DisplayNotification("No More Collectible Space, Remove An Item");
-            return;
-        }
-        AddItem(item, itemList);
+        else { collectibleItems.Add(itemClass); }
+        inventoryPanel.HandleSlotInitialization(count, itemClass);
     }
 }

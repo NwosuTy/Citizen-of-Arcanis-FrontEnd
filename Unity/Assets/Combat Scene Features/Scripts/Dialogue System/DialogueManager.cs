@@ -20,6 +20,9 @@ public class DialogueManager : MonoBehaviour
 
     // Status
     public bool canContinue;
+
+    public bool skipDialogue;
+    public bool spaceBarPressed;
     public bool dialogueIsPlaying { get; private set; }
     public Story currentDialogueStory { get; private set; }
 
@@ -46,14 +49,20 @@ public class DialogueManager : MonoBehaviour
 
     private void Update()
     {
+        spaceBarPressed = Input.GetKeyDown(KeyCode.Space);
+
         if (!dialogueIsPlaying)
         {
             return;
         }
 
-        if (Input.GetKey(KeyCode.Space) && canContinue && currentDialogueStory.currentChoices.Count == 0)
+        if (skipDialogue)
         {
-            print(0);
+            StartCoroutine(ExitDialogueMode());
+        }
+
+        if (spaceBarPressed && canContinue && currentDialogueStory.currentChoices.Count == 0)
+        {
             ContinueDialogueStory();
         }
     }
@@ -78,7 +87,6 @@ public class DialogueManager : MonoBehaviour
     {
         if (currentDialogueStory.canContinue)
         {
-            print(1);
             dialogueUIPanel.StopDisplayCoroutine();
 
             string text = currentDialogueStory.Continue();
@@ -92,7 +100,6 @@ public class DialogueManager : MonoBehaviour
 
             if (currentSpeaker != null)
             {
-                print(2);
                 dialogueUIPanel.DisplayChoicesUI(currentDialogueStory);
                 dialogueUIPanel.DisplayText(currentSpeaker, text);
             }
@@ -111,6 +118,7 @@ public class DialogueManager : MonoBehaviour
         character.isTalking = false;
         currentDialogueStory = null;
         dialogueUIPanel.ExitPanel();
+        skipDialogue = false;
 
         // If a duel was triggered, inform CombatManager and load the combat scene
         if (duelTriggered)

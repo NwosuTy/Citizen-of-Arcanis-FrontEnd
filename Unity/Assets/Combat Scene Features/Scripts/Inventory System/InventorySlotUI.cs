@@ -10,6 +10,7 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
     private bool isDraggingItem;
     private float initalClickTime;
 
+    private Sprite icon;
     private CanvasGroup canvasGroup;
     private ItemClass spawnedObject;
     
@@ -25,6 +26,7 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
     [Header("Slot UI Parameters")]
     [SerializeField] private Image itemIcon;
     [SerializeField] private Button itemButton;
+    [SerializeField] private TextMeshProUGUI itemName;
     [SerializeField] private TextMeshProUGUI itemCountUI;
 
     [Header("Click Parameters")]
@@ -39,19 +41,13 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
     private void Start()
     {
         inventoryManagerPanel = InventoryManagerPanel_UI.Instance;
+
         canvasGroup = inventoryManagerPanel.CanvasGrp;
     }
 
-    public void Initialize(ItemClass item)
+    public void Initialize(int count, ItemClass item)
     {
-        Item = item;
-        IsActive = true;
-
-        SetColorAlpha(itemIcon, 1f);
-        itemIcon.sprite = Item.ItemImage;
-
-        itemCount = 1;
-        itemCountUI.text = itemCount.ToString();
+        AddItem(count, item);
         if (itemButton != null)
         {
             onItemDroppedEvent.AddListener(() => DropItem());
@@ -60,17 +56,28 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
         }
     }
 
+    public void AddItem(int count, ItemClass item)
+    {
+        Item = item;
+        IsActive = true;
+
+        itemCount += count;
+        icon = item.ItemImage;
+
+        Item.SetSlotUI(this);
+        Item.SetPhysicsSystem(false);
+        UpdateSlotUI(1.0f);
+    }
+
     public void SelectItem()
     {
-        if(IsActive == false || itemType == ItemType.Currency)
+        if (IsActive == false || itemType == ItemType.Currency)
         {
             Debug.Log("No Item In Slot To Select");
             return;
         }
-
-        DropItem();
-        //Instantiate Item In Player Hand
         inventoryManagerPanel.ResetInactiveTime();
+        inventoryManagerPanel.InventoryManager.EquipWeapon(Item);
     }
 
     public void DropItem()
@@ -82,10 +89,11 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
         }
 
         itemCount--;
-        if (itemCount == 0)
+        if (itemCount <= 0)
         {
             ClearSlot();
         }
+        UpdateSlotUI(0.04f);
     }
 
     private void ClickItem()
@@ -95,7 +103,7 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
             spawnedObject = Instantiate(Item);
             
             spawnedObject.gameObject.SetActive(true);
-            spawnedObject.transform.position = GetMouseWorldPosition();
+            spawnedObject.transform.SetPositionAndRotation(GetMouseWorldPosition(), Item.transform.rotation);
             spawnedObject.SetPhysicsSystem(false);
         }
     }
@@ -103,14 +111,12 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
     private void ClearSlot()
     {
         IsActive = false;
+
+        icon = null;
+        itemCount = 0;
         spawnedObject = null;
 
-        itemCount = 0;
-        itemCountUI.text = "";
-
-        itemIcon.sprite = null;
-        SetColorAlpha(itemIcon, 0.1f);
-
+        Item.SetSlotUI(null);
         inventoryManagerPanel.InventoryManager.HandleItemDeletion(Item);
         if (itemButton != null)
         {
@@ -121,9 +127,11 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
         Item = null;
     }
 
-    public void UpdateItemCount()
+    public void UpdateSlotUI(float alphaValue)
     {
-        itemCountUI.text = itemCount.ToString();
+        itemIcon.sprite = icon;
+        SetColorAlpha(itemIcon, alphaValue);
+        itemCountUI.text = itemCount.ToString("00");
     }
 
     #region Unity Event Functions
@@ -143,11 +151,11 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
         }
         else if(clickCount > 1 && elapsedTime <= doubleClickDuration)
         {
-            if(itemButton.interactable)
+            if (itemButton.interactable == true)
             {
                 onDoubleClickEvent?.Invoke();
-                clickCount = 0;
             }
+            clickCount = 0;
         }
     }
 
@@ -192,11 +200,11 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
     private Vector3 GetMouseWorldPosition()
     {
         Ray ray = inventoryManagerPanel.MainCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hitInfo))
-        {
-            return hitInfo.point;
-        }
-        return ray.origin + ray.direction * 5f;
+
+        Vector3 originPosition = (Physics.Raycast(ray, out RaycastHit hitInfo)) ? hitInfo.point : ray.origin + ray.direction * 5f;
+
+        originPosition.y = 0.25f;
+        return originPosition;
     }
 
     private void SetColorAlpha(Image image, float alpha)

@@ -8,9 +8,6 @@ using System.Collections.Generic;
 
 public class DialoguePanel : MonoBehaviour
 {
-    private bool skipFlag;
-    private bool isTyping;
-
     private Coroutine typingCoroutine;
     private WaitForSeconds typingSpeed;
     private static DialoguePanel Instance;
@@ -43,11 +40,7 @@ public class DialoguePanel : MonoBehaviour
 
     public void HandleSkip()
     {
-        if (isTyping == false)
-        {
-            return;
-        }
-        skipFlag = true;
+        DialogueManager.Instance.skipDialogue = true;
     }
 
     public void StopDisplayCoroutine()
@@ -108,25 +101,24 @@ public class DialoguePanel : MonoBehaviour
 
     private IEnumerator StartTypingText(string text)
     {
+        speakerDialogue.text = "";
+        bool textFullyRevealed = false;
         DialogueManager dialogueManager = DialogueManager.Instance;
 
-        isTyping = true;
-        dialogueManager.canContinue = false;
-
-        speakerDialogue.text = "";
+        dialogueManager.spaceBarPressed = false;
         foreach (char c in text)
         {
-            if (skipFlag == true)
+            if (Input.GetKeyDown(KeyCode.Space) && textFullyRevealed != true)
             {
                 speakerDialogue.text = text;
+                textFullyRevealed = true;
                 break;
             }
             speakerDialogue.text += c;
             yield return typingSpeed;
         }
 
-        isTyping = false;
-        skipFlag = false;
+        yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space) != true);
         dialogueManager.canContinue = true;
     }
 }

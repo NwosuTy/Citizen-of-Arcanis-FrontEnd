@@ -51,8 +51,10 @@ public class CharacterStatistic : MonoBehaviour
     public void ResetStats()
     {
         characterManager.isDead = false;
-        currentHealth = healthLevel * 10;
-        currentEndurance = enduranceLevel * 10;
+        int multiplier = (characterManager.characterType == CharacterType.Player) ? 10 : 3;
+
+        currentHealth = healthLevel * multiplier;
+        currentEndurance = enduranceLevel * multiplier;
 
         if(healthBar != null)
         {

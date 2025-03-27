@@ -7,7 +7,7 @@ public class InventoryManagerPanel_UI : MonoBehaviour
     private bool hasInitialized;
     
     private float inactivityTimer;
-    private bool isMouseOverPanel;
+    public bool isMouseOverPanel { get; private set; }
     
     private List<InventorySlotUI> currencySlotList;
     private List<InventorySlotUI> collectiblesSlotList;
@@ -79,14 +79,14 @@ public class InventoryManagerPanel_UI : MonoBehaviour
         }
     }
 
-    public void HandleSlotInitialization(ItemClass itemClass)
+    public void HandleSlotInitialization(int count, ItemClass itemClass)
     {
         if(itemClass.ItemType == ItemType.Currency)
         {
-            InitializeSlotUI(itemClass, currencySlotList);
+            InitializeSlotUI(count, itemClass, currencySlotList);
             return;
         }
-        InitializeSlotUI(itemClass, collectiblesSlotList);
+        InitializeSlotUI(count, itemClass, collectiblesSlotList);
     }
 
     public void SubscribeInventoryManager(CharacterInventoryManager inventoryManager)
@@ -94,12 +94,13 @@ public class InventoryManagerPanel_UI : MonoBehaviour
         InventoryManager = inventoryManager;
     }
 
-    public void HandSlotUpdate(InventorySlotUI slotUI)
+    public void HandSlotUpdate(float alphaValue, InventorySlotUI slotUI)
     {
-        slotUI.UpdateItemCount();
+        EnablePanel();
+        slotUI.UpdateSlotUI(alphaValue);
     }
 
-    private void InitializeSlotUI(ItemClass itemClass, List<InventorySlotUI> slotList)
+    private void InitializeSlotUI(int count, ItemClass itemClass, List<InventorySlotUI> slotList)
     {
         InventorySlotUI slotUI = slotList.Find(x => x.IsActive != true);
 
@@ -108,7 +109,7 @@ public class InventoryManagerPanel_UI : MonoBehaviour
             DisplayNotification("No More Collectible Space, Remove An Item");
             return;
         }
-        slotUI.Initialize(itemClass);
+        slotUI.Initialize(count, itemClass);
         DisplayNotification($"{itemClass.ItemName} Has Been Added To Inventory");
     }
 
@@ -160,19 +161,6 @@ public class InventoryManagerPanel_UI : MonoBehaviour
 
     private InventorySlotUI GetSlot(ItemClass item, List<InventorySlotUI> slotList)
     {
-        for(int i = 0; i < slotList.Count; i++)
-        {
-            InventorySlotUI slot = slotList[i];
-            if(slot.IsActive != true)
-            {
-                continue;
-            }
-
-            if(slot.Item.ItemName == item.ItemName)
-            {
-                return slot;
-            }
-        }
-        return null;
+        return slotList.Find(x => x.IsActive == true && x.Item.ItemName == item.ItemName);
     }
 }

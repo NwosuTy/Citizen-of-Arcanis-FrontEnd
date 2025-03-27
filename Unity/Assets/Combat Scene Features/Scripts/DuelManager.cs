@@ -1,13 +1,17 @@
 using UnityEngine;
 using Cinemachine;
+using System.Collections;
 using UnityEngine.SceneManagement;
 
 public class DuelManager : MonoBehaviour
 {
-    private static DuelManager instance;
+    public DuelState duelState;
+    public static DuelManager Instance;
+    private CombatManager combatManager;
 
     private CharacterManager enemy;
     private CharacterManager player;
+    private RewardSystem rewardSystem;
 
     [Header("Character Objects")]
     [SerializeField] private UIManager uiManager;
@@ -20,18 +24,19 @@ public class DuelManager : MonoBehaviour
 
     private void Awake()
     {
-        if(instance != null)
+        if(Instance != null)
         {
-            Destroy(instance);
+            Destroy(Instance);
             return;
         }
-        instance = this;
+        Instance = this;
     }
 
     private void Start()
     {
-        CombatManager combatManager = CombatManager.Instance;
+        combatManager = CombatManager.Instance;
 
+        duelState = DuelState.OnGoing;
         SetObject(playerSpawnPoint, combatManager.PlayerCombatPrefab);
         SetObject(enemySpawnPoint, combatManager.OppositionCombatPrefab);
 
@@ -41,11 +46,60 @@ public class DuelManager : MonoBehaviour
 
     private void Update()
     {
-        if(player.isDead || enemy.isDead || uiManager.timeUp)
+        duelState = SwitchDuelState();
+
+        if(duelState != DuelState.OnGoing)
         {
-            SceneManager.LoadScene("DemoPrincipalScene");
+            StartHandingReward();
+            return;
         }
         uiManager.HandleCountdown(Time.deltaTime);
+    }
+
+    public void StartHandingReward()
+    {
+        StartCoroutine(HandleReward());
+    }
+
+    private DuelState SwitchDuelState()
+    {
+        if (player.isDead)
+        {
+            return DuelState.Lost;
+        }
+        if (enemy.isDead)
+        {
+            return DuelState.Win;
+        }
+        if (uiManager.timeUp)
+        {
+            return DuelState.Draw;
+        }
+        return DuelState.OnGoing;
+    }
+
+    private IEnumerator HandleReward()
+    {
+        if(duelState != DuelState.Lost)
+        {
+            StartCoroutine(rewardSystem.HandleFillUpRewardBox(duelState));
+            yield return new WaitUntil(() => rewardSystem.hasFinished);
+
+            combatManager.AssignRewardBox(rewardSystem);
+            yield return new WaitUntil(() => combatManager.hasRewardBox);
+        }
+        SceneManager.LoadScene("DemoPrincipalScene");
+    }
+
+    public void AddRewardSystem(RewardSystem rewardSystem)
+    {
+        this.rewardSystem = rewardSystem;
+    }
+
+    private void SetCameraTarget()
+    {
+        freeLookCamera.Follow = player.transform;
+        freeLookCamera.LookAt = player.transform;
     }
 
     private void SetObject(Transform parent, CharacterManager character)
@@ -67,11 +121,5 @@ public class DuelManager : MonoBehaviour
             newCharacter.currentTeam = Team.Blue;
         }
         uiManager.PrepareDuelingCharacter(newCharacter);
-    }
-
-    private void SetCameraTarget()
-    {
-        freeLookCamera.Follow = player.transform;
-        freeLookCamera.LookAt = player.transform;
     }
 }

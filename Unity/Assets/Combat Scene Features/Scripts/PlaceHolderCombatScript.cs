@@ -47,6 +47,8 @@ public class PlaceHolderCombatScript : MonoBehaviour
     private void Update()
     {
         if(DialogueManager.Instance.dialogueIsPlaying) { return; }
+        if(InventoryManagerPanel_UI.Instance.isMouseOverPanel) { return; }
+
         HandleInput();
 
         if(damageCollider == null)
