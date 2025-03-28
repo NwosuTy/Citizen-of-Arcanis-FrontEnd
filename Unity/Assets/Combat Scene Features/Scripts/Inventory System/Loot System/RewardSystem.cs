@@ -17,7 +17,7 @@ public class RewardSystem : MonoBehaviour
     {
         hasFinished = false;
         rewardBox = new RewardBox();
-        DuelManager.Instance.AddRewardSystem(this);
+        DuelManager.Instance.SetRewardSystem(this);
     }
 
     public IEnumerator HandleFillUpRewardBox(DuelState duelState)

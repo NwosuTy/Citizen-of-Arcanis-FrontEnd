@@ -110,6 +110,8 @@ public class InventoryManagerPanel_UI : MonoBehaviour
             return;
         }
         slotUI.Initialize(count, itemClass);
+
+	EnablePanel();
         DisplayNotification($"{itemClass.ItemName} Has Been Added To Inventory");
     }
 

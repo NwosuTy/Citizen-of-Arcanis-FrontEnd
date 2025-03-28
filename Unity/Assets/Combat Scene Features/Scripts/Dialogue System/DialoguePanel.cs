@@ -104,8 +104,10 @@ public class DialoguePanel : MonoBehaviour
         speakerDialogue.text = "";
         bool textFullyRevealed = false;
         DialogueManager dialogueManager = DialogueManager.Instance;
+        dialogueManager.canContinue = false;
+        yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space) != true);
 
-        dialogueManager.spaceBarPressed = false;
+        print(Input.GetKeyDown(KeyCode.Space) + "0");
         foreach (char c in text)
         {
             if (Input.GetKeyDown(KeyCode.Space) && textFullyRevealed != true)
@@ -117,8 +119,9 @@ public class DialoguePanel : MonoBehaviour
             speakerDialogue.text += c;
             yield return typingSpeed;
         }
-
+        print(Input.GetKeyDown(KeyCode.Space) + "1");
         yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space) != true);
         dialogueManager.canContinue = true;
+        print(Input.GetKeyDown(KeyCode.Space) + "2");
     }
 }

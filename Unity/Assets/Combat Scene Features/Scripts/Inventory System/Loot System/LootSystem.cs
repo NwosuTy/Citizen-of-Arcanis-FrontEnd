@@ -58,12 +58,30 @@ public static class LootSystem
     }
 }
 
-public static class LoadLevel
+public static class LevelLoader
 {
     private static AsyncOperation sceneLoadingOperation;
     public static void HandleLoadLevel(string levelName, System.Action action, MonoBehaviour monoBehaviour)
     {
         monoBehaviour.StartCoroutine(LoadLevelCoroutine(levelName, action));
+    }
+
+    public static IEnumerator LoadSceneAsync(string sceneName)
+    {
+        Resources.UnloadUnusedAssets();
+        System.GC.Collect();
+
+        sceneLoadingOperation = SceneManager.LoadSceneAsync(sceneName);
+        sceneLoadingOperation.allowSceneActivation = false;
+
+        while(sceneLoadingOperation.isDone != true)
+        {
+            if(sceneLoadingOperation.progress >= 0.9f)
+            {
+                sceneLoadingOperation.allowSceneActivation = true;
+            }
+            yield return null;
+        }
     }
 
     public static IEnumerator LoadLevelCoroutine(string levelName, System.Action action)

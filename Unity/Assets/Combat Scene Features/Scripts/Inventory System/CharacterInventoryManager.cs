@@ -1,7 +1,6 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
-using System;
-using DevionGames.InventorySystem;
 
 public class CharacterInventoryManager : MonoBehaviour
 {
@@ -64,6 +63,7 @@ public class CharacterInventoryManager : MonoBehaviour
 
         activeItem = item;
         slotUI = activeItem.SlotUI;
+        activeItem.SetPhysicsSystem(false);
 
         spawnedItem = Instantiate(activeItem, weaponHolder.transform);
         spawnedItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);

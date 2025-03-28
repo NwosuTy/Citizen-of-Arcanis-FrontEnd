@@ -52,9 +52,9 @@ public class NotificationPanel : MonoBehaviour
             }
             else {content.Initialize(reward, itemBox.CollectibleItems);}
 
-            yield return (StartCoroutine(content.RevealRandomItem()));
+            StartCoroutine(content.RevealRandomItem());
+            yield return new WaitUntil(() => content.hasRevealed);
         }
-
         yield return new WaitForSeconds(1.5f);
         StartCoroutine(Notification(text));
     }

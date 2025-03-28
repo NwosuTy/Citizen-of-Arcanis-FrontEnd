@@ -11,6 +11,7 @@ public class ContentSlotUI : MonoBehaviour
     private WaitForSeconds imageShuffleDuration;
 
     private Reward finalReward;
+    public bool hasRevealed {get; private set;}
     private List<int> unexcludedItems = new List<int>();
     private List<ItemClass> itemsList = new List<ItemClass>();
 
@@ -31,6 +32,7 @@ public class ContentSlotUI : MonoBehaviour
     public void Initialize(Reward reward, ItemClass[] itemArray)
     {
         itemsList.Clear();
+        hasRevealed = false;
 
         finalReward = reward;
         itemsList = new List<ItemClass>(itemArray);
@@ -45,6 +47,7 @@ public class ContentSlotUI : MonoBehaviour
 
     private ItemClass RandomIcon(ItemClass exclude)
     {
+        unexcludedItems.Clear();
         for(int i = 0; i < itemsList.Count; i++)
         {
             if(itemsList[i] == exclude)
@@ -74,5 +77,6 @@ public class ContentSlotUI : MonoBehaviour
             elapsed += Time.deltaTime;
         }
         DisplayContent(finalReward.itemCount, finalReward.itemClass);
+        hasRevealed = true;
     }
 }

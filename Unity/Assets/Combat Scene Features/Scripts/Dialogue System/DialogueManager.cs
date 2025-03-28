@@ -22,7 +22,6 @@ public class DialogueManager : MonoBehaviour
     public bool canContinue;
 
     public bool skipDialogue;
-    public bool spaceBarPressed;
     public bool dialogueIsPlaying { get; private set; }
     public Story currentDialogueStory { get; private set; }
 
@@ -49,8 +48,6 @@ public class DialogueManager : MonoBehaviour
 
     private void Update()
     {
-        spaceBarPressed = Input.GetKeyDown(KeyCode.Space);
-
         if (!dialogueIsPlaying)
         {
             return;
@@ -61,7 +58,7 @@ public class DialogueManager : MonoBehaviour
             StartCoroutine(ExitDialogueMode());
         }
 
-        if (spaceBarPressed && canContinue && currentDialogueStory.currentChoices.Count == 0)
+        if (Input.GetKeyDown(KeyCode.Space) && canContinue && currentDialogueStory.currentChoices.Count == 0)
         {
             ContinueDialogueStory();
         }

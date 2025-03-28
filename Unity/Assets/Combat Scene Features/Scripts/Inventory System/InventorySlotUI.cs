@@ -65,7 +65,6 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
         icon = item.ItemImage;
 
         Item.SetSlotUI(this);
-        Item.SetPhysicsSystem(false);
         UpdateSlotUI(1.0f);
     }
 
