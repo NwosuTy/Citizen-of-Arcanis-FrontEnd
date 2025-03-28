@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4887d21282148ee4898a6a906902ad6d, type: 3}
+  m_Name: Metal Box
+  m_EditorClassIdentifier: 
+  <boxName>k__BackingField: 'Reward Box: Metal'
+  <boxTier>k__BackingField: 1
+  <CurrencyItems>k__BackingField:
+  - {fileID: 3204676244864779087, guid: d74614649f62f234c91399a91e6561f3, type: 3}
+  - {fileID: 4340956281287253898, guid: a7a91a7d2214ed743a262514e1af5911, type: 3}
+  <CollectibleItems>k__BackingField:
+  - {fileID: 1893205474013138667, guid: 0849943402959bb44b60878f23a3cbe7, type: 3}
+  - {fileID: 1114029271913720396, guid: 220ca3866471f6f43a105a7303b6de37, type: 3}
+  - {fileID: 7539641919763583851, guid: ad193683714b5a047a251213e3fe25fa, type: 3}
+  - {fileID: 1642171340067742851, guid: 5635a06697668444382a40ce339ea727, type: 3}
+  <MaxRate>k__BackingField: 7
+  <RewardBoxSize>k__BackingField:
+    minValue: 1
+    maxValue: 5
+  <CurrencyCountSize>k__BackingField:
+    minValue: 1
+    maxValue: 26
+  <CollectibleCountSize>k__BackingField:
+    minValue: 1
+    maxValue: 6

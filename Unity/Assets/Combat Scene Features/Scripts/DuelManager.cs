@@ -1,13 +1,17 @@
 using UnityEngine;
 using Cinemachine;
+using System.Collections;
 using UnityEngine.SceneManagement;
 
 public class DuelManager : MonoBehaviour
 {
-    private static DuelManager instance;
+    public static DuelManager Instance;
+    public DuelState DuelState { get; private set; }
 
+    private CombatManager combatManager;
     private CharacterManager enemy;
     private CharacterManager player;
+    private RewardSystem rewardSystem;
 
     [Header("Character Objects")]
     [SerializeField] private UIManager uiManager;
@@ -18,45 +22,96 @@ public class DuelManager : MonoBehaviour
     [SerializeField] private CharacterDamageCollider weapon;
     [SerializeField] private CinemachineFreeLook freeLookCamera;
 
+    public event DuelStateChanged OnDuelStateChanged;
+    public delegate void DuelStateChanged(DuelState newState);
+
     private void Awake()
     {
-        if(instance != null)
+        if (Instance != null)
         {
-            Destroy(instance);
+            Destroy(gameObject);
             return;
         }
-        instance = this;
+        Instance = this;
     }
 
     private void Start()
     {
-        CombatManager combatManager = CombatManager.Instance;
+        DuelState = DuelState.OnGoing;
+        combatManager = CombatManager.Instance;
 
         SetObject(playerSpawnPoint, combatManager.PlayerCombatPrefab);
         SetObject(enemySpawnPoint, combatManager.OppositionCombatPrefab);
 
         SetCameraTarget();
         uiManager.PrepareTimer();
+        OnDuelStateChanged += HandleDuelStateChanged;
     }
 
     private void Update()
     {
-        if(player.isDead || enemy.isDead || uiManager.timeUp)
+        DuelState newState = SwitchDuelState();
+        if (newState != DuelState && DuelState == DuelState.OnGoing)
         {
-            SceneManager.LoadScene("DemoPrincipalScene");
+            DuelState = newState;
+            OnDuelStateChanged?.Invoke(DuelState);
         }
-        uiManager.HandleCountdown(Time.deltaTime);
+
+        if (DuelState == DuelState.OnGoing)
+        {
+            uiManager.HandleCountdown(Time.deltaTime);
+        }
+    }
+
+    private void HandleDuelStateChanged(DuelState state)
+    {
+        if (state != DuelState.OnGoing)
+        {
+            StartCoroutine(HandleReward());
+        }
+    }
+
+    private DuelState SwitchDuelState()
+    {
+        if (player.isDead) return DuelState.Lost;
+        if (enemy.isDead) return DuelState.Win;
+        if (uiManager.timeUp) return DuelState.Draw;
+        return DuelState.OnGoing;
+    }
+
+    private IEnumerator HandleReward()
+    {
+        if (DuelState != DuelState.Lost)
+        {
+            yield return new WaitForSeconds(2.5f);
+            yield return StartCoroutine(rewardSystem.HandleFillUpRewardBox(DuelState));
+            combatManager.AssignRewardBox(rewardSystem);
+            yield return new WaitUntil(() => combatManager.hasRewardBox);
+        }
+        StartCoroutine(LevelLoader.LoadSceneAsync("DemoPrincipalScene"));
+    }
+
+    public void SetRewardSystem(RewardSystem rewardSystem)
+    {
+        this.rewardSystem = rewardSystem;
+    }
+
+    private void SetCameraTarget()
+    {
+        freeLookCamera.Follow = player.transform;
+        freeLookCamera.LookAt = player.transform;
     }
 
     private void SetObject(Transform parent, CharacterManager character)
     {
         CharacterManager newCharacter = Instantiate(character, parent);
-        CharacterCombat combatManager = newCharacter.GetComponent<CharacterCombat>();
-        CharacterStatistic characterStatistic = newCharacter.GetComponent<CharacterStatistic>();
+        CharacterCombat combat = newCharacter.GetComponent<CharacterCombat>();
+        CharacterStatistic stats = newCharacter.GetComponent<CharacterStatistic>();
 
         newCharacter.combatMode = true;
-        combatManager.AssignWeapon(weapon);
-        if(newCharacter.characterType == CharacterType.AI)
+        combat.AssignWeapon(weapon);
+
+        if (newCharacter.characterType == CharacterType.AI)
         {
             enemy = newCharacter;
             newCharacter.currentTeam = Team.Red;
@@ -66,12 +121,7 @@ public class DuelManager : MonoBehaviour
             player = newCharacter;
             newCharacter.currentTeam = Team.Blue;
         }
-        uiManager.PrepareDuelingCharacter(newCharacter);
-    }
 
-    private void SetCameraTarget()
-    {
-        freeLookCamera.Follow = player.transform;
-        freeLookCamera.LookAt = player.transform;
+        uiManager.PrepareDuelingCharacter(newCharacter);
     }
 }
