@@ -1,31 +1,18 @@
-using System;
 using UnityEngine;
 using System.Collections.Generic;
+using DevionGames.InventorySystem;
 
 public class CharacterInventoryManager : MonoBehaviour
 {
-    //private CharacterInteractionScript interactionScript;
-    //private PlaceHolderCombatScript placeHolderCombatScript;;
-
-    ItemClass spawnedItem;
     InventorySlotUI slotUI;
+    PickableObject spawnedItem;
     private InventoryManagerPanel_UI panel;
+
+    private RewardBox rewardBox = new();
+    private List<ItemClass> itemList = new();
 
     [SerializeField] private ItemClass activeItem;
     [SerializeField] private Transform weaponHolder;
-
-    //Would Make Run On Its Own For Now But Would Change Over Time
-    private const int MAX_SIZE_CURRENCY = 3;
-    private const int MAX_SIZE_COLLECTIBLES = 15;
-
-    private List<ItemClass> currencyItems = new();
-    private List<ItemClass> collectibleItems = new();
-
-    private void Awake()
-    {
-        //interactionScript = GetComponent<CharacterInteractionScript>();
-        //placeHolderCombatScript = GetComponent<PlaceHolderCombatScript>();
-    }
 
     private void Start()
     {
@@ -48,43 +35,34 @@ public class CharacterInventoryManager : MonoBehaviour
         }
     }
 
-    public void EquipWeapon(ItemClass item)
+    //Would Change Later, PlaceHolder Method
+    public void ParseToCombatmanager()
     {
-        //UnEquip current selected Item before Equipping New Item
-        if(activeItem != null)
+        ResetLists();
+        CombatManager.Instance.AssignRewardBox(rewardBox);
+    }
+
+    private void ResetLists()
+    {
+        rewardBox.CleanBox();
+        for (int i = 0; i < itemList.Count; i++)
         {
-            //If Item Is The Same Active Item No Need To Run Function
-            if (activeItem.ItemName == item.ItemName)
-            {
-                return;
-            }
-            UnEquipWeapon();
+            ItemClass item = itemList[i];
+            ItemClass newItem = new(item.itemCount, item.pickedObj.ItemObject.objectPrefab);
+            rewardBox.itemsList.Add(newItem);
         }
-
-        activeItem = item;
-        slotUI = activeItem.SlotUI;
-        activeItem.SetPhysicsSystem(false);
-
-        spawnedItem = Instantiate(activeItem, weaponHolder.transform);
-        spawnedItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
-
-        spawnedItem.RemoveRigidBody();
-        spawnedItem.gameObject.SetActive(true);
-
-        slotUI.DropItem();
-        HandleItemDeletion(item);
-        panel.DisplayNotification($"Equiped {item.ItemName}");
     }
 
     public void UnEquipWeapon()
     {
-        if(activeItem == null)
+        if (activeItem == null)
         {
             return;
         }
+        PickableObject activeObj = activeItem.pickedObj;
 
-        HandleItemAddition(1, activeItem);
-        panel.DisplayNotification($"UnEquiped {activeItem.ItemName}");
+        HandleItemAddition(activeObj);
+        panel.DisplayNotification($"UnEquiped {activeObj.ItemName}");
 
         Destroy(spawnedItem.gameObject);
 
@@ -92,38 +70,63 @@ public class CharacterInventoryManager : MonoBehaviour
         spawnedItem = null;
     }
 
-    public void HandleItemAddition(int itemCount, ItemClass itemClass)
+    public void EquipWeapon(ItemClass item)
     {
-        InventoryManagerPanel_UI inventoryPanel = InventoryManagerPanel_UI.Instance;
-
-        InventorySlotUI existingItem = inventoryPanel.FindSlotUI(itemClass);
-        if(existingItem != null)
+        PickableObject equipedObj = item.pickedObj;
+        PickableObject activeObj = activeItem.pickedObj;
+        //UnEquip current selected Item before Equipping New Item
+        if(activeObj != null)
         {
-            existingItem.AddItem(itemCount, itemClass);
-            return;
+            //If Item Is The Same Active Item No Need To Run Function
+            if (activeObj.ItemName == equipedObj.ItemName)
+            {
+                return;
+            }
+            UnEquipWeapon();
         }
-        AddUnExistingItem(itemCount, itemClass, inventoryPanel);
+
+        activeItem = item;
+        activeObj = activeItem.pickedObj;
+
+        slotUI = activeItem.SlotUI;
+        activeObj.SetPhysicsSystem(false);
+
+        spawnedItem = Instantiate(activeObj, weaponHolder.transform);
+        spawnedItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+        item.UpdateItemCount(false);
+        spawnedItem.RemoveRigidBody();
+        spawnedItem.gameObject.SetActive(true);
+
+        slotUI.DropItem();
+        itemList.Remove(item);
+        panel.DisplayNotification($"Equiped {equipedObj.ItemName}");
     }
 
     public void HandleItemDeletion(ItemClass itemClass)
     {
-        if (itemClass.ItemType == ItemType.Currency)
-        {
-            currencyItems.Remove(itemClass);
-            return;
-        }
-        collectibleItems.Remove(itemClass);
+        itemClass.UpdateItemCount(false);
+        itemList.Remove(itemClass);
     }
 
-    public void AddUnExistingItem(int count, ItemClass itemClass, InventoryManagerPanel_UI inventoryPanel)
+    public void HandleItemAddition(PickableObject pickedObj)
     {
-        bool isCurrency = (itemClass.ItemType == ItemType.Currency);
+        InventoryManagerPanel_UI inventoryPanel = InventoryManagerPanel_UI.Instance;
+        ItemClass existingItem = itemList.Find(x => x.pickedObj == pickedObj);
 
-        if(isCurrency)
+        if(existingItem != null)
         {
-            currencyItems.Add(itemClass);
+            existingItem.UpdateItemCount(true);
+            return;
         }
-        else { collectibleItems.Add(itemClass); }
-        inventoryPanel.HandleSlotInitialization(count, itemClass);
+
+        ItemClass itemClass = new(1, pickedObj);
+        AddUnExistingItem(itemClass);
+    }
+
+    public void AddUnExistingItem(ItemClass itemClass)
+    {
+        itemList.Add(itemClass);
+        panel.HandleSlotInitialization(itemClass);
     }
 }

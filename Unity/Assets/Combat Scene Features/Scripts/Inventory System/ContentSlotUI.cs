@@ -7,13 +7,13 @@ using System.Collections.Generic;
 public class ContentSlotUI : MonoBehaviour
 {
     private float elapsed;
-    private ItemClass selectedItem;
+    private PickableObject selectedItem;
     private WaitForSeconds imageShuffleDuration;
 
-    private Reward finalReward;
+    private ItemClass finalReward;
     public bool hasRevealed {get; private set;}
     private List<int> unexcludedItems = new List<int>();
-    private List<ItemClass> itemsList = new List<ItemClass>();
+    private List<PickableObject> itemsList = new List<PickableObject>();
 
     [Header("Item Properties")]
     [SerializeField] private ItemType itemType;
@@ -29,23 +29,23 @@ public class ContentSlotUI : MonoBehaviour
         imageShuffleDuration = new WaitForSeconds(shuffleDuration);
     }
 
-    public void Initialize(Reward reward, ItemClass[] itemArray)
+    public void Initialize(ItemClass reward, PickableObject[] itemArray)
     {
         itemsList.Clear();
         hasRevealed = false;
 
         finalReward = reward;
-        itemsList = new List<ItemClass>(itemArray);
+        itemsList = new List<PickableObject>(itemArray);
     }
 
-    private void DisplayContent(int count, ItemClass item)
+    private void DisplayContent(int count, PickableObject item)
     {
         itemName.text = item.ItemName;
         itemIcon.sprite = item.ItemImage;
         itemCountUI.text = count.ToString("00");
     }
 
-    private ItemClass RandomIcon(ItemClass exclude)
+    private PickableObject RandomIcon(PickableObject exclude)
     {
         unexcludedItems.Clear();
         for(int i = 0; i < itemsList.Count; i++)
@@ -76,7 +76,7 @@ public class ContentSlotUI : MonoBehaviour
             yield return new WaitForSeconds(0.05f);
             elapsed += Time.deltaTime;
         }
-        DisplayContent(finalReward.itemCount, finalReward.itemClass);
+        DisplayContent(finalReward.itemCount, finalReward.pickedObj);
         hasRevealed = true;
     }
 }

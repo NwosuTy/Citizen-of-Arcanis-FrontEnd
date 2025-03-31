@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class InventoryManagerPanel_UI : MonoBehaviour
 {
@@ -9,8 +10,8 @@ public class InventoryManagerPanel_UI : MonoBehaviour
     private float inactivityTimer;
     public bool isMouseOverPanel { get; private set; }
     
-    private List<InventorySlotUI> currencySlotList;
-    private List<InventorySlotUI> collectiblesSlotList;
+    public List<InventorySlotUI> currencySlotList { get;  private set; }
+    public List<InventorySlotUI> collectiblesSlotList { get; private set; }
 
     public Camera MainCamera { get; private set; }
     public CanvasGroup CanvasGrp { get; private set; }
@@ -79,14 +80,16 @@ public class InventoryManagerPanel_UI : MonoBehaviour
         }
     }
 
-    public void HandleSlotInitialization(int count, ItemClass itemClass)
+    public void HandleSlotInitialization(ItemClass itemClass)
     {
-        if(itemClass.ItemType == ItemType.Currency)
+        PickableObject pickedObj = itemClass.pickedObj;
+
+        if(pickedObj.ItemType == ItemType.Currency)
         {
-            InitializeSlotUI(count, itemClass, currencySlotList);
+            InitializeSlotUI(itemClass, currencySlotList);
             return;
         }
-        InitializeSlotUI(count, itemClass, collectiblesSlotList);
+        InitializeSlotUI(itemClass, collectiblesSlotList);
     }
 
     public void SubscribeInventoryManager(CharacterInventoryManager inventoryManager)
@@ -100,19 +103,21 @@ public class InventoryManagerPanel_UI : MonoBehaviour
         slotUI.UpdateSlotUI(alphaValue);
     }
 
-    private void InitializeSlotUI(int count, ItemClass itemClass, List<InventorySlotUI> slotList)
+    private void InitializeSlotUI(ItemClass itemClass, List<InventorySlotUI> slotList)
     {
-        InventorySlotUI slotUI = slotList.Find(x => x.IsActive != true);
+        InventorySlotUI slotUI = FindInactiveSlot(slotList);
 
         if(slotUI == null)
         {
             DisplayNotification("No More Collectible Space, Remove An Item");
             return;
         }
-        slotUI.Initialize(count, itemClass);
 
-	EnablePanel();
-        DisplayNotification($"{itemClass.ItemName} Has Been Added To Inventory");
+        itemClass.SetSlotUI(slotUI);
+        slotUI.Initialize(itemClass);
+
+	    EnablePanel();
+        DisplayNotification($"{itemClass.pickedObj.ItemName} Has Been Added To Inventory");
     }
 
     public void DisplayNotification(string text)
@@ -148,7 +153,12 @@ public class InventoryManagerPanel_UI : MonoBehaviour
         isMouseOverPanel = status;
     }
 
-    public InventorySlotUI FindSlotUI(ItemClass item)
+    public InventorySlotUI FindInactiveSlot(List<InventorySlotUI> slotList)
+    {
+        return slotList.Find(x => x.IsActive != true);
+    }
+
+    public InventorySlotUI FindSlotUI(PickableObject item)
     {
         InventorySlotUI slot = null;
         bool isCurrency = item.ItemType == ItemType.Currency;
@@ -161,8 +171,8 @@ public class InventoryManagerPanel_UI : MonoBehaviour
         return slot;
     }
 
-    private InventorySlotUI GetSlot(ItemClass item, List<InventorySlotUI> slotList)
+    private InventorySlotUI GetSlot(PickableObject item, List<InventorySlotUI> slotList)
     {
-        return slotList.Find(x => x.IsActive == true && x.Item.ItemName == item.ItemName);
+        return slotList.Find(x => x.IsActive == true && x.Item.pickedObj.ItemName == item.ItemName);
     }
 }

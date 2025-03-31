@@ -4,7 +4,7 @@ using System.Collections;
 public class RewardSystem : MonoBehaviour
 {
     private ItemBox selectedBox;
-    private ItemClass pickedItem;
+    private PickableObject pickedItem;
 
     public bool hasFinished { get; private set; }
     public RewardBox rewardBox {  get; private set; }
@@ -27,16 +27,16 @@ public class RewardSystem : MonoBehaviour
         selectedBox = LootSystem.GetRandomBox(rate, selectedBox, itemBoxes);
         int itemCount = (isDraw) ? 2 : Random.Range(selectedBox.RewardBoxSize.minValue, selectedBox.RewardBoxSize.maxValue);
 
-        if(rewardBox.rewardBoxItems.Count < itemCount)
+        if(rewardBox.itemsList.Count < itemCount)
         {
-            while (rewardBox.rewardBoxItems.Count < itemCount - 1)
+            while (rewardBox.itemsList.Count < itemCount - 1)
             {
                 FillRewardBox(ItemType.Collectible);
             }
             FillRewardBox(ItemType.Currency);
         }
 
-        yield return new WaitUntil(() => rewardBox.rewardBoxItems.Count >= itemCount);
+        yield return new WaitUntil(() => rewardBox.itemsList.Count >= itemCount);
         rewardBox.CleanBox();
 
         yield return new WaitUntil(() => rewardBox.finishedCleaning);
@@ -51,7 +51,7 @@ public class RewardSystem : MonoBehaviour
     private void FillRewardBox(ItemType itemType)
     {
         int min, max;
-        ItemClass[] items;
+        PickableObject[] items;
 
         if (itemType == ItemType.Currency)
         {
@@ -69,7 +69,7 @@ public class RewardSystem : MonoBehaviour
         int random = Random.Range(min, max);
         pickedItem = LootSystem.GetRandomItem(pickedItem, items, selectedBox);
 
-        Reward reward = new(random, pickedItem);
+        ItemClass reward = new(random, pickedItem);
         rewardBox.FillUpBox(selectedBox, reward);
     }
 }
