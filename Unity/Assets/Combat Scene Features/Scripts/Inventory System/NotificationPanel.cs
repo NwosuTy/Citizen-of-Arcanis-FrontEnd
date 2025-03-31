@@ -38,13 +38,13 @@ public class NotificationPanel : MonoBehaviour
     {
         notificationText.gameObject.SetActive(false);
 
-        for(int i = 0; i < rewardBox.rewardBoxItems.Count; i++)
+        for(int i = 0; i < rewardBox.itemsList.Count; i++)
         {
             ContentSlotUI content = contentList[i];
-            Reward reward = rewardBox.rewardBoxItems[i];
+            ItemClass reward = rewardBox.itemsList[i];
 
             content.gameObject.SetActive(true);
-            ItemType itemType = reward.itemClass.ItemType;
+            ItemType itemType = reward.pickedObj.ItemType;
 
             if (itemType == ItemType.Currency)
             { 

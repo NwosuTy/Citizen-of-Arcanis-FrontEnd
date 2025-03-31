@@ -85,7 +85,8 @@ public class DuelManager : MonoBehaviour
         {
             yield return new WaitForSeconds(2.5f);
             yield return StartCoroutine(rewardSystem.HandleFillUpRewardBox(DuelState));
-            combatManager.AssignRewardBox(rewardSystem);
+
+            combatManager.AssignRewardBox(rewardSystem.rewardBox);
             yield return new WaitUntil(() => combatManager.hasRewardBox);
         }
         StartCoroutine(LevelLoader.LoadSceneAsync("DemoPrincipalScene"));

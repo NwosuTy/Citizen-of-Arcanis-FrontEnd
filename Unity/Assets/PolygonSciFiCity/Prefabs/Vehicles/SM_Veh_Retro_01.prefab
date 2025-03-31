@@ -326,32 +326,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e10fc8a8abcc124d914662842e4edb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
+  speed: 3
   turnSpeed: 7
   wayPointColor: {r: 1, g: 0, b: 0, a: 1}
   sensorRange: 5
   avoidanceRange: 1
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 8
   vehicleLayer:
     serializedVersion: 2
     m_Bits: 0
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 8
   waypoints:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  minWaitTime: 15
-  maxWaitTime: 30
+  minWaitTime: 7
+  maxWaitTime: 12
   loopWaypoints: 1
   stoppingDistance: 1
   wheelRotationSpeed: 200
-  frontLeftWheel: {fileID: 7728640942161466671}
-  frontRightWheel: {fileID: 6643939673774048647}
-  rearLeftWheel: {fileID: 6941324594853757644}
-  rearRightWheel: {fileID: 5043832682640249139}
+  wheels:
+  - {fileID: 6941324594853757644}
+  - {fileID: 5043832682640249139}
+  - {fileID: 7728640942161466671}
+  - {fileID: 6643939673774048647}
 --- !u!1 &1717636095952308
 GameObject:
   m_ObjectHideFlags: 0
@@ -1110,7 +1111,7 @@ GameObject:
   - component: {fileID: 3435043370859636639}
   - component: {fileID: 7589071258725515178}
   - component: {fileID: 5131701212929084600}
-  - component: {fileID: 1480111275662602441}
+  - component: {fileID: 702292901737286226}
   m_Layer: 8
   m_Name: Collider
   m_TagString: Untagged
@@ -1183,8 +1184,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &1480111275662602441
-MeshCollider:
+--- !u!65 &702292901737286226
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1201,7 +1202,6 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 43184771610801458, guid: 93e9b16325ba8ca478e6c435ce408f93, type: 2}
+  serializedVersion: 3
+  m_Size: {x: 2.6351836, y: 1.5481586, z: 5.6718235}
+  m_Center: {x: 0, y: 0.87485814, z: 0}

@@ -12,7 +12,7 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
 
     private Sprite icon;
     private CanvasGroup canvasGroup;
-    private ItemClass spawnedObject;
+    private PickableObject spawnedObject;
     
     //Contains Item Properties
     public bool IsActive { get; private set; }
@@ -20,7 +20,6 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
     private InventoryManagerPanel_UI inventoryManagerPanel;
 
     [Header("Item Properties")]
-    public int itemCount;
     [SerializeField] private ItemType itemType;
 
     [Header("Slot UI Parameters")]
@@ -45,9 +44,9 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
         canvasGroup = inventoryManagerPanel.CanvasGrp;
     }
 
-    public void Initialize(int count, ItemClass item)
+    public void Initialize(ItemClass item)
     {
-        AddItem(count, item);
+        AddItem(item);
         if (itemButton != null)
         {
             onItemDroppedEvent.AddListener(() => DropItem());
@@ -56,15 +55,12 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
         }
     }
 
-    public void AddItem(int count, ItemClass item)
+    public void AddItem(ItemClass item)
     {
         Item = item;
         IsActive = true;
 
-        itemCount += count;
-        icon = item.ItemImage;
-
-        Item.SetSlotUI(this);
+        icon = item.pickedObj.ItemImage;
         UpdateSlotUI(1.0f);
     }
 
@@ -87,22 +83,22 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
             return;
         }
 
-        itemCount--;
-        if (itemCount <= 0)
+        if(Item.itemCount <= 0)
         {
             ClearSlot();
         }
-        UpdateSlotUI(0.04f);
     }
 
     private void ClickItem()
     {
-        if (IsActive && itemCount > 0)
+        if (IsActive && Item.itemCount > 0)
         {
-            spawnedObject = Instantiate(Item);
+            PickableObject picked = Item.pickedObj;
+
+            spawnedObject = Instantiate(picked);
             
             spawnedObject.gameObject.SetActive(true);
-            spawnedObject.transform.SetPositionAndRotation(GetMouseWorldPosition(), Item.transform.rotation);
+            spawnedObject.transform.SetPositionAndRotation(GetMouseWorldPosition(), picked.transform.rotation);
             spawnedObject.SetPhysicsSystem(false);
         }
     }
@@ -112,17 +108,18 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
         IsActive = false;
 
         icon = null;
-        itemCount = 0;
         spawnedObject = null;
 
-        Item.SetSlotUI(null);
         inventoryManagerPanel.InventoryManager.HandleItemDeletion(Item);
+        Item.SetSlotUI(null);
+
         if (itemButton != null)
         {
             onItemDroppedEvent.RemoveListener(() => DropItem());
             onItemDraggedEvent.RemoveListener(() => ClickItem());
             onDoubleClickEvent.RemoveListener(() => SelectItem());
         }
+        UpdateSlotUI(0.04f);
         Item = null;
     }
 
@@ -130,7 +127,7 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
     {
         itemIcon.sprite = icon;
         SetColorAlpha(itemIcon, alphaValue);
-        itemCountUI.text = itemCount.ToString("00");
+        itemCountUI.text = Item.itemCount.ToString("00");
     }
 
     #region Unity Event Functions
@@ -191,6 +188,8 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
         {
             spawnedObject.SetPhysicsSystem(true);
         }
+
+        Item.UpdateItemCount(false);
         onItemDroppedEvent?.Invoke();
     }
 

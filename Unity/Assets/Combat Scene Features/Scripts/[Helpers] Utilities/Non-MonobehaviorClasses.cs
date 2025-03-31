@@ -37,15 +37,39 @@ public struct BoundInt
 }
 
 [System.Serializable]
-public class Reward
+public class ItemClass
 {
     public int itemCount;
-    public ItemClass itemClass;
-   
-    public Reward(int count, ItemClass item)
+    public PickableObject pickedObj;
+    public InventorySlotUI SlotUI { get; private set; }
+
+    public ItemClass(int count, PickableObject item)
     {
-        itemClass = item;
+        pickedObj = item;
         itemCount = count;
+    }
+
+    public void SetSlotUI(InventorySlotUI slotUI)
+    {
+        SlotUI = slotUI;
+    }
+
+    public void UpdateItemCount(bool shouldAdd)
+    {
+        float alpha;
+        if (shouldAdd)
+        {
+            alpha = 1.0f;
+            itemCount++;
+        }
+        else
+        {
+            alpha = 0.04f;
+            itemCount--;
+        }
+
+        if(itemCount <= 0) itemCount = 0;
+        SlotUI.UpdateSlotUI(alpha);
     }
 }
 
@@ -53,26 +77,26 @@ public class Reward
 public class RewardBox
 {
     public string boxname;
-    public List<Reward> rewardBoxItems = new();
+    public List<ItemClass> itemsList = new();
     public bool finishedCleaning { get; private set; }
 
-    public void FillUpBox(ItemBox itemBox, Reward reward)
+    public void FillUpBox(ItemBox itemBox, ItemClass reward)
     {
         finishedCleaning = false;
         boxname = itemBox.boxName;
-        rewardBoxItems.Add(reward);
+        itemsList.Add(reward);
     }
 
     public void CleanBox()
     {
-        rewardBoxItems.RemoveAll(x => x.itemClass == null);
+        itemsList.RemoveAll(x => x.pickedObj == null);
         finishedCleaning = true;
     }
 
     public void EmptyBox()
     {
         boxname = "";
-        rewardBoxItems.Clear();
+        itemsList.Clear();
     }
 }
 

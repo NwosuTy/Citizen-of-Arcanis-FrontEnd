@@ -263,6 +263,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 8850248004563827396}
+  <ItemObject>k__BackingField: {fileID: 11400000, guid: 682d3b895f499b044b3ec05219fe9564, type: 2}
   <rewardRate>k__BackingField: 1
   <ItemName>k__BackingField: Pick-Axe
   <ItemImage>k__BackingField: {fileID: 21300000, guid: 575a1e2821f78e24bb70f3ba24d83bde, type: 3}

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4411257972928544}
   - component: {fileID: 33873203307335168}
   - component: {fileID: 23735778941026604}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SM_Veh_Garbage_01_Wheel_fl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 4955029930620150}
   - component: {fileID: 33004547935434320}
   - component: {fileID: 23983682250478472}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SM_Veh_Garbage_01_SteeringW
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -177,7 +177,7 @@ GameObject:
   - component: {fileID: 4943331785125966}
   - component: {fileID: 33873000997281540}
   - component: {fileID: 23355612716713844}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SM_Veh_Garbage_01_Wheel_rr_02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -260,10 +260,9 @@ GameObject:
   - component: {fileID: 4362264027587702}
   - component: {fileID: 33512148020435380}
   - component: {fileID: 23426050647316102}
-  - component: {fileID: 64216644797307908}
   - component: {fileID: 3615563643820270013}
   - component: {fileID: 8965234710636506379}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SM_Veh_Garbage_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -343,28 +342,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &64216644797307908
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1403180029507646}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 43262471403038334, guid: c21451efd3d48db4e80ac8c9c95ff009, type: 2}
 --- !u!54 &3615563643820270013
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -404,32 +381,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e10fc8a8abcc124d914662842e4edb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
+  speed: 3
   turnSpeed: 7
   wayPointColor: {r: 0, g: 0.084820986, b: 1, a: 1}
   sensorRange: 5
   avoidanceRange: 1
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 8
   vehicleLayer:
     serializedVersion: 2
     m_Bits: 0
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 8
   waypoints:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  minWaitTime: 15
-  maxWaitTime: 30
+  minWaitTime: 7
+  maxWaitTime: 15
   loopWaypoints: 1
   stoppingDistance: 1
   wheelRotationSpeed: 200
-  frontLeftWheel: {fileID: 4411257972928544}
-  frontRightWheel: {fileID: 4248052673145524}
-  rearLeftWheel: {fileID: 4900714794337880}
-  rearRightWheel: {fileID: 4987522326786522}
+  wheels:
+  - {fileID: 4411257972928544}
+  - {fileID: 4248052673145524}
+  - {fileID: 4900714794337880}
+  - {fileID: 4987522326786522}
+  - {fileID: 4801732926610694}
+  - {fileID: 4943331785125966}
 --- !u!1 &1443734789490234
 GameObject:
   m_ObjectHideFlags: 0
@@ -441,7 +421,7 @@ GameObject:
   - component: {fileID: 4248052673145524}
   - component: {fileID: 33996927736425392}
   - component: {fileID: 23026419693307034}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SM_Veh_Garbage_01_Wheel_fr
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -524,7 +504,7 @@ GameObject:
   - component: {fileID: 4987522326786522}
   - component: {fileID: 33580411801340948}
   - component: {fileID: 23077295457565750}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SM_Veh_Garbage_01_Wheel_rl_02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -607,7 +587,7 @@ GameObject:
   - component: {fileID: 4533102175363990}
   - component: {fileID: 33768556354757060}
   - component: {fileID: 23594856584163432}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SM_Veh_Garbage_01_Glass
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -690,7 +670,7 @@ GameObject:
   - component: {fileID: 4900714794337880}
   - component: {fileID: 33241495825996340}
   - component: {fileID: 23923621824182926}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SM_Veh_Garbage_01_Wheel_rl_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -773,7 +753,7 @@ GameObject:
   - component: {fileID: 4801732926610694}
   - component: {fileID: 33060506157644446}
   - component: {fileID: 23620496461185442}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SM_Veh_Garbage_01_Wheel_rr_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}

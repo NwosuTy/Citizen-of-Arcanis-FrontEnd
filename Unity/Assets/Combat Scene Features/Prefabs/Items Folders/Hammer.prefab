@@ -148,6 +148,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 1884449563821466306}
+  <ItemObject>k__BackingField: {fileID: 11400000, guid: c6d4126e335ef184498c49b4e3fbe498, type: 2}
   <rewardRate>k__BackingField: 3
   <ItemName>k__BackingField: Hammer
   <ItemImage>k__BackingField: {fileID: 21300000, guid: f6293f20fd85aa143bead12afd67ebbb, type: 3}

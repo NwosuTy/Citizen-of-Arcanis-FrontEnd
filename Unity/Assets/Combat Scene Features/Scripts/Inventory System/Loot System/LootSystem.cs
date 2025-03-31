@@ -32,14 +32,14 @@ public static class LootSystem
         return selectedItem;
     }
 
-    public static ItemClass GetRandomItem(ItemClass exclude, ItemClass[] itemsArray, ItemBox itemBox)
+    public static PickableObject GetRandomItem(PickableObject exclude, PickableObject[] itemsArray, ItemBox itemBox)
     {
         int random = 0;
         unExcludedIndex.Clear();
 
         for (int i = 0; i < itemsArray.Length; i++)
         {
-            ItemClass item = itemsArray[i];
+            PickableObject item = itemsArray[i];
             if (item == null || item == exclude)
             {
                 continue;
@@ -53,7 +53,7 @@ public static class LootSystem
             unExcludedIndex.Add(i);
         }
         random = Random.Range(0, unExcludedIndex.Count);
-        ItemClass wonItem = itemsArray[random];
+        PickableObject wonItem = itemsArray[random];
         return wonItem;
     }
 }

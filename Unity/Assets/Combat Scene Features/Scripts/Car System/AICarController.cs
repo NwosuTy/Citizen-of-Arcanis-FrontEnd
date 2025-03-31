@@ -7,31 +7,53 @@ public class AICarController : MonoBehaviour
     private Rigidbody rb;
     private bool isWaiting = false;
     private bool movingForward = true;
+
+    private float angleToWaypoint;
+    private float distanceToWaypoint;
     private int currentWaypointIndex = 0;
-    private bool firstCycleCompleted = false;
-    private Collider[] detectedVehicles = new Collider[10]; // Buffer to reduce GC allocations
 
     [Header("Movement Settings")]
+    [Tooltip("Speed at which the car moves forward.")]
     [SerializeField] private float speed = 10f;
+
+    [Tooltip("Speed at which the car turns towards waypoints.")]
     [SerializeField] private float turnSpeed = 5f;
+
+    [Tooltip("Color of waypoints in the scene view.")]
     [SerializeField] private Color wayPointColor = Color.red;
 
     [Header("Sensor Settings")]
+    [Tooltip("Distance at which the car detects obstacles.")]
     [SerializeField] private float sensorRange = 10f;
+
+    [Tooltip("Range within which the car avoids obstacles.")]
     [SerializeField] private float avoidanceRange = 5f;
-    [SerializeField] private LayerMask obstacleLayer;
+
     [SerializeField] private LayerMask vehicleLayer;
+    [SerializeField] private LayerMask obstacleLayer;
 
     [Header("Waypoint Settings")]
+    [Tooltip("List of waypoints the car will follow.")]
     [SerializeField] private Transform[] waypoints;
+
+    [Tooltip("Minimum wait time at the first and last waypoint.")]
     [SerializeField] private float minWaitTime = 10f;
+
+    [Tooltip("Maximum wait time at the first and last waypoint.")]
     [SerializeField] private float maxWaitTime = 15f;
+
+    [Tooltip("Should the waypoints loop after reaching the last one?")]
     [SerializeField] private bool loopWaypoints = true;
+
+    [Tooltip("Distance threshold to consider waypoint reached.")]
     [SerializeField] private float stoppingDistance = 1f;
 
     [Header("Wheel Settings")]
+    [Tooltip("Speed of the wheel rotation (visual effect).")]
     [SerializeField] private float wheelRotationSpeed = 200f;
-    [SerializeField] private Transform frontLeftWheel, frontRightWheel, rearLeftWheel, rearRightWheel;
+
+    [Tooltip("Array of wheels (front left, front right, rear left, rear right).")]
+    [SerializeField] private Transform[] wheels;
 
     private void Awake()
     {
@@ -43,58 +65,66 @@ public class AICarController : MonoBehaviour
     {
         if (waypoints == null || waypoints.Length == 0)
         {
-            //Debug.LogError("No waypoints assigned to AI Car! Please assign waypoints in the Inspector.");
             enabled = false;
-            return;
         }
     }
 
     private void FixedUpdate()
     {
-        if (isWaiting || currentWaypointIndex >= waypoints.Length) return;
+        if(waypoints == null || waypoints.Length == 0)
+        {
+            return;
+        }
+
+        if (isWaiting || currentWaypointIndex >= waypoints.Length)
+        {
+            return;
+        }
 
         MoveToWaypoint();
         RotateWheels();
+        MaintainUprightPosition();
     }
 
     private void MoveToWaypoint()
     {
-        if (waypoints == null || waypoints.Length == 0 || waypoints[currentWaypointIndex] == null) return;
+        if (waypoints == null || waypoints.Length == 0 || waypoints[currentWaypointIndex] == null)
+        {
+            return;
+        }
 
         Vector3 targetPosition = waypoints[currentWaypointIndex].position;
         Vector3 direction = (targetPosition - transform.position).normalized;
 
         // Rotate the vehicle to face the waypoint
         Quaternion targetRotation = Quaternion.LookRotation(direction);
-        rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime));
+        angleToWaypoint = Vector3.Angle(transform.forward, direction);
 
-        // Move forward only when facing the waypoint
-        if (Vector3.Angle(transform.forward, direction) < 10f)
-        {
-            rb.velocity = direction * speed;
-        }
+        float effectiveTurnSpeed = movingForward ? turnSpeed : turnSpeed * 2f;
+        rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, effectiveTurnSpeed * Time.fixedDeltaTime));
 
-        // Check if we reached the last or first waypoint
-        if (Vector3.Distance(transform.position, targetPosition) < stoppingDistance)
+        rb.velocity = direction * speed;
+        distanceToWaypoint = Vector3.Distance(transform.position, targetPosition);
+        if (distanceToWaypoint < stoppingDistance)
         {
-            if (currentWaypointIndex == waypoints.Length - 1)
+            if(movingForward)
             {
-                if (!firstCycleCompleted)
-                {
-                    firstCycleCompleted = true;
-                }
-                else
+                if (currentWaypointIndex == waypoints.Length - 1)
                 {
                     StartCoroutine(WaitAndReverse());
+                    return;
                 }
+                currentWaypointIndex++;
             }
-            else if (currentWaypointIndex == 0 && firstCycleCompleted)
-            {
-                StartCoroutine(WaitAndReverse());
-            }
+            
             else
             {
-                currentWaypointIndex = movingForward ? currentWaypointIndex + 1 : currentWaypointIndex - 1;
+                if (currentWaypointIndex == 0)
+                {
+                    StartCoroutine(WaitAndReverse());
+                    return;
+                }
+                currentWaypointIndex--;
             }
         }
     }
@@ -102,14 +132,17 @@ public class AICarController : MonoBehaviour
     private IEnumerator WaitAndReverse()
     {
         isWaiting = true;
+        rb.velocity = Vector3.zero;
+
+        // Ensure the car remains upright
+        Quaternion fixedRotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
+        rb.MoveRotation(fixedRotation);
+
         float waitTime = Random.Range(minWaitTime, maxWaitTime);
         yield return new WaitForSeconds(waitTime);
 
         // Reverse direction
         movingForward = !movingForward;
-
-        // Ensure smooth transition
-        currentWaypointIndex = movingForward ? 0 : waypoints.Length - 1;
         isWaiting = false;
     }
 
@@ -117,10 +150,18 @@ public class AICarController : MonoBehaviour
     {
         float rotationAmount = speed * wheelRotationSpeed * Time.fixedDeltaTime;
 
-        if (rearLeftWheel != null) { rearLeftWheel.Rotate(Vector3.right, rotationAmount); }
-        if (frontLeftWheel != null) { frontLeftWheel.Rotate(Vector3.right, rotationAmount); }
-        if (rearRightWheel != null) { rearRightWheel.Rotate(Vector3.right, rotationAmount); }
-        if (frontRightWheel != null) { frontRightWheel.Rotate(Vector3.right, rotationAmount); }
+        foreach (Transform wheel in wheels)
+        {
+            if (wheel != null)
+            {
+                wheel.Rotate(Vector3.right, rotationAmount);
+            }
+        }
+    }
+
+    private void MaintainUprightPosition()
+    {
+        rb.rotation = Quaternion.Euler(0, rb.rotation.eulerAngles.y, 0);
     }
 
     private void OnDrawGizmos()
