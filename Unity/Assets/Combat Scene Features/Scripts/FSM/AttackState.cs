@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Attack", menuName = "AIState/AttackState")]
@@ -27,15 +28,15 @@ public class AttackState : AIState
         movement.RotateTowardsTarget();
         characterManager.AnimatorManagaer.SetBlendTreeParameter(0f, 0f, false, Time.deltaTime);
         
-        if (willPerformCombo && hasPerformedCombo != true)
-        {
-            if(currentAttack.comboAction != null)
-            {
-                //hasPerformedCombo = true;
-                //combat.currentAction = currentAttack;
-                //currentAttack.comboAction.PerformAction(characterManager);
-            }
-        }
+        //if (willPerformCombo && hasPerformedCombo != true)
+        //{
+        //    if(currentAttack.comboAction != null)
+        //    {
+        //        //hasPerformedCombo = true;
+        //        //combat.currentAction = currentAttack;
+        //        //currentAttack.comboAction.PerformAction(characterManager);
+        //    }
+        //}
 
         movement.HandleRotationWhileAttacking(characterManager);
         if (!hasPerformedAttack)
@@ -59,12 +60,27 @@ public class AttackState : AIState
 
     private void PerformAttack(CharacterManager character)
     {
+        float delta = Time.deltaTime;
         CharacterCombat combat = character.CombatManager;
 
-        hasPerformedAttack = true;
+        if(combat.weaponManager.type == WeaponType.Gun)
+        {
+            combat.StartCoroutine(HandleShooting(delta, combat));
+            return;
+        }
         combat.currentAction = currentAttack;
         currentAttack.PerformAction(character);
+
+        hasPerformedAttack = true;
         combat.currentRecovery = currentAttack.recoveryTime;
+    }
+
+    private IEnumerator HandleShooting(float delta, CharacterCombat combat)
+    {
+        combat.HandleWeaponAction(delta);
+
+        yield return new WaitForSeconds(3.5f);
+        hasPerformedAttack = true;
     }
 
     protected override void ResetStateParameters(CharacterManager character)

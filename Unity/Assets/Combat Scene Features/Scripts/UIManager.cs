@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class UIManager : MonoBehaviour
     [Header("Player Info")]
     [SerializeField] private PlayerUI enemyUI;
     [SerializeField] private PlayerUI playerUI;
+    [SerializeField] private Image crossHairImage;
 
     public void PrepareTimer()
     {
@@ -30,6 +32,17 @@ public class UIManager : MonoBehaviour
         countdownTimer.color = (remainingTimeInt < maxTime/4) ? Color.red : Color.green;
 
         timeUp = (remainingTimeInt <= 0);
+    }
+
+    public void UpdateCrossHairImageUI(CharacterManager characterManager)
+    {
+        WeaponManager weapon = characterManager.CombatManager.weaponManager;
+
+        if(weapon != null && weapon.type == WeaponType.Gun)
+        {
+            crossHairImage.enabled = true;
+            weapon.SetCrossHairImage(crossHairImage);
+        }
     }
 
     public void PrepareDuelingCharacter(CharacterManager characterManager)

@@ -1746,6 +1746,7 @@ MonoBehaviour:
   isTalking: 0
   canRotate: 0
   isGrounded: 0
+  isLockedIn: 0
   isSprinting: 0
   isAttacking: 0
   performingAction: 0
@@ -1829,16 +1830,18 @@ MonoBehaviour:
   attackType: 0
   damageModifier: 1
   currentRecovery: 0
-  currentAction: {fileID: 0}
-  WeaponHolder: {fileID: 7799437257087853866}
-  <CombatCharacter>k__BackingField: {fileID: 11400000, guid: 3621d9a569844184c9f3b4ff0d9dee63, type: 2}
-  damageCollider: {fileID: 0}
-  <LightActions>k__BackingField:
+  crossHairTransform: {fileID: 0}
+  inaccuracy: 0.15
+  targetOffset: {x: 0, y: 0.55, z: 0}
+  lightActions:
   - {fileID: 11400000, guid: 08803766e0459e94d819042c3535ea81, type: 2}
   - {fileID: 11400000, guid: 56d5de51446dc8441a1b613cb02e3aea, type: 2}
-  <HeavyActions>k__BackingField:
+  heavyActions:
   - {fileID: 11400000, guid: d713d4458cdf69f4797ac609695c087e, type: 2}
   - {fileID: 11400000, guid: 8557d7f3eeba7114c917e3840b014574, type: 2}
+  currentAction: {fileID: 0}
+  <WeaponHolder>k__BackingField: {fileID: 0}
+  <CombatCharacter>k__BackingField: {fileID: 11400000, guid: 3621d9a569844184c9f3b4ff0d9dee63, type: 2}
 --- !u!114 &9114153362447864624
 MonoBehaviour:
   m_ObjectHideFlags: 0

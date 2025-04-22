@@ -6,6 +6,9 @@ TagManager:
   tags:
   - NPC
   - Fire
+  - Metal
+  - Wood
+  - Brick
   layers:
   - Default
   - TransparentFX

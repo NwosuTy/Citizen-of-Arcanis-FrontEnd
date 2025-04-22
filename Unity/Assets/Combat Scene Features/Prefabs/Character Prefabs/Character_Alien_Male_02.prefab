@@ -1638,12 +1638,17 @@ MonoBehaviour:
   damageModifier: 1
   currentRecovery: 0
   crossHairTransform: {fileID: 0}
-  inaccuracy: 0
-  targetOffset: {x: 0, y: 0, z: 0}
-  lightActions: []
-  heavyActions: []
+  inaccuracy: 0.15
+  targetOffset: {x: 0, y: 0.55, z: 0}
+  lightActions:
+  - {fileID: 11400000, guid: 08803766e0459e94d819042c3535ea81, type: 2}
+  - {fileID: 11400000, guid: 56d5de51446dc8441a1b613cb02e3aea, type: 2}
+  heavyActions:
+  - {fileID: 11400000, guid: d713d4458cdf69f4797ac609695c087e, type: 2}
+  - {fileID: 11400000, guid: 8557d7f3eeba7114c917e3840b014574, type: 2}
   currentAction: {fileID: 0}
-  <WeaponHolder>k__BackingField: {fileID: 0}
+  <GunWeaponHolder>k__BackingField: {fileID: 6244157301234166464}
+  <MeleeWeaponHolder>k__BackingField: {fileID: 8397206188198086707}
   <CombatCharacter>k__BackingField: {fileID: 11400000, guid: 3cd416857d0dd504ab92290e465885e9, type: 2}
 --- !u!114 &2541100426860592856
 MonoBehaviour:

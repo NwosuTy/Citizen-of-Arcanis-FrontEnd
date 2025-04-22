@@ -122,12 +122,13 @@ public class DuelManager : MonoBehaviour
             return;
         }
 
-        WeaponManager spawnedItem = Instantiate(weapon, characterManager.CombatManager.WeaponHolder);
+        Transform holder = characterManager.CombatManager.WeaponHolder(weapon);
+        WeaponManager spawnedItem = Instantiate(weapon, holder);
         spawnedItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
 
         spawnedItem.pickableObject.SetPhysicsSystem(false);
-        weapon.Initialize(characterManager);
-        characterManager.CombatManager.AssignWeapon(weapon);
+        spawnedItem.Initialize(characterManager);
+        characterManager.CombatManager.AssignWeapon(spawnedItem);
     }
 
     private WeaponManager GetRandomWeapon(WeaponManager exclude)
@@ -163,6 +164,7 @@ public class DuelManager : MonoBehaviour
         {
             player = newCharacter;
             player.currentTeam = Team.Blue;
+            player.CombatManager.SetCrossHair(cameraAimObject);
         }
         uiManager.PrepareDuelingCharacter(newCharacter);
     }

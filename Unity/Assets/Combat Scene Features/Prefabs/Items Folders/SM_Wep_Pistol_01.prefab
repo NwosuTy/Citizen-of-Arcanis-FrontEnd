@@ -323,10 +323,10 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!114 &3433440648423686324
 MonoBehaviour:
@@ -368,9 +368,9 @@ MonoBehaviour:
   <EnemyLayerMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 8
-  <pickableObject>k__BackingField: {fileID: 0}
-  isShooting: 0
+  <pickableObject>k__BackingField: {fileID: 3433440648423686324}
   maxBullets: 25
+  isShooting: 0
   grip: {fileID: 3368870716923783333}
   rest: {fileID: 5046125427142768735}
   <RestLockedPosition>k__BackingField: {x: 0, y: 0, z: 0}
@@ -379,7 +379,7 @@ MonoBehaviour:
   muzzleFlash:
   - {fileID: 3392079507021320844}
   - {fileID: 3391799307951002154}
-  damageCollider: {fileID: 0}
+  <DamageCollider>k__BackingField: {fileID: 0}
 --- !u!1 &699285803539740710
 GameObject:
   m_ObjectHideFlags: 0

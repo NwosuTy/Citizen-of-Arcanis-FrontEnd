@@ -12,11 +12,6 @@ public class PickableObject : MonoBehaviour, IInteractable
     [field: SerializeField] public Sprite ItemImage { get; private set; }
     [field: SerializeField] public ItemType ItemType { get; private set; }
 
-    private void Awake()
-    {
-        weaponManager = GetComponent<WeaponManager>();
-    }
-
     public void Interact()
     {
         CharacterInventoryManager.Instance.HandleItemAddition(this);

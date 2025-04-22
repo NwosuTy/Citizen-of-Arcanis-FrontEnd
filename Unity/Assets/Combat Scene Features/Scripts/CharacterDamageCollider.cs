@@ -25,11 +25,12 @@ public class CharacterDamageCollider : MonoBehaviour
 
     public void SetColliderStatus(bool status)
     {
-        damageCollider.enabled = status;
         if(status == false)
         {
             charactersBeingDamaged.Clear();
         }
+        rigidBody.isKinematic = !status;
+        damageCollider.enabled = status;
     }
 
     private void OnTriggerEnter(Collider other)

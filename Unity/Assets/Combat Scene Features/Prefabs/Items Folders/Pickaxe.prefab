@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 2697730951616686723}
   - component: {fileID: 5223131959849034981}
   - component: {fileID: 4484947039192627879}
+  - component: {fileID: 445009372580082058}
+  - component: {fileID: 8623762187269002118}
   m_Layer: 0
   m_Name: Pick
   m_TagString: Untagged
@@ -83,6 +85,73 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &445009372580082058
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1932468019286671522}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300004, guid: 05e25cb0e60755f4187905a9902c75a7, type: 3}
+--- !u!114 &8623762187269002118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1932468019286671522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a66a13a3ed6283a44a1b6e102ab31b1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rigidBody: {fileID: 8850248004563827396}
+  damageCollider: {fileID: 445009372580082058}
+--- !u!1 &5019337158889215888
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3052260811476794892}
+  m_Layer: 0
+  m_Name: Grip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3052260811476794892
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5019337158889215888}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6346210578459161807}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6397317237191181586
 GameObject:
   m_ObjectHideFlags: 0
@@ -201,6 +270,7 @@ Transform:
   m_Children:
   - {fileID: 512147584094463040}
   - {fileID: 2697730951616686723}
+  - {fileID: 3052260811476794892}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: -90}
 --- !u!54 &8850248004563827396
@@ -225,10 +295,10 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!65 &3196904315624415937
 BoxCollider:
@@ -265,7 +335,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 8850248004563827396}
   <ItemObject>k__BackingField: {fileID: 11400000, guid: 682d3b895f499b044b3ec05219fe9564, type: 2}
-  <weaponManager>k__BackingField: {fileID: 0}
+  <weaponManager>k__BackingField: {fileID: 792675308162109049}
   <rewardRate>k__BackingField: 1
   <ItemName>k__BackingField: Pick-Axe
   <ItemImage>k__BackingField: {fileID: 21300000, guid: 575a1e2821f78e24bb70f3ba24d83bde, type: 3}
@@ -287,17 +357,17 @@ MonoBehaviour:
   bulletSpeed: 1000
   maxBulletTime: 3
   <type>k__BackingField: 1
-  _overrideController: {fileID: 0}
+  _overrideController: {fileID: 22100000, guid: 7b5b050b75dfa1746b407ecfbe01c009, type: 2}
   <EnemyLayerMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
-  isShooting: 0
+  <pickableObject>k__BackingField: {fileID: 7539641919763583851}
   maxBullets: 0
-  inaccuracy: 0
+  isShooting: 0
+  grip: {fileID: 3052260811476794892}
+  rest: {fileID: 0}
+  <RestLockedPosition>k__BackingField: {x: 0, y: 0, z: 0}
+  <RestOriginalPosition>k__BackingField: {x: 0, y: 0, z: 0}
   muzzlePoint: {fileID: 0}
-  impactFX: {fileID: 0}
   muzzleFlash: []
-  lightActions:
-  - {fileID: 11400000, guid: 08803766e0459e94d819042c3535ea81, type: 2}
-  heavyActions: []
-  damageCollider: {fileID: 0}
+  <DamageCollider>k__BackingField: {fileID: 0}

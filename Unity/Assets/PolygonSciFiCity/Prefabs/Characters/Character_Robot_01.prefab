@@ -106,7 +106,8 @@ MonoBehaviour:
   attackType: 0
   damageModifier: 1
   currentAction: {fileID: 0}
-  <WeaponHolder>k__BackingField: {fileID: 4739363599086399907}
+  GunWeaponHolder: {fileID: 4739363599086399907}
+  MeleeWeaponHolder: {fileID: 4739363599086399907}
   lightActions:
   - {fileID: 11400000, guid: 08803766e0459e94d819042c3535ea81, type: 2}
   heavyActions:

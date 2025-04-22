@@ -22,7 +22,8 @@ public class PlaceHolderCombatScript : MonoBehaviour
     [Header("Parameters")]
     public int damageModifier;
     public AttackActions currentAction;
-    [field: SerializeField] public Transform WeaponHolder { get; private set; }
+    [SerializeField] private Transform GunWeaponHolder;
+    [SerializeField] private Transform MeleeWeaponHolder;
 
     [Header("Attack Actions")]
     [SerializeField] private AttackActions[] lightActions;
@@ -42,7 +43,7 @@ public class PlaceHolderCombatScript : MonoBehaviour
     {
         PrepareActions();
         CombatManager combatManager = CombatManager.Instance;
-        CharacterInventoryManager.Instance.AssignWeaponHolder(WeaponHolder);
+        CharacterInventoryManager.Instance.SetCharacterManager(null, this);
         if (combatManager != null) { combatManager.AssignPlayer(CombatCharacter.characterManager); }
     }
 
@@ -61,6 +62,15 @@ public class PlaceHolderCombatScript : MonoBehaviour
             if(damageCollider != null) { damageCollider.SetCharacter(null, this); }
         }
         HandleAttackAction();
+    }
+
+    public Transform WeaponHolder(WeaponManager weapon)
+    {
+        if(weapon == null || weapon.type == WeaponType.Melee)
+        {
+            return MeleeWeaponHolder;
+        }
+        return GunWeaponHolder;
     }
 
     #region Input
@@ -107,26 +117,7 @@ public class PlaceHolderCombatScript : MonoBehaviour
 
 
     #region Attack Actions
-    public void EnableCollider()
-    {
-        if(damageCollider == null)
-        {
-            handCollider.SetColliderStatus(true);
-            return;
-        }
-        damageCollider.SetColliderStatus(true);
-    }
-
-    public void DisableCollider()
-    {
-        if(damageCollider == null)
-        {
-            handCollider.SetColliderStatus(false);
-            return;
-        }
-        damageCollider.SetColliderStatus(false);
-    }
-
+    
     private void PrepareActions()
     {
         for (int i = 0; i < lightActions.Length; i++)

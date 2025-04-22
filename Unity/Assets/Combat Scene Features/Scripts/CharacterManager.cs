@@ -113,7 +113,7 @@ public class CharacterManager : MonoBehaviour
 
         if (characterType == CharacterType.Player)
         {
-            CharacterInventoryManager.Instance.SetCharacterManager(this);
+            CharacterInventoryManager.Instance.SetCharacterManager(this, null);
         }
     }
 

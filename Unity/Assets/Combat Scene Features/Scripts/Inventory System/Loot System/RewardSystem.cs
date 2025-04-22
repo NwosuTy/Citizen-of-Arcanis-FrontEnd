@@ -69,7 +69,7 @@ public class RewardSystem : MonoBehaviour
         int random = Random.Range(min, max);
         pickedItem = LootSystem.GetRandomItem(pickedItem, items, selectedBox);
 
-        ItemClass reward = new(random, pickedItem);
+        ItemClass reward = new(random, pickedItem.ItemObject.objectPrefab);
         rewardBox.FillUpBox(selectedBox, reward);
     }
 }

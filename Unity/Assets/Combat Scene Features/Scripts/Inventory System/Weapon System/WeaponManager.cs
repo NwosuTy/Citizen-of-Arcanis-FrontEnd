@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(PickableObject))]
@@ -6,7 +7,10 @@ public class WeaponManager : MonoBehaviour
 {
     //Private Variables
     private Ray ray;
+    private int bulletLeft;
     private float accumulatedTime;
+
+    private Image crossHairImg;
     private List<Ammo> bulletList = new();
 
     [Header("Gun Status")]
@@ -22,8 +26,8 @@ public class WeaponManager : MonoBehaviour
     [field: SerializeField] public PickableObject pickableObject { get; private set; }
 
     [Header("Gun Parameters")]
+    [SerializeField] private int maxBullets;
     [SerializeField] private bool isShooting;
-    [SerializeField] private float maxBullets;
     [SerializeField] private Transform grip, rest;
     [field: SerializeField] public Vector3 RestLockedPosition { get; protected set; }
     [field: SerializeField] public Vector3 RestOriginalPosition { get; protected set; }
@@ -32,12 +36,13 @@ public class WeaponManager : MonoBehaviour
     [SerializeField] private Transform muzzlePoint;
     [SerializeField] private ParticleSystem[] muzzleFlash;
 
-    [Header("Melee Parameters")]
-    [SerializeField] private CharacterDamageCollider damageCollider;
+    [field: Header("Melee Parameters")]
+    [field: SerializeField] public CharacterDamageCollider DamageCollider { get; private set; }
 
     private void Awake()
     {
         pickableObject = GetComponent<PickableObject>();
+        DamageCollider = GetComponentInChildren<CharacterDamageCollider>();
     }
 
     public void Initialize(CharacterManager character)
@@ -47,23 +52,37 @@ public class WeaponManager : MonoBehaviour
             return;
         }
 
+        bulletLeft = maxBullets;
         character.CombatManager.AssignWeapon(this);
-        if(damageCollider != null)
+        if(DamageCollider != null)
         {
-            damageCollider.SetCharacter(character, null);
+            DamageCollider.SetCharacter(character, null);
         }
         character.Anim.runtimeAnimatorController = _overrideController;
-        character.rigController.SetTwoBoneIKConstraint(grip, rest);
+        if(type == WeaponType.Gun) character.rigController.SetTwoBoneIKConstraint(grip, rest);
     }
 
-    public void EnableCollider()
+    public void WeaponManager_Update(CharacterManager character)
     {
-        damageCollider.SetColliderStatus(true);
+        if(type == WeaponType.Gun)
+        {
+            UpdateBullet(Time.deltaTime, character);
+        }
     }
 
-    public void DisableCollider()
+    private void HandleReload()
     {
-        damageCollider.SetColliderStatus(false);
+        if (bulletLeft >= maxBullets)
+        {
+            return;
+        }
+        int difference = maxBullets - bulletLeft;
+        bulletLeft += difference;
+    }
+
+    public void SetCrossHairImage(Image crossHair)
+    {
+        crossHairImg = crossHair;
     }
 
     public void HandleAction(float delta, Vector3 targetPosition, CharacterManager characterManager)
@@ -164,6 +183,7 @@ public class WeaponManager : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit raycastHit, distance, EnemyLayerMask))
         {
+            crossHairImg.color = Color.green;
             CharacterManager shotCharacter = raycastHit.collider.GetComponentInParent<CharacterManager>();
             CharacterStatistic shotCharacterStat = shotCharacter.StatsManager;
             //StartCoroutine(HandleTrailFX(start, raycastHit.point));
@@ -181,6 +201,7 @@ public class WeaponManager : MonoBehaviour
             bullet.time = maxBulletTime;
             return;
         }
+        crossHairImg.color = Color.white;
         //StartCoroutine(HandleTrailFX(start, end));
     }
 
@@ -216,10 +237,4 @@ public class WeaponManager : MonoBehaviour
     }
 
     #endregion
-}
-
-public enum WeaponType
-{
-    Gun,
-    Melee
 }

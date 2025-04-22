@@ -25,6 +25,12 @@ public enum ItemBoxTier //More For Design
     Diamond //5 Items[3-7] and Ruby[1-10]
 }
 
+public enum WeaponType
+{
+    Gun,
+    Melee
+}
+
 #endregion
 
 #region Classes

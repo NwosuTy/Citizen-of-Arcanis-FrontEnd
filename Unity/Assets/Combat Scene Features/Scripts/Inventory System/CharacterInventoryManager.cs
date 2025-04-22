@@ -7,12 +7,12 @@ public class CharacterInventoryManager : MonoBehaviour
     PickableObject spawnedItem;
     public static CharacterInventoryManager Instance { get; private set; }
 
-    private Transform weaponHolder;
     private List<ItemClass> itemList = new();
     private CharacterManager characterManager;
+    private PlaceHolderCombatScript placeHolderCombat;
 
     [Header("Parameters")]
-    [SerializeField] private ItemClass activeItem;
+    [SerializeField] private ItemClass activeItem = new(0, null);
     [field: SerializeField] public InventoryManagerPanel_UI Panel { get; private set; }
 
     private void Awake()
@@ -40,10 +40,10 @@ public class CharacterInventoryManager : MonoBehaviour
         }
     }
 
-    public void SetCharacterManager(CharacterManager cm)
+    public void SetCharacterManager(CharacterManager cm, PlaceHolderCombatScript pcs)
     {
         characterManager = cm;
-        AssignWeaponHolder(cm.CombatManager.WeaponHolder);
+        placeHolderCombat = pcs;
     }
 
     public void UnEquipWeapon()
@@ -59,8 +59,8 @@ public class CharacterInventoryManager : MonoBehaviour
 
         Destroy(spawnedItem.gameObject);
 
-        activeItem = null;
         spawnedItem = null;
+        activeItem = new(0, spawnedItem);
     }
 
     public void EquipWeapon(ItemClass item)
@@ -84,6 +84,7 @@ public class CharacterInventoryManager : MonoBehaviour
         slotUI = activeItem.SlotUI;
         activeObj.SetPhysicsSystem(false);
 
+        Transform weaponHolder = WeaponHolder(activeObj.weaponManager);
         spawnedItem = Instantiate(activeObj, weaponHolder);
         spawnedItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
 
@@ -98,6 +99,15 @@ public class CharacterInventoryManager : MonoBehaviour
         slotUI.DropItem();
         itemList.Remove(item);
         Panel.DisplayNotification($"Equiped {equipedObj.ItemName}");
+    }
+
+    private Transform WeaponHolder(WeaponManager weaponManager)
+    {
+        if(characterManager == null)
+        {
+            return placeHolderCombat.WeaponHolder(weaponManager);
+        }
+        return characterManager.CombatManager.WeaponHolder(weaponManager);
     }
 
     public void HandleItemDeletion(ItemClass itemClass)
@@ -116,7 +126,7 @@ public class CharacterInventoryManager : MonoBehaviour
             return;
         }
 
-        ItemClass itemClass = new(1, pickedObj);
+        ItemClass itemClass = new(1, pickedObj.ItemObject.objectPrefab);
         AddUnExistingItem(itemClass);
     }
 
@@ -124,11 +134,5 @@ public class CharacterInventoryManager : MonoBehaviour
     {
         itemList.Add(itemClass);
         Panel.HandleSlotInitialization(itemClass);
-    }
-
-    //PlaceHolder
-    public void AssignWeaponHolder(Transform wh)
-    {
-        weaponHolder = wh;
     }
 }

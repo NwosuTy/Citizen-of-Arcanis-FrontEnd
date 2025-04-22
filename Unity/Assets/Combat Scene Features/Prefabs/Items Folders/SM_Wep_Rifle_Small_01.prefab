@@ -132,6 +132,7 @@ MonoBehaviour:
   <EnemyLayerMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 8
+  <pickableObject>k__BackingField: {fileID: -8849501538632602018}
   isShooting: 0
   maxBullets: 25
   grip: {fileID: 2140759881034851688}

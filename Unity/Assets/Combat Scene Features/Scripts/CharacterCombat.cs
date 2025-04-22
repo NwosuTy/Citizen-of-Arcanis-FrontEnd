@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public enum AttackType
 {
@@ -36,7 +37,8 @@ public class CharacterCombat : MonoBehaviour
 
     [field: Header("Combat Character")]
     public AttackActions currentAction;
-    [field: SerializeField] public Transform WeaponHolder { get; private set; }
+    [SerializeField] private Transform GunWeaponHolder;
+    [SerializeField] private Transform MeleeWeaponHolder;
     [field: SerializeField] public CharacterCombatData CombatCharacter { get; private set; }
 
     private void Awake()
@@ -54,14 +56,29 @@ public class CharacterCombat : MonoBehaviour
         weaponManager = weapon;
     }
 
+    public Transform WeaponHolder(WeaponManager weapon)
+    {
+        if(weapon == null || weapon.type == WeaponType.Melee)
+        {
+            return MeleeWeaponHolder;
+        }
+        return GunWeaponHolder;
+    }
+
     public Vector3 GetTargetPosition()
     {
         if(characterManager.characterType == CharacterType.AI)
         {
             Vector3 target = characterManager.PositionOfTarget + targetOffset;
             target += Random.insideUnitSphere * inaccuracy;
+            return target;
         }
         return crossHairTransform.position;
+    }
+
+    public void SetCrossHair(Transform crossHair)
+    {
+        crossHairTransform = crossHair;
     }
 
     public void Combat_Update(float delta)
@@ -75,6 +92,10 @@ public class CharacterCombat : MonoBehaviour
         else if (type == CharacterType.Player)
         {
             Attack(delta, characterManager.PlayerInput);
+        }
+        if(weaponManager != null)
+        {
+            weaponManager.WeaponManager_Update(characterManager);
         }
     }
 
@@ -101,7 +122,8 @@ public class CharacterCombat : MonoBehaviour
 
     private void Attack(float delta, InputManager input)
     {
-        if (input.lightAttackInput != true && input.heavyAttackInput != true)
+        characterManager.isAttacking = (input.lightAttackInput == true || input.heavyAttackInput == true);
+        if(characterManager.isAttacking != true)
         {
             return;
         }
@@ -119,13 +141,35 @@ public class CharacterCombat : MonoBehaviour
                 currentAction = heavyActions[random];
             }
             currentAction.PerformAction(characterManager);
+            input.ResetInput();
             return;
         }
+        HandleWeaponAction(delta);
+        input.ResetInput();
+    }
 
-        
+    public void HandleWeaponAction(float delta)
+    {
         Vector3 targePosition = GetTargetPosition();
         weaponManager.HandleAction(delta, targePosition, characterManager);
-        input.ResetInput();
+    }
+
+    public void EnableCollider()
+    {
+        if(weaponManager == null)
+        {
+            return;
+        }
+        weaponManager.DamageCollider.SetColliderStatus(true);
+    }
+
+    public void DisableCollider()
+    {
+        if (weaponManager == null)
+        {
+            return;
+        }
+        weaponManager.DamageCollider.SetColliderStatus(false);
     }
 
     private void InitializeAttackActions()
