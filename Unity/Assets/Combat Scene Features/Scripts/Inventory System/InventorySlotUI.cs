@@ -39,8 +39,7 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
 
     private void Start()
     {
-        inventoryManagerPanel = InventoryManagerPanel_UI.Instance;
-
+        inventoryManagerPanel = CharacterInventoryManager.Instance.Panel;
         canvasGroup = inventoryManagerPanel.CanvasGrp;
     }
 
@@ -72,7 +71,7 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
             return;
         }
         inventoryManagerPanel.ResetInactiveTime();
-        inventoryManagerPanel.InventoryManager.EquipWeapon(Item);
+        CharacterInventoryManager.Instance.EquipWeapon(Item);
     }
 
     public void DropItem()
@@ -110,7 +109,7 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
         icon = null;
         spawnedObject = null;
 
-        inventoryManagerPanel.InventoryManager.HandleItemDeletion(Item);
+        CharacterInventoryManager.Instance.HandleItemDeletion(Item);
         Item.SetSlotUI(null);
 
         if (itemButton != null)

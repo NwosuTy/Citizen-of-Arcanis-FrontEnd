@@ -22,6 +22,7 @@ public class PlaceHolderCombatScript : MonoBehaviour
     [Header("Parameters")]
     public int damageModifier;
     public AttackActions currentAction;
+    [field: SerializeField] public Transform WeaponHolder { get; private set; }
 
     [Header("Attack Actions")]
     [SerializeField] private AttackActions[] lightActions;
@@ -41,13 +42,15 @@ public class PlaceHolderCombatScript : MonoBehaviour
     {
         PrepareActions();
         CombatManager combatManager = CombatManager.Instance;
+        CharacterInventoryManager.Instance.AssignWeaponHolder(WeaponHolder);
         if (combatManager != null) { combatManager.AssignPlayer(CombatCharacter.characterManager); }
     }
 
     private void Update()
     {
+        InventoryManagerPanel_UI inventory = CharacterInventoryManager.Instance.Panel;
         if(DialogueManager.Instance.dialogueIsPlaying) { return; }
-        if(InventoryManagerPanel_UI.Instance.isMouseOverPanel) { return; }
+        if(inventory.isMouseOverPanel) { return; }
 
         HandleInput();
 

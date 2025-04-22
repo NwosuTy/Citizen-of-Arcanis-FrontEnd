@@ -51356,14 +51356,14 @@ AnimationClip:
   - time: 0.16666667
     functionName: EnableCollider
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 11500000, guid: 52e1727468eb2604b8a1becac6018dba, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.9
     functionName: DisableCollider
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 11500000, guid: 52e1727468eb2604b8a1becac6018dba, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

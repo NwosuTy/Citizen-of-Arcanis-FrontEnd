@@ -10,6 +10,7 @@ public class InputManager : MonoBehaviour
 
     public bool jumpInput { get; private set; }
     public bool dashInput { get; private set; }
+    public bool lockedInput { get; private set; }
     public bool lightAttackInput { get; private set; }
     public bool heavyAttackInput { get; private set; }
 
@@ -27,6 +28,8 @@ public class InputManager : MonoBehaviour
         HandleMovement();
 
         HandleAttackInput();
+        lockedInput = Input.GetMouseButtonDown(1);
+
         dashInput = Input.GetKey(KeyCode.LeftShift);
         jumpInput = Input.GetKeyDown(KeyCode.Space);
     }

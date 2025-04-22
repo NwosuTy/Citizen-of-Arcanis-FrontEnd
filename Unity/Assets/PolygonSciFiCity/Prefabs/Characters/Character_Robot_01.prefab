@@ -42,7 +42,6 @@ GameObject:
   - component: {fileID: 4950051439177134}
   - component: {fileID: 95910397095232528}
   - component: {fileID: 2908230284272128565}
-  - component: {fileID: 9740925945683042}
   m_Layer: 3
   m_Name: Character_Robot_01
   m_TagString: Player
@@ -107,6 +106,7 @@ MonoBehaviour:
   attackType: 0
   damageModifier: 1
   currentAction: {fileID: 0}
+  <WeaponHolder>k__BackingField: {fileID: 4739363599086399907}
   lightActions:
   - {fileID: 11400000, guid: 08803766e0459e94d819042c3535ea81, type: 2}
   heavyActions:
@@ -114,20 +114,6 @@ MonoBehaviour:
   handCollider: {fileID: 0}
   damageCollider: {fileID: 0}
   <CombatCharacter>k__BackingField: {fileID: 11400000, guid: 9222ea318d6aae74fbb17c9fb2962476, type: 2}
---- !u!114 &9740925945683042
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1025864630481856}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fae55e5a2dfbcee4da7439e720194fdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  activeItem: {fileID: 0}
-  weaponHolder: {fileID: 4739363599086399907}
 --- !u!1 &1027719268642640
 GameObject:
   m_ObjectHideFlags: 0

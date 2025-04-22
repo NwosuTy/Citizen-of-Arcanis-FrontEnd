@@ -24,6 +24,7 @@ public class CharacterManager : MonoBehaviour
     public CharacterCombat CombatManager { get; private set; }
     public CharacterStatistic StatsManager { get; private set; }
     public CharacterMovement MovementManager { get; private set; }
+    public CharacterAnimatorRigController rigController { get; private set; }
 
     //AI Components
     public NavMeshPath navMeshPath;
@@ -48,6 +49,7 @@ public class CharacterManager : MonoBehaviour
     [HideInInspector] public bool isTalking;
     [HideInInspector] public bool canRotate;
     [HideInInspector] public bool isGrounded;
+    [HideInInspector] public bool isLockedIn;
     [HideInInspector] public bool isSprinting;
     [HideInInspector] public bool isAttacking;
     [HideInInspector] public bool performingAction;
@@ -76,10 +78,12 @@ public class CharacterManager : MonoBehaviour
         AnimatorManagaer = GetComponent<CharacterAnim>();
         CombatManager = GetComponent<CharacterCombat>();
         StatsManager = GetComponent<CharacterStatistic>();
+
         MovementManager = GetComponent<CharacterMovement>();
+        rigController = GetComponentInChildren<CharacterAnimatorRigController>();
 
         //Character Type Based Components
-        if(characterType == CharacterType.Player)
+        if (characterType == CharacterType.Player)
         {
             PlayerInput = GetComponent<InputManager>();
             if(PlayerInput == null)
@@ -106,11 +110,16 @@ public class CharacterManager : MonoBehaviour
     {
         InitializeStates();
         StatsManager.ResetStats();
+
+        if (characterType == CharacterType.Player)
+        {
+            CharacterInventoryManager.Instance.SetCharacterManager(this);
+        }
     }
 
     private void Update()
     {
-        if(isDead)
+        if (isDead)
         {
             return;
         }
@@ -118,12 +127,12 @@ public class CharacterManager : MonoBehaviour
 
         isGrounded = Controller.isGrounded;
 
-        if(characterType == CharacterType.Player)
+        if (characterType == CharacterType.Player)
         {
             PlayerInput.InputManager_Update();
         }
 
-        if(characterType == CharacterType.AI)
+        if (characterType == CharacterType.AI)
         {
             HandleStateChange();
         }
@@ -132,6 +141,10 @@ public class CharacterManager : MonoBehaviour
         SetTargetDetails();
         CombatManager.Combat_Update(delta);
         MovementManager.CharacterMovement_Update(delta);
+        if (rigController != null)
+        {
+            rigController.CharacterAnimationRig_Updater(delta);
+        }
     }
 
     private void HandleStateChange()

@@ -178,6 +178,7 @@ GameObject:
   - component: {fileID: 8850248004563827396}
   - component: {fileID: 3196904315624415937}
   - component: {fileID: 7539641919763583851}
+  - component: {fileID: 792675308162109049}
   m_Layer: 0
   m_Name: Pickaxe
   m_TagString: Untagged
@@ -264,7 +265,39 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 8850248004563827396}
   <ItemObject>k__BackingField: {fileID: 11400000, guid: 682d3b895f499b044b3ec05219fe9564, type: 2}
+  <weaponManager>k__BackingField: {fileID: 0}
   <rewardRate>k__BackingField: 1
   <ItemName>k__BackingField: Pick-Axe
   <ItemImage>k__BackingField: {fileID: 21300000, guid: 575a1e2821f78e24bb70f3ba24d83bde, type: 3}
   <ItemType>k__BackingField: 1
+--- !u!114 &792675308162109049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8207425811474429001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52e1727468eb2604b8a1becac6018dba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fireRate: 25
+  bulletDrop: 300
+  bulletSpeed: 1000
+  maxBulletTime: 3
+  <type>k__BackingField: 1
+  _overrideController: {fileID: 0}
+  <EnemyLayerMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 0
+  isShooting: 0
+  maxBullets: 0
+  inaccuracy: 0
+  muzzlePoint: {fileID: 0}
+  impactFX: {fileID: 0}
+  muzzleFlash: []
+  lightActions:
+  - {fileID: 11400000, guid: 08803766e0459e94d819042c3535ea81, type: 2}
+  heavyActions: []
+  damageCollider: {fileID: 0}

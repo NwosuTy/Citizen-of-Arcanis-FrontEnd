@@ -1,11 +1,12 @@
 using UnityEngine;
 using Cinemachine;
 using System.Collections;
-using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class DuelManager : MonoBehaviour
 {
     public static DuelManager Instance;
+    private List<int> indexList = new();
     public DuelState DuelState { get; private set; }
 
     private CombatManager combatManager;
@@ -19,8 +20,11 @@ public class DuelManager : MonoBehaviour
     [SerializeField] private Transform playerSpawnPoint;
 
     [Header("General Property")]
-    [SerializeField] private CharacterDamageCollider weapon;
+    [SerializeField] private Transform cameraAimObject;
     [SerializeField] private CinemachineFreeLook freeLookCamera;
+
+    [Header("Weapon Objects")]
+    [SerializeField] private WeaponManager[] weaponManagers;
 
     public event DuelStateChanged OnDuelStateChanged;
     public delegate void DuelStateChanged(DuelState newState);
@@ -85,9 +89,15 @@ public class DuelManager : MonoBehaviour
         {
             yield return new WaitForSeconds(2.5f);
             yield return StartCoroutine(rewardSystem.HandleFillUpRewardBox(DuelState));
-
-            combatManager.AssignRewardBox(rewardSystem.rewardBox);
-            yield return new WaitUntil(() => combatManager.hasRewardBox);
+            
+            RewardBox rewardBox = rewardSystem.rewardBox;
+            for (int i = 0; i < rewardBox.itemsList.Count; i++)
+            {
+                ItemClass itemClass = rewardBox.itemsList[i];
+                CharacterInventoryManager.Instance.AddUnExistingItem(itemClass);
+            }
+            rewardSystem.rewardBox.EmptyBox();
+            yield return new WaitUntil(() => rewardSystem.rewardBox.finishedCleaning);
         }
         StartCoroutine(LevelLoader.LoadSceneAsync("DemoPrincipalScene"));
     }
@@ -103,26 +113,57 @@ public class DuelManager : MonoBehaviour
         freeLookCamera.LookAt = player.transform;
     }
 
+    private void PrepareWeapon(CharacterManager characterManager)
+    {
+        WeaponManager weapon = GetRandomWeapon(null);
+        if (weapon == null)
+        {
+            Debug.LogError("No weapon found");
+            return;
+        }
+
+        WeaponManager spawnedItem = Instantiate(weapon, characterManager.CombatManager.WeaponHolder);
+        spawnedItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+        spawnedItem.pickableObject.SetPhysicsSystem(false);
+        weapon.Initialize(characterManager);
+        characterManager.CombatManager.AssignWeapon(weapon);
+    }
+
+    private WeaponManager GetRandomWeapon(WeaponManager exclude)
+    {
+        indexList.Clear();
+        for (int i = 0; i < weaponManagers.Length; i++)
+        {
+            WeaponManager weapon = weaponManagers[i];
+            if (weapon == null || weapon == exclude)
+            {
+                continue;
+            }
+            indexList.Add(i);
+        }
+
+        int randomIndex = Random.Range(0, indexList.Count);
+        int selectedIndex = indexList[randomIndex];
+        return weaponManagers[selectedIndex];
+    }
+
     private void SetObject(Transform parent, CharacterManager character)
     {
         CharacterManager newCharacter = Instantiate(character, parent);
-        CharacterCombat combat = newCharacter.GetComponent<CharacterCombat>();
-        CharacterStatistic stats = newCharacter.GetComponent<CharacterStatistic>();
-
         newCharacter.combatMode = true;
-        combat.AssignWeapon(weapon);
 
         if (newCharacter.characterType == CharacterType.AI)
         {
             enemy = newCharacter;
-            newCharacter.currentTeam = Team.Red;
+            PrepareWeapon(enemy);
+            enemy.currentTeam = Team.Red;
         }
         else
         {
             player = newCharacter;
-            newCharacter.currentTeam = Team.Blue;
+            player.currentTeam = Team.Blue;
         }
-
         uiManager.PrepareDuelingCharacter(newCharacter);
     }
 }

@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4083323319263769192}
   - component: {fileID: 1884449563821466306}
   - component: {fileID: 1114029271913720396}
+  - component: {fileID: 3667227814751392977}
   m_Layer: 0
   m_Name: Hammer
   m_TagString: Untagged
@@ -149,7 +150,39 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 1884449563821466306}
   <ItemObject>k__BackingField: {fileID: 11400000, guid: c6d4126e335ef184498c49b4e3fbe498, type: 2}
+  <weaponManager>k__BackingField: {fileID: 0}
   <rewardRate>k__BackingField: 3
   <ItemName>k__BackingField: Hammer
   <ItemImage>k__BackingField: {fileID: 21300000, guid: f6293f20fd85aa143bead12afd67ebbb, type: 3}
   <ItemType>k__BackingField: 1
+--- !u!114 &3667227814751392977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3130984907228576316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52e1727468eb2604b8a1becac6018dba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fireRate: 25
+  bulletDrop: 300
+  bulletSpeed: 1000
+  maxBulletTime: 3
+  <type>k__BackingField: 1
+  _overrideController: {fileID: 0}
+  <EnemyLayerMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 0
+  isShooting: 0
+  maxBullets: 0
+  inaccuracy: 0
+  muzzlePoint: {fileID: 0}
+  impactFX: {fileID: 0}
+  muzzleFlash: []
+  lightActions:
+  - {fileID: 11400000, guid: 08803766e0459e94d819042c3535ea81, type: 2}
+  heavyActions: []
+  damageCollider: {fileID: 0}

@@ -15,24 +15,29 @@ public enum ComboStatus
 public class CharacterCombat : MonoBehaviour
 {
     CharacterManager characterManager;
+    public WeaponManager weaponManager { get; private set; }
 
-    [Header("Status")]
+    [Header("Combat Status")]
     public bool canCombo;
     public AttackType attackType;
-    
+
     [Header("Parameters")]
     public int damageModifier;
     public float currentRecovery;
-    public AttackActions currentAction;
+    [SerializeField] private Transform crossHairTransform;
+
+    [Header("Gun Parameters")]
+    [SerializeField] private float inaccuracy;
+    [SerializeField] private Vector3 targetOffset;
+
+    [Header("Melee Parameters")]
+    [SerializeField] private AttackActions[] lightActions;
+    [SerializeField] private AttackActions[] heavyActions;
 
     [field: Header("Combat Character")]
-    [SerializeField] private Transform WeaponHolder;
+    public AttackActions currentAction;
+    [field: SerializeField] public Transform WeaponHolder { get; private set; }
     [field: SerializeField] public CharacterCombatData CombatCharacter { get; private set; }
-
-    [Header("Tools")]
-    [SerializeField] private CharacterDamageCollider damageCollider;
-    [field: SerializeField] public AttackActions[] LightActions { get; private set; }
-    [field: SerializeField] public AttackActions[] HeavyActions { get; private set; }
 
     private void Awake()
     {
@@ -41,18 +46,22 @@ public class CharacterCombat : MonoBehaviour
 
     private void Start()
     {
-        PrepareActions();
+        InitializeAttackActions();
     }
 
-    public void AssignWeapon(CharacterDamageCollider weapon)
+    public void AssignWeapon(WeaponManager weapon)
     {
-        damageCollider = GetComponentInChildren<CharacterDamageCollider>();
+        weaponManager = weapon;
+    }
 
-        if(damageCollider  == null)
+    public Vector3 GetTargetPosition()
+    {
+        if(characterManager.characterType == CharacterType.AI)
         {
-            damageCollider = Instantiate(weapon, WeaponHolder);
-            damageCollider.SetCharacter(characterManager, null);
+            Vector3 target = characterManager.PositionOfTarget + targetOffset;
+            target += Random.insideUnitSphere * inaccuracy;
         }
+        return crossHairTransform.position;
     }
 
     public void Combat_Update(float delta)
@@ -65,23 +74,8 @@ public class CharacterCombat : MonoBehaviour
         }
         else if (type == CharacterType.Player)
         {
-            Attack(characterManager.PlayerInput);
+            Attack(delta, characterManager.PlayerInput);
         }
-    }
-
-    public void EnableCollider()
-    {
-        damageCollider.SetColliderStatus(true);
-    }
-
-    public void DisableCollider()
-    {
-        damageCollider.SetColliderStatus(false);
-    }
-
-    public void SetComboStatus(ComboStatus status)
-    {
-        canCombo = (status == ComboStatus.Can) ? true : false;
     }
 
     private void HandleRecoveryTimer(float delta)
@@ -100,41 +94,52 @@ public class CharacterCombat : MonoBehaviour
         currentRecovery -= delta;
     }
 
-    private void Attack(InputManager input)
+    public void SetComboStatus(ComboStatus status)
     {
-        if(input.lightAttackInput != true && input.heavyAttackInput != true)
+        canCombo = (status == ComboStatus.Can);
+    }
+
+    private void Attack(float delta, InputManager input)
+    {
+        if (input.lightAttackInput != true && input.heavyAttackInput != true)
         {
             return;
         }
 
-        if(input.lightAttackInput)
+        if (weaponManager == null || weaponManager.type == WeaponType.Melee)
         {
-            int random = Random.Range(0, LightActions.Length);
-            currentAction = LightActions[random];
+            if (input.lightAttackInput)
+            {
+                int random = Random.Range(0, lightActions.Length);
+                currentAction = lightActions[random];
+            }
+            else
+            {
+                int random = Random.Range(0, heavyActions.Length);
+                currentAction = heavyActions[random];
+            }
+            currentAction.PerformAction(characterManager);
+            return;
         }
-        else if(input.heavyAttackInput)
-        {
-            int random = Random.Range(0, HeavyActions.Length);
-            currentAction = HeavyActions[random];
-        }
-        if(currentAction != null) { currentAction.PerformAction(characterManager); }
+
+        
+        Vector3 targePosition = GetTargetPosition();
+        weaponManager.HandleAction(delta, targePosition, characterManager);
         input.ResetInput();
     }
 
-    private void PrepareActions()
+    private void InitializeAttackActions()
     {
-        CombatState combat = characterManager.Combat;
-
-        for(int i = 0; i < LightActions.Length; i++)
+        for (int i = 0; i < lightActions.Length; i++)
         {
-            LightActions[i] = Instantiate(LightActions[i]);
-            LightActions[i].Initialize();
+            lightActions[i] = Instantiate(lightActions[i]);
+            lightActions[i].Initialize();
         }
 
-        for (int i = 0; i < HeavyActions.Length; i++)
+        for (int i = 0; i < heavyActions.Length; i++)
         {
-            HeavyActions[i] = Instantiate(HeavyActions[i]);
-            HeavyActions[i].Initialize();
+            heavyActions[i] = Instantiate(heavyActions[i]);
+            heavyActions[i].Initialize();
         }
     }
 }

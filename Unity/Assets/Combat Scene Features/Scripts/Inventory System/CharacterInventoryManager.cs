@@ -1,32 +1,37 @@
 using UnityEngine;
 using System.Collections.Generic;
-using DevionGames.InventorySystem;
 
 public class CharacterInventoryManager : MonoBehaviour
 {
     InventorySlotUI slotUI;
     PickableObject spawnedItem;
-    private InventoryManagerPanel_UI panel;
+    public static CharacterInventoryManager Instance { get; private set; }
 
-    private RewardBox rewardBox = new();
+    private Transform weaponHolder;
     private List<ItemClass> itemList = new();
+    private CharacterManager characterManager;
 
+    [Header("Parameters")]
     [SerializeField] private ItemClass activeItem;
-    [SerializeField] private Transform weaponHolder;
+    [field: SerializeField] public InventoryManagerPanel_UI Panel { get; private set; }
 
-    private void Start()
+    private void Awake()
     {
-        panel = InventoryManagerPanel_UI.Instance;
-
-        panel.SubscribeInventoryManager(this);
-        CombatManager.Instance.AddRewardsToInventory(this);
+        if (Instance != null)
+        {
+            Debug.Log("Multiple Instances In Scene");
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     private void Update()
     {
         if(Input.GetKeyDown(KeyCode.I))
         {
-            panel.EnablePanel();
+            Panel.EnablePanel();
         }
 
         if(Input.GetKeyDown(KeyCode.U))
@@ -35,22 +40,10 @@ public class CharacterInventoryManager : MonoBehaviour
         }
     }
 
-    //Would Change Later, PlaceHolder Method
-    public void ParseToCombatmanager()
+    public void SetCharacterManager(CharacterManager cm)
     {
-        ResetLists();
-        CombatManager.Instance.AssignRewardBox(rewardBox);
-    }
-
-    private void ResetLists()
-    {
-        rewardBox.CleanBox();
-        for (int i = 0; i < itemList.Count; i++)
-        {
-            ItemClass item = itemList[i];
-            ItemClass newItem = new(item.itemCount, item.pickedObj.ItemObject.objectPrefab);
-            rewardBox.itemsList.Add(newItem);
-        }
+        characterManager = cm;
+        AssignWeaponHolder(cm.CombatManager.WeaponHolder);
     }
 
     public void UnEquipWeapon()
@@ -62,7 +55,7 @@ public class CharacterInventoryManager : MonoBehaviour
         PickableObject activeObj = activeItem.pickedObj;
 
         HandleItemAddition(activeObj);
-        panel.DisplayNotification($"UnEquiped {activeObj.ItemName}");
+        Panel.DisplayNotification($"UnEquiped {activeObj.ItemName}");
 
         Destroy(spawnedItem.gameObject);
 
@@ -91,16 +84,20 @@ public class CharacterInventoryManager : MonoBehaviour
         slotUI = activeItem.SlotUI;
         activeObj.SetPhysicsSystem(false);
 
-        spawnedItem = Instantiate(activeObj, weaponHolder.transform);
+        spawnedItem = Instantiate(activeObj, weaponHolder);
         spawnedItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
 
+        if(spawnedItem.weaponManager != null)
+        {
+            spawnedItem.weaponManager.Initialize(characterManager);
+        }
         item.UpdateItemCount(false);
         spawnedItem.RemoveRigidBody();
         spawnedItem.gameObject.SetActive(true);
 
         slotUI.DropItem();
         itemList.Remove(item);
-        panel.DisplayNotification($"Equiped {equipedObj.ItemName}");
+        Panel.DisplayNotification($"Equiped {equipedObj.ItemName}");
     }
 
     public void HandleItemDeletion(ItemClass itemClass)
@@ -111,7 +108,6 @@ public class CharacterInventoryManager : MonoBehaviour
 
     public void HandleItemAddition(PickableObject pickedObj)
     {
-        InventoryManagerPanel_UI inventoryPanel = InventoryManagerPanel_UI.Instance;
         ItemClass existingItem = itemList.Find(x => x.pickedObj == pickedObj);
 
         if(existingItem != null)
@@ -127,6 +123,12 @@ public class CharacterInventoryManager : MonoBehaviour
     public void AddUnExistingItem(ItemClass itemClass)
     {
         itemList.Add(itemClass);
-        panel.HandleSlotInitialization(itemClass);
+        Panel.HandleSlotInitialization(itemClass);
+    }
+
+    //PlaceHolder
+    public void AssignWeaponHolder(Transform wh)
+    {
+        weaponHolder = wh;
     }
 }

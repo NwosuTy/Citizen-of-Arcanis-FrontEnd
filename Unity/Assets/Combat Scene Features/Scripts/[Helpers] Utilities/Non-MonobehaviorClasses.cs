@@ -97,7 +97,21 @@ public class RewardBox
     {
         boxname = "";
         itemsList.Clear();
+        finishedCleaning = true;
     }
 }
 
+public class Ammo
+{
+    public float time;
+    public Vector3 initialPosition;
+    public Vector3 initialVelocity;
+
+    public Ammo(Vector3 pos, Vector3 vel)
+    {
+        time = 0.0f;
+        initialPosition = pos;
+        initialVelocity = vel;
+    }
+}
 #endregion
