@@ -340,7 +340,7 @@ Transform:
   m_GameObject: {fileID: 474611629835236483}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.4, y: 1.223, z: 0}
+  m_LocalPosition: {x: 0.236, y: 0.858, z: 0.579}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2997,7 +2997,7 @@ MonoBehaviour:
     m_Mid: {fileID: 3925798437211724189}
     m_Tip: {fileID: 2828794864567043509}
     m_Target: {fileID: 0}
-    m_Hint: {fileID: 5103570725223898087}
+    m_Hint: {fileID: 7699770892054542043}
     m_TargetPositionWeight: 1
     m_TargetRotationWeight: 1
     m_HintWeight: 1
@@ -3406,7 +3406,7 @@ MonoBehaviour:
       m_Item7:
         transform: {fileID: 0}
         weight: 0
-    m_Offset: {x: 0, y: 0.02, z: 0.43}
+    m_Offset: {x: -0.1, y: 0.02, z: 0.55}
     m_ConstrainedAxes:
       x: 1
       y: 1
@@ -4474,7 +4474,7 @@ MonoBehaviour:
   currentRecovery: 0
   crossHairTransform: {fileID: 0}
   inaccuracy: 0
-  targetOffset: {x: 0, y: 0, z: 0}
+  targetOffset: {x: 0, y: 0.85, z: 0}
   lightActions:
   - {fileID: 11400000, guid: 08803766e0459e94d819042c3535ea81, type: 2}
   - {fileID: 11400000, guid: 56d5de51446dc8441a1b613cb02e3aea, type: 2}

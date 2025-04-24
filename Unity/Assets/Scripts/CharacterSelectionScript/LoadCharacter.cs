@@ -30,6 +30,8 @@ public class LoadCharacter : MonoBehaviour
     /// Optional - can be left unassigned if character name display is not needed.
     /// </summary>
     public TMP_Text label;
+    [Header("General Property")]
+    [SerializeField] private Transform cameraAimObject;
 
     /// <summary>
     /// Initializes the character and its drone loading process when the script starts.
@@ -52,6 +54,12 @@ public class LoadCharacter : MonoBehaviour
         if (minimapController != null)
         {
             minimapController.player = clone.transform;
+            CombatManager combatManager = CombatManager.Instance;
+
+            PlaceHolderCombatScript pcs = clone.GetComponent<PlaceHolderCombatScript>();
+            combatManager.FreeLookCamera.Follow = clone.transform;
+            combatManager.FreeLookCamera.LookAt = clone.transform;
+            pcs.SetCrossHair(cameraAimObject);
         }
 
         if (label != null)

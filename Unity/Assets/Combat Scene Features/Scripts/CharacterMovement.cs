@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -7,7 +6,7 @@ public class CharacterMovement : MonoBehaviour
     private CharacterManager characterManager;
 
     private Vector3 moveDirection;
-    private Transform cameraObject;
+    public Transform cameraObject { get; protected set; }
 
     //Gravity
     private int fallingTimerHash;

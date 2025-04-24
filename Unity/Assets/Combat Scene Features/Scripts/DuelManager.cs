@@ -111,6 +111,9 @@ public class DuelManager : MonoBehaviour
     {
         freeLookCamera.Follow = player.transform;
         freeLookCamera.LookAt = player.transform;
+
+        CombatManager.Instance.FreeLookCamera.Follow = player.transform;
+        CombatManager.Instance.FreeLookCamera.LookAt = player.transform;
     }
 
     private void PrepareWeapon(CharacterManager characterManager)
@@ -127,7 +130,7 @@ public class DuelManager : MonoBehaviour
         spawnedItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
 
         spawnedItem.pickableObject.SetPhysicsSystem(false);
-        spawnedItem.Initialize(characterManager);
+        spawnedItem.Initialize(characterManager, null);
         characterManager.CombatManager.AssignWeapon(spawnedItem);
     }
 

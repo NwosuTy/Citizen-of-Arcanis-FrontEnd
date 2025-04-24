@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Cinemachine;
 
 #region Enums
 
@@ -107,17 +108,60 @@ public class RewardBox
     }
 }
 
-public class Ammo
+[System.Serializable]
+public class WeaponRecoil
 {
-    public float time;
-    public Vector3 initialPosition;
-    public Vector3 initialVelocity;
+    private int index;    
+    private Transform cameraObject;
 
-    public Ammo(Vector3 pos, Vector3 vel)
+    private float time;
+    private float verticalRecoil;
+    private float horizontalRecoil;
+
+    [Header("Parameters")]
+    [SerializeField] private float duration;
+    [SerializeField] private Vector2[] recoilPattern;
+
+    [Header("Components")]
+    [SerializeField] private CinemachineFreeLook freeLook;
+    [SerializeField] private CinemachineImpulseSource impulseSource;
+
+    public void Initialize(Transform cameraObj, CinemachineFreeLook freeLook, CinemachineImpulseSource impulseSource)
     {
-        time = 0.0f;
-        initialPosition = pos;
-        initialVelocity = vel;
+        this.freeLook = freeLook;
+        cameraObject = cameraObj;
+        this.impulseSource = impulseSource;
+    }
+
+    public void ResetIndex()
+    {
+        index = 0;
+    }
+
+    public void HandleRecoil(float delta)
+    {
+        if(time > 0.0f)
+        {
+            freeLook.m_YAxis.Value -= ((verticalRecoil / 1000) * delta) / duration;
+            freeLook.m_XAxis.Value -= ((horizontalRecoil / 1000) * delta) / duration;
+            time -= delta;
+        }
+    }
+
+    public void GenerateRecoilPattern()
+    {
+        time = duration;
+        impulseSource.GenerateImpulse(cameraObject.forward);
+
+        verticalRecoil = recoilPattern[index].y;
+        horizontalRecoil = recoilPattern[index].x;
+
+        index = NextIndex();
+    }
+
+    private int NextIndex()
+    {
+        return (index + 1) % recoilPattern.Length;
     }
 }
 #endregion

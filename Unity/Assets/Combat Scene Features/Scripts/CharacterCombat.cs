@@ -84,7 +84,13 @@ public class CharacterCombat : MonoBehaviour
     public void Combat_Update(float delta)
     {
         CharacterType type = characterManager.characterType;
-        
+        CombatManager combatManager = CombatManager.Instance;
+        bool hasGun = (weaponManager != null && weaponManager.type == WeaponType.Gun);
+        if (hasGun)
+        {
+            weaponManager.WeaponManager_Update(delta);
+        }
+
         if (type == CharacterType.AI)
         {
             HandleRecoveryTimer(delta);
@@ -92,11 +98,9 @@ public class CharacterCombat : MonoBehaviour
         else if (type == CharacterType.Player)
         {
             Attack(delta, characterManager.PlayerInput);
-        }
-        if(weaponManager != null)
-        {
-            weaponManager.WeaponManager_Update(characterManager);
-        }
+            combatManager.CrossHairImg.gameObject.SetActive(hasGun);
+            combatManager.FreeLookCamera.gameObject.SetActive(hasGun);
+        }    
     }
 
     private void HandleRecoveryTimer(float delta)
@@ -123,7 +127,7 @@ public class CharacterCombat : MonoBehaviour
     private void Attack(float delta, InputManager input)
     {
         characterManager.isAttacking = (input.lightAttackInput == true || input.heavyAttackInput == true);
-        if(characterManager.isAttacking != true)
+        if(characterManager.isAttacking != true || CharacterInventoryManager.Instance.Panel.isMouseOverPanel)
         {
             return;
         }
@@ -151,7 +155,7 @@ public class CharacterCombat : MonoBehaviour
     public void HandleWeaponAction(float delta)
     {
         Vector3 targePosition = GetTargetPosition();
-        weaponManager.HandleAction(delta, targePosition, characterManager);
+        weaponManager.HandleAction(targePosition, characterManager, null);
     }
 
     public void EnableCollider()
@@ -170,6 +174,11 @@ public class CharacterCombat : MonoBehaviour
             return;
         }
         weaponManager.DamageCollider.SetColliderStatus(false);
+    }
+
+    public void ResetPerformAttack()
+    {
+        characterManager.Attack.ResetPerformAttack();
     }
 
     private void InitializeAttackActions()

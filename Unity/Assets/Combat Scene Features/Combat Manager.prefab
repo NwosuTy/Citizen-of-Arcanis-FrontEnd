@@ -64,7 +64,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   woodBulletHoles: {fileID: 1031560401822814, guid: 3c0b5f221ea995442b9d11dc526de1c0, type: 3}
   metalBulletHoles: {fileID: 1892351807075712, guid: 44be68b4fc4366142a9cd1ae1f761ea4, type: 3}
-  cementBulletHoles: {fileID: 1341869769842038, guid: 8b7a1ffda5bb7474b8fae646c45ce7b4, type: 3}
+  cementBulletHoles: {fileID: 248482557015467493, guid: dff48fe310853ec4a86e00651dbd7a1f, type: 3}
+  bulletTrailPrefab: {fileID: 3987156027170035156, guid: 555c25e338ea1f040b32aba35196a448, type: 3}
   bloodPrefab: {fileID: 0}
 --- !u!1 &3375102967119790488
 GameObject:

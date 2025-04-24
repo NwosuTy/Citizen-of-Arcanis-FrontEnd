@@ -1,6 +1,7 @@
 using UnityEngine;
+using Cinemachine;
 using UnityEngine.UI;
-using System.Collections.Generic;
+using System.Collections;
 
 [RequireComponent(typeof(PickableObject))]
 public class WeaponManager : MonoBehaviour
@@ -8,29 +9,28 @@ public class WeaponManager : MonoBehaviour
     //Private Variables
     private Ray ray;
     private int bulletLeft;
-    private float accumulatedTime;
 
     private Image crossHairImg;
-    private List<Ammo> bulletList = new();
+    private CinemachineFreeLook freeLookCamera;
+    private CinemachineImpulseSource impulseSource;
 
     [Header("Gun Status")]
-    [SerializeField] protected int fireRate = 25;
-    [SerializeField] protected float bulletDrop = 300f;
-    [SerializeField] protected float bulletSpeed = 1000f;
-    [SerializeField] protected float maxBulletTime = 3.0f;
+    [SerializeField] private int fireRate = 25;
+    [SerializeField] private float gunRange = 15.0f;
+    [SerializeField] private float simulationSpeed = 3.0f;
 
     [field: Header("Parameters")]
     [field: SerializeField] public WeaponType type { get; private set; }
     [SerializeField] private AnimatorOverrideController _overrideController;
-    [field: SerializeField] public LayerMask EnemyLayerMask { get; protected set; }
+    [field: SerializeField] public LayerMask DamageableMask { get; private set; }
     [field: SerializeField] public PickableObject pickableObject { get; private set; }
 
     [Header("Gun Parameters")]
     [SerializeField] private int maxBullets;
     [SerializeField] private bool isShooting;
     [SerializeField] private Transform grip, rest;
-    [field: SerializeField] public Vector3 RestLockedPosition { get; protected set; }
-    [field: SerializeField] public Vector3 RestOriginalPosition { get; protected set; }
+    [field: SerializeField] public Vector3 RestLockedPosition { get; private set; }
+    [field: SerializeField] public Vector3 RestOriginalPosition { get; private set; }
 
     [Header("Gun Parameters (FX)")]
     [SerializeField] private Transform muzzlePoint;
@@ -39,34 +39,43 @@ public class WeaponManager : MonoBehaviour
     [field: Header("Melee Parameters")]
     [field: SerializeField] public CharacterDamageCollider DamageCollider { get; private set; }
 
+    [Header("Weapon Recoil")]
+    [SerializeField] private WeaponRecoil weaponRecoil = new();
+
     private void Awake()
     {
         pickableObject = GetComponent<PickableObject>();
-        DamageCollider = GetComponentInChildren<CharacterDamageCollider>();
+
+        impulseSource = GetComponent<CinemachineImpulseSource>();
+        DamageCollider = GetComponentInChildren<CharacterDamageCollider>(); 
     }
 
-    public void Initialize(CharacterManager character)
+    public void Initialize(CharacterManager character, PlaceHolderCombatScript pcs)
     {
-        if(character == null)
-        {
-            return;
-        }
-
         bulletLeft = maxBullets;
-        character.CombatManager.AssignWeapon(this);
-        if(DamageCollider != null)
+        if(pcs == null)
         {
-            DamageCollider.SetCharacter(character, null);
+            character.CombatManager.AssignWeapon(this);
+            character.Anim.runtimeAnimatorController = _overrideController;
         }
-        character.Anim.runtimeAnimatorController = _overrideController;
-        if(type == WeaponType.Gun) character.rigController.SetTwoBoneIKConstraint(grip, rest);
-    }
+        else
+        {
+            pcs.AssignWeapon(this);
+        }
+        if (DamageCollider != null)
+        {
+            DamageCollider.SetCharacter(character, pcs);
+        }
 
-    public void WeaponManager_Update(CharacterManager character)
-    {
         if(type == WeaponType.Gun)
         {
-            UpdateBullet(Time.deltaTime, character);
+            CombatManager combatManager = CombatManager.Instance;
+
+            crossHairImg = combatManager.CrossHairImg;
+            freeLookCamera = combatManager.FreeLookCamera;
+
+            weaponRecoil.Initialize(combatManager.CameraObject, freeLookCamera, impulseSource);
+            if(character != null) character.rigController.SetTwoBoneIKConstraint(grip, rest);
         }
     }
 
@@ -85,18 +94,26 @@ public class WeaponManager : MonoBehaviour
         crossHairImg = crossHair;
     }
 
-    public void HandleAction(float delta, Vector3 targetPosition, CharacterManager characterManager)
+    public void WeaponManager_Update(float delta)
+    {
+        weaponRecoil.HandleRecoil(delta);
+    }
+
+    public void HandleAction(Vector3 targetPosition, CharacterManager characterManager, PlaceHolderCombatScript pcs)
     {
         if(type == WeaponType.Gun)
         {
-            HandleAction_Gun(delta, targetPosition, characterManager);
+            HandleAction_Gun(targetPosition, characterManager, pcs);
         }
     }
 
-    private void HandleAction_Gun(float delta, Vector3 targetPosition, CharacterManager characterManager)
+    private void HandleAction_Gun(Vector3 targetPosition, CharacterManager characterManager, PlaceHolderCombatScript pcs)
     {
+        if(characterManager != null)
         characterManager.CombatManager.currentAction = null;
-        HandleShooting(characterManager, targetPosition, Time.deltaTime);
+
+        HandleVFX();
+        HandleShooting(targetPosition, characterManager, pcs);
     }
 
     #region Gun Parameters
@@ -109,108 +126,34 @@ public class WeaponManager : MonoBehaviour
         }
     }
 
-    private void HandleShooting(CharacterManager character, Vector3 targetPosition, float delta)
+    private void HandleShooting(Vector3 targetPosition, CharacterManager character, PlaceHolderCombatScript pcs)
     {
-        if (character == null)
+        Vector3 direction = targetPosition - muzzlePoint.position;
+        Ray ray = new(muzzlePoint.position, direction);
+
+        crossHairImg.color = Color.white;
+        weaponRecoil.GenerateRecoilPattern();
+        if(Physics.Raycast(ray, out RaycastHit hitInfo, gunRange, DamageableMask))
         {
-            return;
-        }
-
-        if (character.performingAction)
-        {
-            return;
-        }
-
-        if (character.isAttacking != true)
-        {
-            return;
-        }
-
-        accumulatedTime += delta;
-        float fireInterval = 1.0f / fireRate;
-
-        while (accumulatedTime > 0.0f)
-        {
-            FireBullet(targetPosition);
-            accumulatedTime -= fireInterval;
-        }
-    }
-
-    public void UpdateBullet(float delta, CharacterManager character)
-    {
-        SimulateBullet(delta, character);
-        bulletList.RemoveAll(x => x.time >= maxBulletTime);
-    }
-
-    #endregion
-
-    #region Bullet Functions
-
-    protected Ammo CreateBullet(Vector3 pos, Vector3 vel)
-    {
-        Ammo bullet = new(pos, vel);
-        return bullet;
-    }
-
-    protected Vector3 GetBulletPosition(Ammo bullet)
-    {
-        //Pos = bPos + bVel * bTime + 0.5 * grv * bTime^2
-        Vector3 gravity = Vector3.down * bulletDrop;
-        return bullet.initialPosition + (bullet.initialVelocity * bullet.time) + (0.5f * bullet.time * bullet.time * gravity);
-    }
-
-    protected void SimulateBullet(float delta, CharacterManager characterManager)
-    {
-        bulletList.ForEach
-        (
-            bullet =>
-            {
-                Vector3 p0 = GetBulletPosition(bullet);
-                bullet.time += delta;
-                Vector3 p1 = GetBulletPosition(bullet);
-                HandleRaycastSegment(p0, p1, bullet, characterManager);
-            }
-        );
-    }
-
-    protected void HandleRaycastSegment(Vector3 start, Vector3 end, Ammo bullet, CharacterManager characterManager)
-    {
-        Vector3 dir = end - start;
-        float distance = dir.magnitude;
-
-        ray.origin = start;
-        ray.direction = dir;
-
-        if (Physics.Raycast(ray, out RaycastHit raycastHit, distance, EnemyLayerMask))
-        {
-            crossHairImg.color = Color.green;
-            CharacterManager shotCharacter = raycastHit.collider.GetComponentInParent<CharacterManager>();
-            CharacterStatistic shotCharacterStat = shotCharacter.StatsManager;
-            //StartCoroutine(HandleTrailFX(start, raycastHit.point));
+            CharacterManager shotCharacter = hitInfo.collider.GetComponentInParent<CharacterManager>();
+            StartCoroutine(HandleTrailFX(muzzlePoint.position, hitInfo.point));
+            bool sameTema = (pcs == null && shotCharacter.currentTeam != character.currentTeam);
 
             if (shotCharacter == null)
             {
-                InstantiateBulletHoles(raycastHit);
+                InstantiateBulletHoles(hitInfo);
             }
-
-            if (shotCharacter != null && shotCharacter.characterType != characterManager.characterType)
+            else if(shotCharacter != null && sameTema)
             {
-                float directionFromHit = Vector3.SignedAngle(characterManager.transform.position, shotCharacter.transform.position, Vector3.up);
-                shotCharacterStat.TakeDamage(7, AttackType.Heavy);
+                crossHairImg.color = Color.green;
+                shotCharacter.StatsManager.TakeDamage(2, AttackType.Heavy);
             }
-            bullet.time = maxBulletTime;
             return;
         }
-        crossHairImg.color = Color.white;
-        //StartCoroutine(HandleTrailFX(start, end));
+        StartCoroutine(HandleTrailFX(muzzlePoint.position, targetPosition));
     }
 
-    protected virtual void FireBullet(Vector3 targetPosition)
-    {
-        HandleVFX();
-    }
-
-    protected void InstantiateBulletHoles(RaycastHit raycastHit)
+    private void InstantiateBulletHoles(RaycastHit raycastHit)
     {
         float positionMultiplier = 0.5f;
         float spawnX = raycastHit.point.x - ray.direction.x * positionMultiplier;
@@ -223,7 +166,7 @@ public class WeaponManager : MonoBehaviour
         bulletHoles.transform.SetPositionAndRotation(spawnPosition, targetRotation);
     }
 
-    protected GameObject ImpactHole(Collider damagedCollider)
+    private GameObject ImpactHole(Collider damagedCollider)
     {
         if (damagedCollider.CompareTag("Wood"))
         {
@@ -234,6 +177,33 @@ public class WeaponManager : MonoBehaviour
             return GameObjectManager.metalBulletHolesPool.Get();
         }
         return GameObjectManager.cementBulletHolesPool.Get();
+    }
+
+    private IEnumerator HandleTrailFX(Vector3 start, Vector3 end)
+    {
+        TrailRenderer trail = GameObjectManager.bulletTrailPool.Get();
+        trail.transform.position = start;
+        yield return null;
+
+        trail.emitting = true;
+        float distance = Vector3.Distance(start, end);
+        float remainingDistance = distance;
+        while (remainingDistance > 0f)
+        {
+            trail.transform.position = Vector3.Lerp(start, end, Mathf.Clamp01(1 - (remainingDistance / distance)));
+
+            remainingDistance -= simulationSpeed * Time.deltaTime;
+            yield return null;
+        }
+
+        trail.transform.position = end;
+        yield return new WaitForSeconds(trail.time);
+        yield return null;
+
+        trail.emitting = false;
+        trail.transform.position = end;
+
+        GameObjectManager.bulletTrailPool.Release(trail);
     }
 
     #endregion

@@ -48,7 +48,7 @@ public class CharacterInventoryManager : MonoBehaviour
 
     public void UnEquipWeapon()
     {
-        if (activeItem == null)
+        if (activeItem.pickedObj == null)
         {
             return;
         }
@@ -79,18 +79,18 @@ public class CharacterInventoryManager : MonoBehaviour
         }
 
         activeItem = item;
-        activeObj = activeItem.pickedObj;
-
         slotUI = activeItem.SlotUI;
-        activeObj.SetPhysicsSystem(false);
+        activeObj = activeItem.pickedObj;
 
         Transform weaponHolder = WeaponHolder(activeObj.weaponManager);
         spawnedItem = Instantiate(activeObj, weaponHolder);
+
+        spawnedItem.SetPhysicsSystem(false);
         spawnedItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
 
         if(spawnedItem.weaponManager != null)
         {
-            spawnedItem.weaponManager.Initialize(characterManager);
+            spawnedItem.weaponManager.Initialize(characterManager, placeHolderCombat);
         }
         item.UpdateItemCount(false);
         spawnedItem.RemoveRigidBody();

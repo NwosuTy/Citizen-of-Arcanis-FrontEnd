@@ -13,6 +13,7 @@ public class PlaceHolderCombatScript : MonoBehaviour
     private Animator animator;
     private int performActionHash;
     private bool hasAssignedWeapon;
+    public WeaponManager weaponManager { get; private set; }
 
     [Header("Status")]
     public bool isAttacking;
@@ -24,6 +25,7 @@ public class PlaceHolderCombatScript : MonoBehaviour
     public AttackActions currentAction;
     [SerializeField] private Transform GunWeaponHolder;
     [SerializeField] private Transform MeleeWeaponHolder;
+    [SerializeField] private Transform crossHairTransform;
 
     [Header("Attack Actions")]
     [SerializeField] private AttackActions[] lightActions;
@@ -54,14 +56,28 @@ public class PlaceHolderCombatScript : MonoBehaviour
         if(inventory.isMouseOverPanel) { return; }
 
         HandleInput();
+        CombatManager combatManager = CombatManager.Instance;
+        bool hasGun = (weaponManager != null && weaponManager.type == WeaponType.Gun);
+        if (hasGun)
+        {
+            weaponManager.WeaponManager_Update(Time.deltaTime);
+        }
 
-        if(damageCollider == null)
+        if (damageCollider == null)
         {
             //Would Move To When Player Picks Up Weapon Function
             damageCollider = GetComponentInChildren<CharacterDamageCollider>();
             if(damageCollider != null) { damageCollider.SetCharacter(null, this); }
         }
+
         HandleAttackAction();
+        combatManager.CrossHairImg.gameObject.SetActive(hasGun);
+        combatManager.FreeLookCamera.gameObject.SetActive(hasGun);
+    }
+
+    public void AssignWeapon(WeaponManager weapon)
+    {
+        weaponManager = weapon;
     }
 
     public Transform WeaponHolder(WeaponManager weapon)
@@ -71,6 +87,11 @@ public class PlaceHolderCombatScript : MonoBehaviour
             return MeleeWeaponHolder;
         }
         return GunWeaponHolder;
+    }
+
+    public void SetCrossHair(Transform crossHair)
+    {
+        crossHairTransform = crossHair;
     }
 
     #region Input
@@ -135,23 +156,36 @@ public class PlaceHolderCombatScript : MonoBehaviour
 
     private void HandleAttackAction()
     {
-        if (lightAttackInput != true && heavyAttackInput != true)
+        isAttacking = (lightAttackInput == true || heavyAttackInput == true);
+        if (isAttacking != true || CharacterInventoryManager.Instance.Panel.isMouseOverPanel)
         {
             return;
         }
 
-        if (lightAttackInput)
+        if (weaponManager == null || weaponManager.type == WeaponType.Melee)
         {
-            int random = Random.Range(0, lightActions.Length);
-            currentAction = lightActions[random];
+            if (lightAttackInput)
+            {
+                int random = Random.Range(0, lightActions.Length);
+                currentAction = lightActions[random];
+            }
+            else
+            {
+                int random = Random.Range(0, heavyActions.Length);
+                currentAction = heavyActions[random];
+            }
+            currentAction.PerformAction(this);
+            ResetInput();
+            return;
         }
-        else if (heavyAttackInput)
-        {
-            int random = Random.Range(0, heavyActions.Length);
-            currentAction = heavyActions[random];
-        }
-        if (currentAction != null) { currentAction.PerformAction(this); }
+        HandleWeaponAction(Time.deltaTime);
         ResetInput();
+    }
+
+    public void HandleWeaponAction(float delta)
+    {
+        Vector3 targePosition = crossHairTransform.position;
+        weaponManager.HandleAction(targePosition, null, this);
     }
 
     public void PlayTargetAnimation(int targetAnimation, bool performingAction, float transitionDuration = 0.2f, bool canRotate = true)

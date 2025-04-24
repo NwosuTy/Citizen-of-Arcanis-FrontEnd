@@ -65,7 +65,9 @@ public class AttackState : AIState
 
         if(combat.weaponManager.type == WeaponType.Gun)
         {
-            combat.StartCoroutine(HandleShooting(delta, combat));
+            character.isAttacking = true;
+            combat.HandleWeaponAction(delta);
+            combat.Invoke(nameof(ResetPerformAttack), 0.35f);
             return;
         }
         combat.currentAction = currentAttack;
@@ -75,11 +77,8 @@ public class AttackState : AIState
         combat.currentRecovery = currentAttack.recoveryTime;
     }
 
-    private IEnumerator HandleShooting(float delta, CharacterCombat combat)
+    public void ResetPerformAttack()
     {
-        combat.HandleWeaponAction(delta);
-
-        yield return new WaitForSeconds(3.5f);
         hasPerformedAttack = true;
     }
 

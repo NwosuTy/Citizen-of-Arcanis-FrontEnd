@@ -18,12 +18,7 @@ public class CharacterInteractionScript : MonoBehaviour
 
     private void Start()
     {
-        if (characterManager != null && characterManager.combatMode)
-        {
-            return;
-        }
         colliderArray = new Collider[20];
-        CombatManager combatManager = CombatManager.Instance;
     }
 
     private void Update()
@@ -35,15 +30,15 @@ public class CharacterInteractionScript : MonoBehaviour
             return;
         }
 
-        if(characterManager != null && characterManager.combatMode)
-        {
-            interactUI.SetActive(false);
-            return;
-        }
-
         IInteractable interactable = GetInteractableObject();
         if(interactable != null )
         {
+            bool inCombat = (characterManager != null && characterManager.combatMode);
+            if (interactable is DialogueTrigger && inCombat)
+            {
+                return;
+            }
+
             interactText.text = interactable.GetInteractText();
             interactUI.SetActive(true);
             if (Input.GetKeyDown(KeyCode.E))
@@ -74,4 +69,11 @@ public class CharacterInteractionScript : MonoBehaviour
         }
         return null;
     }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, detectRadius);
+    }
+
 }

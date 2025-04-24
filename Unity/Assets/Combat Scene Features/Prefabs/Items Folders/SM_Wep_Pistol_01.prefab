@@ -204,6 +204,7 @@ GameObject:
   - component: {fileID: 6473579750282001884}
   - component: {fileID: 3433440648423686324}
   - component: {fileID: 8927555516968111289}
+  - component: {fileID: 8235450046859528893}
   m_Layer: 0
   m_Name: SM_Wep_Pistol_01
   m_TagString: Untagged
@@ -219,7 +220,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1700825503440746}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -323,10 +324,10 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 126
+  m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &3433440648423686324
 MonoBehaviour:
@@ -360,26 +361,98 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fireRate: 25
-  bulletDrop: 300
-  bulletSpeed: 1000
-  maxBulletTime: 3
+  gunRange: 15
+  simulationSpeed: 50
   <type>k__BackingField: 0
   _overrideController: {fileID: 22100000, guid: c6e6fa582c1515a4b96568292d9bfffb, type: 2}
-  <EnemyLayerMask>k__BackingField:
+  <DamageableMask>k__BackingField:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 201
   <pickableObject>k__BackingField: {fileID: 3433440648423686324}
   maxBullets: 25
   isShooting: 0
   grip: {fileID: 3368870716923783333}
   rest: {fileID: 5046125427142768735}
-  <RestLockedPosition>k__BackingField: {x: 0, y: 0, z: 0}
-  <RestOriginalPosition>k__BackingField: {x: 0, y: 0, z: 0}
+  <RestLockedPosition>k__BackingField: {x: 0.225, y: 0.503, z: 0.444}
+  <RestOriginalPosition>k__BackingField: {x: -0.036, y: 0.101, z: 0.052}
   muzzlePoint: {fileID: 7306037806239786991}
   muzzleFlash:
   - {fileID: 3392079507021320844}
   - {fileID: 3391799307951002154}
   <DamageCollider>k__BackingField: {fileID: 0}
+  weaponRecoil:
+    duration: 0.1
+    recoilPattern:
+    - {x: 10, y: 10}
+    - {x: 7, y: 10}
+    - {x: 5, y: 10}
+    - {x: 2, y: 10}
+    - {x: 1, y: 10}
+    - {x: -2, y: 10}
+    - {x: -5, y: 10}
+    - {x: -7, y: 10}
+    - {x: -10, y: 10}
+    - {x: -7, y: 10}
+    - {x: -5, y: 10}
+    - {x: -2, y: 10}
+    - {x: -1, y: 10}
+    - {x: 2, y: 10}
+    - {x: 5, y: 10}
+    freeLook: {fileID: 0}
+    impulseSource: {fileID: 0}
+--- !u!114 &8235450046859528893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700825503440746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 180ecf9b41d478f468eb3e9083753217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ImpulseDefinition:
+    m_ImpulseChannel: 1
+    m_ImpulseShape: 2
+    m_CustomImpulseShape:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_ImpulseDuration: 0.2
+    m_ImpulseType: 3
+    m_DissipationRate: 0.25
+    m_RawSignal: {fileID: 11400000, guid: 926c583073b59e4468d012649a56be48, type: 2}
+    m_AmplitudeGain: 1
+    m_FrequencyGain: 1
+    m_RepeatMode: 0
+    m_Randomize: 1
+    m_TimeEnvelope:
+      m_AttackShape:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      m_DecayShape:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      m_AttackTime: 0
+      m_SustainTime: 0.2
+      m_DecayTime: 0.7
+      m_ScaleWithImpact: 1
+      m_HoldForever: 0
+    m_ImpactRadius: 100
+    m_DirectionMode: 0
+    m_DissipationMode: 2
+    m_DissipationDistance: 1000
+    m_PropagationSpeed: 343
+  m_DefaultVelocity: {x: 0, y: -1, z: 0}
 --- !u!1 &699285803539740710
 GameObject:
   m_ObjectHideFlags: 0
@@ -405,7 +478,7 @@ Transform:
   m_GameObject: {fileID: 699285803539740710}
   serializedVersion: 2
   m_LocalRotation: {x: 0.54167527, y: -0.45451945, z: 0.45451945, w: 0.54167527}
-  m_LocalPosition: {x: 0.02, y: 0.028, z: -0.142}
+  m_LocalPosition: {x: 0.028, y: -0.02, z: -0.097}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10268,8 +10341,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4916615819644298024}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.04163387, y: -0.1763221, z: 0.96830696, w: -0.17192654}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.041633874, y: -0.1763221, z: 0.968307, w: -0.17192654}
+  m_LocalPosition: {x: -0.036, y: 0.101, z: 0.052}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
