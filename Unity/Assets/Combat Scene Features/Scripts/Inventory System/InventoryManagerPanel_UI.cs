@@ -16,8 +16,7 @@ public class InventoryManagerPanel_UI : MonoBehaviour
     public Camera MainCamera { get; private set; }
     public CanvasGroup CanvasGrp { get; private set; }
 
-    public static InventoryManagerPanel_UI Instance { get; private set; }
-    public CharacterInventoryManager InventoryManager { get; private set; }
+    //public static InventoryManagerPanel_UI Instance { get; private set; }
 
     [Header("Parameters")]
     [SerializeField] private Transform currencySlotParent;
@@ -31,14 +30,6 @@ public class InventoryManagerPanel_UI : MonoBehaviour
 
     private void Awake()
     {
-        if(Instance != null)
-        {
-            Debug.Log("Multiple Instances In Scene");
-            Destroy(Instance.gameObject);
-            return;
-        }
-
-        Instance = this;
         isMouseOverPanel = false;
         MainCamera = Camera.main;
         CanvasGrp = GetComponent<CanvasGroup>();
@@ -90,11 +81,6 @@ public class InventoryManagerPanel_UI : MonoBehaviour
             return;
         }
         InitializeSlotUI(itemClass, collectiblesSlotList);
-    }
-
-    public void SubscribeInventoryManager(CharacterInventoryManager inventoryManager)
-    {
-        InventoryManager = inventoryManager;
     }
 
     public void HandSlotUpdate(float alphaValue, InventorySlotUI slotUI)

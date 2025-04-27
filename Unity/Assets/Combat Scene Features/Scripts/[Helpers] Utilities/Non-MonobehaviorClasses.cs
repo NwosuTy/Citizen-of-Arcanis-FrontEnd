@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Cinemachine;
 
 #region Enums
 
@@ -23,6 +24,12 @@ public enum ItemBoxTier //More For Design
     Metal, //3 Items[1-5] and Coin[5-25]
     Gold, //3 Items[2-5], Coin[10-25] and Token[5-15]
     Diamond //5 Items[3-7] and Ruby[1-10]
+}
+
+public enum WeaponType
+{
+    Gun,
+    Melee
 }
 
 #endregion
@@ -97,7 +104,64 @@ public class RewardBox
     {
         boxname = "";
         itemsList.Clear();
+        finishedCleaning = true;
     }
 }
 
+[System.Serializable]
+public class WeaponRecoil
+{
+    private int index;    
+    private Transform cameraObject;
+
+    private float time;
+    private float verticalRecoil;
+    private float horizontalRecoil;
+
+    [Header("Parameters")]
+    [SerializeField] private float duration;
+    [SerializeField] private Vector2[] recoilPattern;
+
+    [Header("Components")]
+    [SerializeField] private CinemachineVirtualCameraBase freeLook;
+    [SerializeField] private CinemachineImpulseSource impulseSource;
+
+    public void Initialize(Transform cameraObj, CinemachineVirtualCameraBase virtualCamera, CinemachineImpulseSource impulseSource)
+    {
+        this.freeLook = virtualCamera;
+        cameraObject = cameraObj;
+        this.impulseSource = impulseSource;
+    }
+
+    public void ResetIndex()
+    {
+        index = 0;
+    }
+
+    public void HandleRecoil(float delta)
+    {
+        if(time > 0.0f)
+        {
+            //freeLook.m_YAxis.Value -= ((verticalRecoil / 1000) * delta) / duration;
+            //freeLook.m_XAxis.Value -= ((horizontalRecoil / 1000) * delta) / duration;
+            time -= delta;
+        }
+    }
+
+    public void GenerateRecoilPattern()
+    {
+        time = duration;
+        impulseSource.GenerateImpulse(cameraObject.forward);
+
+        verticalRecoil = recoilPattern[index].y;
+        horizontalRecoil = recoilPattern[index].x;
+
+        index = NextIndex();
+    }
+
+    private int NextIndex()
+    {
+        return (index + 1) % recoilPattern.Length;
+    }
+}
 #endregion

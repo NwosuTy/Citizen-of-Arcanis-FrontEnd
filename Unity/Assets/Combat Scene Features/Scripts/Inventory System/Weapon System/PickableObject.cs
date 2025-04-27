@@ -4,6 +4,7 @@ public class PickableObject : MonoBehaviour, IInteractable
 {
     [SerializeField] private Rigidbody rigidBody;
     [field: SerializeField] public ItemObjects ItemObject { get; private set; }
+    [field: SerializeField] public WeaponManager weaponManager { get; private set; }
 
     [field: Header("Item Details")]
     [field: SerializeField] public int rewardRate { get; private set; }
@@ -13,7 +14,7 @@ public class PickableObject : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        InventoryManagerPanel_UI.Instance.InventoryManager.HandleItemAddition(this);
+        CharacterInventoryManager.Instance.HandleItemAddition(this);
         gameObject.SetActive(false);
     }
 

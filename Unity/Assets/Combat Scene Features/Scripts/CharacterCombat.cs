@@ -16,23 +16,31 @@ public class CharacterCombat : MonoBehaviour
 {
     CharacterManager characterManager;
 
-    [Header("Status")]
+    private Vector3 targetPosition;
+    public WeaponManager weaponManager { get; private set; }
+
+    [Header("Combat Status")]
     public bool canCombo;
     public AttackType attackType;
-    
+
     [Header("Parameters")]
     public int damageModifier;
     public float currentRecovery;
-    public AttackActions currentAction;
+    [SerializeField] private Transform crossHairTransform;
+
+    [Header("Gun Parameters")]
+    [SerializeField] private float inaccuracy;
+    [SerializeField] private Vector3 targetOffset;
+
+    [Header("Melee Parameters")]
+    [SerializeField] private AttackActions[] lightActions;
+    [SerializeField] private AttackActions[] heavyActions;
 
     [field: Header("Combat Character")]
-    [SerializeField] private Transform WeaponHolder;
+    public AttackActions currentAction;
+    [SerializeField] private Transform GunWeaponHolder;
+    [SerializeField] private Transform MeleeWeaponHolder;
     [field: SerializeField] public CharacterCombatData CombatCharacter { get; private set; }
-
-    [Header("Tools")]
-    [SerializeField] private CharacterDamageCollider damageCollider;
-    [field: SerializeField] public AttackActions[] LightActions { get; private set; }
-    [field: SerializeField] public AttackActions[] HeavyActions { get; private set; }
 
     private void Awake()
     {
@@ -41,24 +49,50 @@ public class CharacterCombat : MonoBehaviour
 
     private void Start()
     {
-        PrepareActions();
+        InitializeAttackActions();
     }
 
-    public void AssignWeapon(CharacterDamageCollider weapon)
+    public void AssignWeapon(WeaponManager weapon)
     {
-        damageCollider = GetComponentInChildren<CharacterDamageCollider>();
+        weaponManager = weapon;
+    }
 
-        if(damageCollider  == null)
+    public Transform WeaponHolder(WeaponManager weapon)
+    {
+        if(weapon == null || weapon.type == WeaponType.Melee)
         {
-            damageCollider = Instantiate(weapon, WeaponHolder);
-            damageCollider.SetCharacter(characterManager, null);
+            return MeleeWeaponHolder;
         }
+        return GunWeaponHolder;
+    }
+
+    public Vector3 GetTargetPosition()
+    {
+        if(characterManager.characterType == CharacterType.AI)
+        {
+            Vector3 target = characterManager.PositionOfTarget + targetOffset;
+            target += Random.insideUnitSphere * inaccuracy;
+            return target;
+        }
+        return crossHairTransform.position;
+    }
+
+    public void SetCrossHair(Transform crossHair)
+    {
+        crossHairTransform = crossHair;
     }
 
     public void Combat_Update(float delta)
     {
+        bool hasGun = HasGun();
+        targetPosition = GetTargetPosition();
         CharacterType type = characterManager.characterType;
-        
+
+        if (hasGun)
+        {
+            weaponManager.WeaponManager_Update(targetPosition, characterManager, delta);
+        }
+
         if (type == CharacterType.AI)
         {
             HandleRecoveryTimer(delta);
@@ -66,22 +100,8 @@ public class CharacterCombat : MonoBehaviour
         else if (type == CharacterType.Player)
         {
             Attack(characterManager.PlayerInput);
-        }
-    }
-
-    public void EnableCollider()
-    {
-        damageCollider.SetColliderStatus(true);
-    }
-
-    public void DisableCollider()
-    {
-        damageCollider.SetColliderStatus(false);
-    }
-
-    public void SetComboStatus(ComboStatus status)
-    {
-        canCombo = (status == ComboStatus.Can) ? true : false;
+            characterManager.CameraController.EnableShooterGraphics(hasGun);
+        }    
     }
 
     private void HandleRecoveryTimer(float delta)
@@ -100,41 +120,82 @@ public class CharacterCombat : MonoBehaviour
         currentRecovery -= delta;
     }
 
+    public void SetComboStatus(ComboStatus status)
+    {
+        canCombo = (status == ComboStatus.Can);
+    }
+
     private void Attack(InputManager input)
     {
-        if(input.lightAttackInput != true && input.heavyAttackInput != true)
+        characterManager.isAttacking = (input.lightAttackInput == true || input.heavyAttackInput == true);
+        if(characterManager.isAttacking != true || CharacterInventoryManager.Instance.Panel.isMouseOverPanel)
         {
             return;
         }
 
-        if(input.lightAttackInput)
+        if (weaponManager == null || weaponManager.type == WeaponType.Melee)
         {
-            int random = Random.Range(0, LightActions.Length);
-            currentAction = LightActions[random];
+            if (input.lightAttackInput)
+            {
+                int random = Random.Range(0, lightActions.Length);
+                currentAction = lightActions[random];
+            }
+            else
+            {
+                int random = Random.Range(0, heavyActions.Length);
+                currentAction = heavyActions[random];
+            }
+            currentAction.PerformAction(characterManager);
+            return;
         }
-        else if(input.heavyAttackInput)
-        {
-            int random = Random.Range(0, HeavyActions.Length);
-            currentAction = HeavyActions[random];
-        }
-        if(currentAction != null) { currentAction.PerformAction(characterManager); }
-        input.ResetInput();
+        HandleWeaponAction();
     }
 
-    private void PrepareActions()
+    public void HandleWeaponAction()
     {
-        CombatState combat = characterManager.Combat;
+        weaponManager.HandleAction(targetPosition, characterManager);
+    }    
 
-        for(int i = 0; i < LightActions.Length; i++)
+    public bool HasGun()
+    {
+        return weaponManager != null && weaponManager.type == WeaponType.Gun;
+    }
+
+    public void EnableCollider()
+    {
+        if(weaponManager == null)
         {
-            LightActions[i] = Instantiate(LightActions[i]);
-            LightActions[i].Initialize();
+            return;
+        }
+        weaponManager.DamageCollider.SetColliderStatus(true);
+    }
+
+    public void DisableCollider()
+    {
+        if (weaponManager == null)
+        {
+            return;
+        }
+        weaponManager.DamageCollider.SetColliderStatus(false);
+    }
+
+    public void ResetPerformAttack()
+    {
+        characterManager.Attack.ResetPerformAttack();
+    }
+
+    private void InitializeAttackActions()
+    {
+        for (int i = 0; i < lightActions.Length; i++)
+        {
+            lightActions[i] = Instantiate(lightActions[i]);
+            lightActions[i].Initialize();
         }
 
-        for (int i = 0; i < HeavyActions.Length; i++)
+        for (int i = 0; i < heavyActions.Length; i++)
         {
-            HeavyActions[i] = Instantiate(HeavyActions[i]);
-            HeavyActions[i].Initialize();
+            heavyActions[i] = Instantiate(heavyActions[i]);
+            heavyActions[i].Initialize();
         }
     }
 }

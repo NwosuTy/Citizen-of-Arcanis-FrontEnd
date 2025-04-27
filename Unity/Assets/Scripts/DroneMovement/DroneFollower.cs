@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -11,47 +9,27 @@ public class DroneFollower : MonoBehaviour
     /// <summary>
     /// The character that the drone will follow.
     /// </summary>
-    public Transform target;
+    private CharacterManager target;
+    private Transform targetTransform;
 
-    /// <summary>
-    /// The main camera's transform used for calculating relative positioning.
-    /// </summary>
-    public Transform cameraTransform;
+    [Tooltip("The main camera's transform used for calculating relative positioning.")]
+    [SerializeField] private Transform cameraTransform;
+    [Tooltip("Distance from the target character to the drone.")]
+    [SerializeField] private float followDistance = 2.3f;
+    [Tooltip("Base height for the drone above the target.")]
+    [SerializeField] private float followHeight = 2.0f;
 
-    /// <summary>
-    /// Desired follow distance behind the target.
-    /// </summary>
-    public float followDistance = 2.3f;
+    [Tooltip("Smoothing speed for the drone's movement.")]
+    [SerializeField] private float smoothSpeed = 8.0f;
+    [Tooltip("Amount of vertical oscillation for floating effect.")]
+    [SerializeField] private float floatAmount = 0.5f;
 
-    /// <summary>
-    /// Base height for the drone above the target.
-    /// </summary>
-    public float followHeight = 2.0f;
-
-    /// <summary>
-    /// Smoothing speed for position transitions.
-    /// </summary>
-    public float smoothSpeed = 8.0f;
-
-    /// <summary>
-    /// Amplitude of the floating effect.
-    /// </summary>
-    public float floatAmount = 0.5f;
-
-    /// <summary>
-    /// Speed of the floating oscillation.
-    /// </summary>
-    public float floatSpeed = 1.5f;
-
-    /// <summary>
-    /// Smoothing speed for rotation transitions.
-    /// </summary>
-    public float rotationSmoothSpeed = 3.0f;
-
-    /// <summary>
-    /// Smoothing speed for position transitions when idle.
-    /// </summary>
-    public float transitionSpeed = 5.0f;
+    [Tooltip("Speed of the floating oscillation.")]
+    [SerializeField] private float floatSpeed = 1.5f;
+    [Tooltip("Smoothing speed for position transitions when idle.")]
+    [SerializeField] private float transitionSpeed = 5.0f;
+    [Tooltip("Speed of rotation smoothing for the drone.")]
+    [SerializeField] private float rotationSmoothSpeed = 3.0f;
 
     /// <summary>
     /// Internal velocity tracker for smooth movement.
@@ -77,10 +55,6 @@ public class DroneFollower : MonoBehaviour
     /// Target rotation for smooth orientation adjustments.
     /// </summary>
     private Quaternion targetRotation;
-
-    /// <summary>
-    /// Sets the initial relative position and rotation of the drone.
-    /// </summary>
     void Start()
     {
         offset = new Vector3(1.0f, followHeight, -followDistance); // Offset to position the drone
@@ -88,10 +62,6 @@ public class DroneFollower : MonoBehaviour
         targetRotation = transform.rotation;
     }
 
-    /// <summary>
-    /// Updates the drone's position and rotation in real-time based on the target's and camera's positions.
-    /// Applies a floating effect to simulate hovering.
-    /// </summary>
     void Update()
     {
         if (target != null && cameraTransform != null)
@@ -101,7 +71,7 @@ public class DroneFollower : MonoBehaviour
             cameraForward.Normalize();
 
             Vector3 cameraRight = cameraTransform.right;
-            Vector3 desiredPosition = target.position
+            Vector3 desiredPosition = targetTransform.position
                                       + (-cameraForward * followDistance)
                                       + (cameraRight * offset.x)
                                       + (Vector3.up * followHeight);
@@ -112,7 +82,7 @@ public class DroneFollower : MonoBehaviour
 
             transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref velocity, 1f / transitionSpeed);
 
-            Vector3 directionToTarget = target.position - transform.position;
+            Vector3 directionToTarget = targetTransform.position - transform.position;
             Quaternion lookRotation = Quaternion.LookRotation(directionToTarget);
             targetRotation = Quaternion.Slerp(targetRotation, lookRotation, rotationSmoothSpeed * Time.deltaTime);
 
@@ -128,7 +98,7 @@ public class DroneFollower : MonoBehaviour
     {
         if (target != null && cameraTransform != null)
         {
-            isMoving = target.GetComponent<Rigidbody>()?.velocity.magnitude > 0.1f;
+            isMoving = target.Controller.velocity.magnitude > 0.1f;
 
             if (isMoving)
             {
@@ -137,7 +107,7 @@ public class DroneFollower : MonoBehaviour
                 cameraForward.Normalize();
 
                 Vector3 cameraRight = cameraTransform.right;
-                Vector3 desiredPosition = target.position
+                Vector3 desiredPosition = targetTransform.position
                                           + (-cameraForward * followDistance)
                                           + (cameraRight * offset.x)
                                           + (Vector3.up * followHeight);
@@ -149,5 +119,16 @@ public class DroneFollower : MonoBehaviour
                 transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref velocity, 1f / smoothSpeed);
             }
         }
+    }
+
+    public void SetDrone_Target(CharacterManager cm)
+    {
+        target = cm;
+        targetTransform = target.transform;
+    }
+
+    public void SetCameraTransform(Transform cameraTransform)
+    {
+        this.cameraTransform = cameraTransform;
     }
 }

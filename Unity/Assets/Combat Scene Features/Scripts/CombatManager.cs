@@ -4,9 +4,8 @@ using UnityEngine.SceneManagement;
 
 public class CombatManager : MonoBehaviour
 {
-    private RewardBox rewardBox = new();
     private WaitForSeconds waitForSeconds;
-    public bool hasRewardBox {  get; private set; }
+    public Transform CameraObject { get; protected set; }
 
     public static CombatManager Instance { get; private set; }
     [field: SerializeField] public CharacterManager PlayerCombatPrefab { get; private set; }
@@ -28,9 +27,16 @@ public class CombatManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    private void OnEnable()
+    {
+        if(CameraObject == null)
+        {
+            CameraObject = Camera.main.transform;
+        }
+    }
+
     private void Start()
     {
-        rewardBox = new();
         waitForSeconds = new WaitForSeconds(transitionDelay);
     }
 
@@ -42,7 +48,6 @@ public class CombatManager : MonoBehaviour
     public void StartDuel(CharacterManager npc)
     {
         OppositionCombatPrefab = npc;
-        InventoryManagerPanel_UI.Instance.InventoryManager.ParseToCombatmanager();
         StartCoroutine(LoadCombatScene());
     }
 
@@ -55,30 +60,5 @@ public class CombatManager : MonoBehaviour
 
         yield return waitForSeconds;
         sceneTransitionAnimator.CrossFade("RectangleGridOut", 0.0f);
-    }
-
-    public void AssignRewardBox(RewardBox rewardBox)
-    {
-        hasRewardBox = true;
-        for(int i = 0; i < rewardBox.itemsList.Count; i++)
-        {
-            ItemClass reward = rewardBox.itemsList[i];
-            if(this.rewardBox.itemsList.Contains(reward))
-            {
-                continue;
-            }
-            this.rewardBox.itemsList.Add(rewardBox.itemsList[i]);
-        }
-    }
-
-    public void AddRewardsToInventory(CharacterInventoryManager inventory)
-    {
-        for (int i = 0; i < rewardBox.itemsList.Count; i++)
-        {
-            ItemClass itemClass = rewardBox.itemsList[i];
-            inventory.AddUnExistingItem(itemClass);
-        }
-        hasRewardBox = false;
-        rewardBox.EmptyBox();
     }
 }

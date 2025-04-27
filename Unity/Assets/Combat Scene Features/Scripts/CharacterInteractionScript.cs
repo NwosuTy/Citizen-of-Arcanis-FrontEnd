@@ -18,15 +18,11 @@ public class CharacterInteractionScript : MonoBehaviour
 
     private void Start()
     {
-        if (characterManager != null && characterManager.combatMode)
-        {
-            return;
-        }
+        interactUI.SetActive(false);
         colliderArray = new Collider[20];
-        CombatManager combatManager = CombatManager.Instance;
     }
 
-    private void Update()
+    public void InteractionUpdate()
     {
         DialogueManager instance = DialogueManager.Instance;
         if(instance != null && instance.dialogueIsPlaying)
@@ -35,29 +31,23 @@ public class CharacterInteractionScript : MonoBehaviour
             return;
         }
 
-        if(characterManager != null && characterManager.combatMode)
+        IInteractable interactable = GetInteractableObject();
+        bool inCombat = interactable is DialogueTrigger &&  (characterManager != null && characterManager.combatMode);
+        if (interactable == null || inCombat)
         {
             interactUI.SetActive(false);
             return;
         }
 
-        IInteractable interactable = GetInteractableObject();
-        if(interactable != null )
+        interactText.text = interactable.GetInteractText();
+        interactUI.SetActive(true);
+
+        if (characterManager.PlayerInput.interactInput)
         {
-            interactText.text = interactable.GetInteractText();
-            interactUI.SetActive(true);
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                interactable.Interact();
-                interactUI.SetActive(false);
-            }
-        }
-        else
-        {
+            interactable.Interact();
             interactUI.SetActive(false);
         }
     }
-
     private IInteractable GetInteractableObject()
     {
         int count = Physics.OverlapSphereNonAlloc(transform.position, detectRadius, colliderArray);
@@ -73,5 +63,11 @@ public class CharacterInteractionScript : MonoBehaviour
             return interactable;
         }
         return null;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, detectRadius);
     }
 }

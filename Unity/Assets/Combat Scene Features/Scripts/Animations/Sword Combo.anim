@@ -108751,7 +108751,7 @@ AnimationClip:
   - time: 0.5
     functionName: EnableCollider
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 11500000, guid: 52e1727468eb2604b8a1becac6018dba, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
@@ -108765,7 +108765,7 @@ AnimationClip:
   - time: 1.5
     functionName: DisableCollider
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 11500000, guid: 52e1727468eb2604b8a1becac6018dba, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
@@ -108779,7 +108779,7 @@ AnimationClip:
   - time: 1.8000001
     functionName: EnableCollider
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 11500000, guid: 52e1727468eb2604b8a1becac6018dba, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
@@ -108821,7 +108821,7 @@ AnimationClip:
   - time: 3.8333333
     functionName: DisableCollider
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 11500000, guid: 52e1727468eb2604b8a1becac6018dba, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

@@ -1,32 +1,36 @@
 using UnityEngine;
 using System.Collections.Generic;
-using DevionGames.InventorySystem;
 
 public class CharacterInventoryManager : MonoBehaviour
 {
     InventorySlotUI slotUI;
     PickableObject spawnedItem;
-    private InventoryManagerPanel_UI panel;
+    public static CharacterInventoryManager Instance { get; private set; }
 
-    private RewardBox rewardBox = new();
     private List<ItemClass> itemList = new();
+    private CharacterManager characterManager;
 
-    [SerializeField] private ItemClass activeItem;
-    [SerializeField] private Transform weaponHolder;
+    [Header("Parameters")]
+    [SerializeField] private ItemClass activeItem = new(0, null);
+    [field: SerializeField] public InventoryManagerPanel_UI Panel { get; private set; }
 
-    private void Start()
+    private void Awake()
     {
-        panel = InventoryManagerPanel_UI.Instance;
-
-        panel.SubscribeInventoryManager(this);
-        CombatManager.Instance.AddRewardsToInventory(this);
+        if (Instance != null)
+        {
+            Debug.Log("Multiple Instances In Scene");
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     private void Update()
     {
         if(Input.GetKeyDown(KeyCode.I))
         {
-            panel.EnablePanel();
+            Panel.EnablePanel();
         }
 
         if(Input.GetKeyDown(KeyCode.U))
@@ -35,39 +39,26 @@ public class CharacterInventoryManager : MonoBehaviour
         }
     }
 
-    //Would Change Later, PlaceHolder Method
-    public void ParseToCombatmanager()
+    public void SetCharacterManager(CharacterManager cm)
     {
-        ResetLists();
-        CombatManager.Instance.AssignRewardBox(rewardBox);
-    }
-
-    private void ResetLists()
-    {
-        rewardBox.CleanBox();
-        for (int i = 0; i < itemList.Count; i++)
-        {
-            ItemClass item = itemList[i];
-            ItemClass newItem = new(item.itemCount, item.pickedObj.ItemObject.objectPrefab);
-            rewardBox.itemsList.Add(newItem);
-        }
+        characterManager = cm;
     }
 
     public void UnEquipWeapon()
     {
-        if (activeItem == null)
+        if (activeItem.pickedObj == null)
         {
             return;
         }
         PickableObject activeObj = activeItem.pickedObj;
 
         HandleItemAddition(activeObj);
-        panel.DisplayNotification($"UnEquiped {activeObj.ItemName}");
+        Panel.DisplayNotification($"UnEquiped {activeObj.ItemName}");
 
         Destroy(spawnedItem.gameObject);
 
-        activeItem = null;
         spawnedItem = null;
+        activeItem = new(0, spawnedItem);
     }
 
     public void EquipWeapon(ItemClass item)
@@ -86,21 +77,31 @@ public class CharacterInventoryManager : MonoBehaviour
         }
 
         activeItem = item;
+        slotUI = activeItem.SlotUI;
         activeObj = activeItem.pickedObj;
 
-        slotUI = activeItem.SlotUI;
-        activeObj.SetPhysicsSystem(false);
+        Transform weaponHolder = WeaponHolder(activeObj.weaponManager);
+        spawnedItem = Instantiate(activeObj, weaponHolder);
 
-        spawnedItem = Instantiate(activeObj, weaponHolder.transform);
+        spawnedItem.SetPhysicsSystem(false);
         spawnedItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
 
+        if(spawnedItem.weaponManager != null)
+        {
+            spawnedItem.weaponManager.Initialize(characterManager);
+        }
         item.UpdateItemCount(false);
         spawnedItem.RemoveRigidBody();
         spawnedItem.gameObject.SetActive(true);
 
         slotUI.DropItem();
         itemList.Remove(item);
-        panel.DisplayNotification($"Equiped {equipedObj.ItemName}");
+        Panel.DisplayNotification($"Equiped {equipedObj.ItemName}");
+    }
+
+    private Transform WeaponHolder(WeaponManager weaponManager)
+    {
+        return characterManager.CombatManager.WeaponHolder(weaponManager);
     }
 
     public void HandleItemDeletion(ItemClass itemClass)
@@ -111,7 +112,6 @@ public class CharacterInventoryManager : MonoBehaviour
 
     public void HandleItemAddition(PickableObject pickedObj)
     {
-        InventoryManagerPanel_UI inventoryPanel = InventoryManagerPanel_UI.Instance;
         ItemClass existingItem = itemList.Find(x => x.pickedObj == pickedObj);
 
         if(existingItem != null)
@@ -120,13 +120,13 @@ public class CharacterInventoryManager : MonoBehaviour
             return;
         }
 
-        ItemClass itemClass = new(1, pickedObj);
+        ItemClass itemClass = new(1, pickedObj.ItemObject.objectPrefab);
         AddUnExistingItem(itemClass);
     }
 
     public void AddUnExistingItem(ItemClass itemClass)
     {
         itemList.Add(itemClass);
-        panel.HandleSlotInitialization(itemClass);
+        Panel.HandleSlotInitialization(itemClass);
     }
 }

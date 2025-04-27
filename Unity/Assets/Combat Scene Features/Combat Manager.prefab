@@ -45,6 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 213b22c1e58a1f448b8efa151fa96c55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <PlayerCombatPrefab>k__BackingField: {fileID: 0}
+  <OppositionCombatPrefab>k__BackingField: {fileID: 0}
   transitionDelay: 1
   sceneTransitionAnimator: {fileID: 3562696924171110464}
 --- !u!1 &3375102967119790488

@@ -14,7 +14,9 @@ public class PlayerUI : MonoBehaviour
 
     public void SetParameters(CharacterManager character)
     {
-        characterNameText.text = character.name;
+        string displayName = character.name.Replace("(Clone)", "").Trim();
+
+        characterNameText.text = displayName;
         characterSprite.sprite = character.CharacterImage;
         character.StatsManager.SetBarUIs(healthBarUI, enduranceBarUI);
     }

@@ -113,6 +113,7 @@ public class DialogueManager : MonoBehaviour
         
         dialogueIsPlaying = false;
         character.isTalking = false;
+        character.dontMove = false;
         currentDialogueStory = null;
         dialogueUIPanel.ExitPanel();
         skipDialogue = false;
