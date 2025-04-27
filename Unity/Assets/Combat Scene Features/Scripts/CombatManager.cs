@@ -1,16 +1,11 @@
 using UnityEngine;
-using Cinemachine;
-using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
 
 public class CombatManager : MonoBehaviour
 {
     private WaitForSeconds waitForSeconds;
-
-    public Image CrossHairImg { get; private set; }
     public Transform CameraObject { get; protected set; }
-    public CinemachineFreeLook FreeLookCamera { get; private set; }
 
     public static CombatManager Instance { get; private set; }
     [field: SerializeField] public CharacterManager PlayerCombatPrefab { get; private set; }
@@ -34,14 +29,6 @@ public class CombatManager : MonoBehaviour
 
     private void OnEnable()
     {
-        if (CrossHairImg == null)
-        {
-            CrossHairImg = GameObject.Find("Crosshair").GetComponent<Image>();
-        }   
-        if (FreeLookCamera == null)
-        {
-            FreeLookCamera = GameObject.Find("Gun Camera").GetComponent<CinemachineFreeLook>();
-        }  
         if(CameraObject == null)
         {
             CameraObject = Camera.main.transform;

@@ -122,3 +122,20 @@ The following packages were added:
   com.unity.searcher@4.9.2
   com.unity.shadergraph@14.0.11
   com.unity.modules.subsystems@1.0.0
+
+=== Thu Apr 24 23:41:05 2025
+
+Packages were changed.
+Update Mode: updateDependencies
+
+The following packages were updated:
+  com.unity.render-pipelines.core from version 14.0.7 to 14.0.11
+  com.unity.render-pipelines.universal from version 14.0.7 to 14.0.11
+
+=== Thu Apr 24 23:41:05 2025
+
+Packages were changed.
+Update Mode: mergeDefaultDependencies
+
+The following packages were added:
+  com.unity.inputsystem@1.11.0

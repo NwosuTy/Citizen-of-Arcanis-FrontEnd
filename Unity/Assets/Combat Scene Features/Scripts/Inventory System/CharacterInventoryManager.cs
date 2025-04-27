@@ -9,7 +9,6 @@ public class CharacterInventoryManager : MonoBehaviour
 
     private List<ItemClass> itemList = new();
     private CharacterManager characterManager;
-    private PlaceHolderCombatScript placeHolderCombat;
 
     [Header("Parameters")]
     [SerializeField] private ItemClass activeItem = new(0, null);
@@ -40,10 +39,9 @@ public class CharacterInventoryManager : MonoBehaviour
         }
     }
 
-    public void SetCharacterManager(CharacterManager cm, PlaceHolderCombatScript pcs)
+    public void SetCharacterManager(CharacterManager cm)
     {
         characterManager = cm;
-        placeHolderCombat = pcs;
     }
 
     public void UnEquipWeapon()
@@ -90,7 +88,7 @@ public class CharacterInventoryManager : MonoBehaviour
 
         if(spawnedItem.weaponManager != null)
         {
-            spawnedItem.weaponManager.Initialize(characterManager, placeHolderCombat);
+            spawnedItem.weaponManager.Initialize(characterManager);
         }
         item.UpdateItemCount(false);
         spawnedItem.RemoveRigidBody();
@@ -103,10 +101,6 @@ public class CharacterInventoryManager : MonoBehaviour
 
     private Transform WeaponHolder(WeaponManager weaponManager)
     {
-        if(characterManager == null)
-        {
-            return placeHolderCombat.WeaponHolder(weaponManager);
-        }
         return characterManager.CombatManager.WeaponHolder(weaponManager);
     }
 

@@ -44,8 +44,8 @@ public class DuelManager : MonoBehaviour
         DuelState = DuelState.OnGoing;
         combatManager = CombatManager.Instance;
 
-        SetObject(playerSpawnPoint, combatManager.PlayerCombatPrefab);
-        SetObject(enemySpawnPoint, combatManager.OppositionCombatPrefab);
+        SetObject(enemySpawnPoint, combatManager.OppositionCombatPrefab, CharacterType.AI);
+        SetObject(playerSpawnPoint, combatManager.PlayerCombatPrefab, CharacterType.Player);
 
         SetCameraTarget();
         uiManager.PrepareTimer();
@@ -111,9 +111,6 @@ public class DuelManager : MonoBehaviour
     {
         freeLookCamera.Follow = player.transform;
         freeLookCamera.LookAt = player.transform;
-
-        CombatManager.Instance.FreeLookCamera.Follow = player.transform;
-        CombatManager.Instance.FreeLookCamera.LookAt = player.transform;
     }
 
     private void PrepareWeapon(CharacterManager characterManager)
@@ -130,7 +127,7 @@ public class DuelManager : MonoBehaviour
         spawnedItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
 
         spawnedItem.pickableObject.SetPhysicsSystem(false);
-        spawnedItem.Initialize(characterManager, null);
+        spawnedItem.Initialize(characterManager);
         characterManager.CombatManager.AssignWeapon(spawnedItem);
     }
 
@@ -152,12 +149,14 @@ public class DuelManager : MonoBehaviour
         return weaponManagers[selectedIndex];
     }
 
-    private void SetObject(Transform parent, CharacterManager character)
+    private void SetObject(Transform parent, CharacterManager character, CharacterType characterType)
     {
         CharacterManager newCharacter = Instantiate(character, parent);
-        newCharacter.combatMode = true;
 
-        if (newCharacter.characterType == CharacterType.AI)
+        newCharacter.combatMode = true;
+        newCharacter.SetCharacterType(characterType);
+
+        if (characterType == CharacterType.AI)
         {
             enemy = newCharacter;
             PrepareWeapon(enemy);

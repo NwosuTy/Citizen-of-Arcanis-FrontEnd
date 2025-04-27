@@ -4412,6 +4412,7 @@ MonoBehaviour:
   targetMask:
     serializedVersion: 2
     m_Bits: 8
+  <CameraTarget>k__BackingField: {fileID: 0}
   <CharacterImage>k__BackingField: {fileID: 21300000, guid: e71423d8930713f418ec93bf023bd5d2, type: 3}
   activeState: {fileID: 0}
   <Patrol>k__BackingField: {fileID: 0}
@@ -4432,8 +4433,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthBar: {fileID: 0}
   enduranceBar: {fileID: 0}
+  duration: 0
   healthLevel: 10
   enduranceLevel: 10
+  hoverOffset: {x: 0, y: 2, z: 0}
 --- !u!114 &2027902990271785919
 MonoBehaviour:
   m_ObjectHideFlags: 0

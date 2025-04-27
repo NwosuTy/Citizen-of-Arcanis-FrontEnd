@@ -365,9 +365,6 @@ MonoBehaviour:
   simulationSpeed: 50
   <type>k__BackingField: 0
   _overrideController: {fileID: 22100000, guid: c6e6fa582c1515a4b96568292d9bfffb, type: 2}
-  <DamageableMask>k__BackingField:
-    serializedVersion: 2
-    m_Bits: 201
   <pickableObject>k__BackingField: {fileID: 3433440648423686324}
   maxBullets: 25
   isShooting: 0
@@ -375,6 +372,15 @@ MonoBehaviour:
   rest: {fileID: 5046125427142768735}
   <RestLockedPosition>k__BackingField: {x: 0.225, y: 0.503, z: 0.444}
   <RestOriginalPosition>k__BackingField: {x: -0.036, y: 0.101, z: 0.052}
+  <EnemyMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 8
+  <ObstacleMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  <DamageableMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 201
   muzzlePoint: {fileID: 7306037806239786991}
   muzzleFlash:
   - {fileID: 3392079507021320844}

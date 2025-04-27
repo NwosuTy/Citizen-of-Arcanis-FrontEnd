@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 public enum AttackType
 {
@@ -16,6 +15,8 @@ public enum ComboStatus
 public class CharacterCombat : MonoBehaviour
 {
     CharacterManager characterManager;
+
+    private Vector3 targetPosition;
     public WeaponManager weaponManager { get; private set; }
 
     [Header("Combat Status")]
@@ -83,12 +84,13 @@ public class CharacterCombat : MonoBehaviour
 
     public void Combat_Update(float delta)
     {
+        bool hasGun = HasGun();
+        targetPosition = GetTargetPosition();
         CharacterType type = characterManager.characterType;
-        CombatManager combatManager = CombatManager.Instance;
-        bool hasGun = (weaponManager != null && weaponManager.type == WeaponType.Gun);
+
         if (hasGun)
         {
-            weaponManager.WeaponManager_Update(delta);
+            weaponManager.WeaponManager_Update(targetPosition, characterManager, delta);
         }
 
         if (type == CharacterType.AI)
@@ -97,9 +99,8 @@ public class CharacterCombat : MonoBehaviour
         }
         else if (type == CharacterType.Player)
         {
-            Attack(delta, characterManager.PlayerInput);
-            combatManager.CrossHairImg.gameObject.SetActive(hasGun);
-            combatManager.FreeLookCamera.gameObject.SetActive(hasGun);
+            Attack(characterManager.PlayerInput);
+            characterManager.CameraController.EnableShooterGraphics(hasGun);
         }    
     }
 
@@ -124,7 +125,7 @@ public class CharacterCombat : MonoBehaviour
         canCombo = (status == ComboStatus.Can);
     }
 
-    private void Attack(float delta, InputManager input)
+    private void Attack(InputManager input)
     {
         characterManager.isAttacking = (input.lightAttackInput == true || input.heavyAttackInput == true);
         if(characterManager.isAttacking != true || CharacterInventoryManager.Instance.Panel.isMouseOverPanel)
@@ -145,17 +146,19 @@ public class CharacterCombat : MonoBehaviour
                 currentAction = heavyActions[random];
             }
             currentAction.PerformAction(characterManager);
-            input.ResetInput();
             return;
         }
-        HandleWeaponAction(delta);
-        input.ResetInput();
+        HandleWeaponAction();
     }
 
-    public void HandleWeaponAction(float delta)
+    public void HandleWeaponAction()
     {
-        Vector3 targePosition = GetTargetPosition();
-        weaponManager.HandleAction(targePosition, characterManager, null);
+        weaponManager.HandleAction(targetPosition, characterManager);
+    }    
+
+    public bool HasGun()
+    {
+        return weaponManager != null && weaponManager.type == WeaponType.Gun;
     }
 
     public void EnableCollider()

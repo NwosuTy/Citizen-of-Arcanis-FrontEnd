@@ -1,8 +1,13 @@
+using System.Collections;
 using UnityEngine;
 
 public class CharacterStatistic : MonoBehaviour
 {
     private int currentHealth;
+    private bool showHealthBar;
+    private WaitForSeconds waitForSeconds;
+
+    private Camera mainCamera;
     public int currentEndurance { get; private set; }
 
     private int deathAnimation;
@@ -14,10 +19,13 @@ public class CharacterStatistic : MonoBehaviour
     [Header("Components")]
     [SerializeField] private UIBar healthBar;
     [SerializeField] private UIBar enduranceBar;
+    [SerializeField] private UIBar hoveringHealthBarAI;
 
     [Header("Parameters")]
+    [SerializeField] private float duration;
     [SerializeField] private int healthLevel;
     [SerializeField] private int enduranceLevel;
+    [SerializeField] private Vector3 hoverOffset;
 
     private void Awake()
     {
@@ -27,6 +35,9 @@ public class CharacterStatistic : MonoBehaviour
     private void Start()
     {
         PrepareDamageAnimations();
+        mainCamera = Camera.main;
+
+        waitForSeconds = new(duration);
         deathAnimation = Animator.StringToHash("Death");
     }
 
@@ -61,6 +72,11 @@ public class CharacterStatistic : MonoBehaviour
             healthBar.SetMaxValue(currentHealth);
             healthBar.SetCurrentValue(currentHealth);
         }
+        if(hoveringHealthBarAI != null)
+        {
+            hoveringHealthBarAI.SetBillboard(mainCamera, transform);
+            hoveringHealthBarAI.gameObject.SetActive(showHealthBar);
+        }
     }
 
     public void ReduceEndurance(float value)
@@ -71,7 +87,7 @@ public class CharacterStatistic : MonoBehaviour
     public void TakeDamage(int damageValue, AttackType attackType)
     {
         currentHealth -= damageValue;
-        healthBar.SetCurrentValue(currentHealth);
+        UpdateHealthBar();
         CharacterAnim anim = characterManager.AnimatorManagaer;
 
         if(currentHealth <= 0)
@@ -94,5 +110,28 @@ public class CharacterStatistic : MonoBehaviour
         }
         int heavyRandom = Random.Range(0, heavyDamageAnimationArray.Length);
         anim.PlayTargetAnimation(heavyDamageAnimationArray[heavyRandom], true);
+    }
+
+    private void UpdateHealthBar()
+    {
+        showHealthBar = true;
+        if(characterManager.characterType != CharacterType.AI || characterManager.combatMode)
+        {
+            healthBar.SetCurrentValue(currentHealth);
+            return;
+        }
+        hoveringHealthBarAI.SetCurrentValue(currentHealth);
+        hoveringHealthBarAI.gameObject.SetActive(showHealthBar);
+        StartCoroutine(DisableHealthBar(hoveringHealthBarAI.gameObject));
+    }
+
+    private IEnumerator DisableHealthBar(GameObject healthBar)
+    {
+        while (showHealthBar == true)
+        {
+            yield return waitForSeconds;
+            showHealthBar = false;
+            healthBar.SetActive(false);
+        }
     }
 }

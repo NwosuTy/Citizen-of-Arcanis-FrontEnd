@@ -4,16 +4,14 @@ using System.Collections.Generic;
 public class CharacterDamageCollider : MonoBehaviour
 {
     private CharacterManager characterCausingDamage;
-    private PlaceHolderCombatScript placeHolderCombat;
     private List<CharacterManager> charactersBeingDamaged = new();
 
     [Header("Parameters")]
     [SerializeField] private Rigidbody rigidBody;
     [SerializeField] private Collider damageCollider;
     
-    public void SetCharacter(CharacterManager cm, PlaceHolderCombatScript pcs)
+    public void SetCharacter(CharacterManager cm)
     {
-        placeHolderCombat = pcs;
         characterCausingDamage = cm;
 
         rigidBody.isKinematic = true;
@@ -42,9 +40,8 @@ public class CharacterDamageCollider : MonoBehaviour
             return;
         }
         bool sameObjectCC = (characterCausingDamage != null && characterCausingDamage == damaged);
-        bool sameObjectPCS = (placeHolderCombat != null && placeHolderCombat.gameObject == damaged.gameObject);
 
-        if(sameObjectCC || sameObjectPCS)
+        if(sameObjectCC)
         {
             return;
         }
@@ -64,13 +61,9 @@ public class CharacterDamageCollider : MonoBehaviour
         }
 
         charactersBeingDamaged.Add(damaged);
-        CharacterCombat combat = (characterCausingDamage == null) ? null : characterCausingDamage.CombatManager;
-        AttackActions currentAttack = (characterCausingDamage != null) ? combat.currentAction : placeHolderCombat.currentAction;
-        if(placeHolderCombat != null)
-        {
-            damaged.StatsManager.PlayDamageAnimation(damaged.AnimatorManagaer, currentAttack.attackType);
-            return;
-        }
+
+        CharacterCombat combat = characterCausingDamage.CombatManager;
+        AttackActions currentAttack = combat.currentAction;
         int damage = combat.damageModifier * currentAttack.damageValue;
         damaged.StatsManager.TakeDamage(damage, currentAttack.attackType);
     }

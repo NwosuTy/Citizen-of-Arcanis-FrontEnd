@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8679144592217417963}
   - component: {fileID: 2723606900977066209}
-  - component: {fileID: 3903456282143896313}
   m_Layer: 0
   m_Name: Combat Manager
   m_TagString: Untagged
@@ -50,23 +49,6 @@ MonoBehaviour:
   <OppositionCombatPrefab>k__BackingField: {fileID: 0}
   transitionDelay: 1
   sceneTransitionAnimator: {fileID: 3562696924171110464}
---- !u!114 &3903456282143896313
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1296510828280431910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 20108c5b8af4c5a4184f35cf324a8fb7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  woodBulletHoles: {fileID: 1031560401822814, guid: 3c0b5f221ea995442b9d11dc526de1c0, type: 3}
-  metalBulletHoles: {fileID: 1892351807075712, guid: 44be68b4fc4366142a9cd1ae1f761ea4, type: 3}
-  cementBulletHoles: {fileID: 248482557015467493, guid: dff48fe310853ec4a86e00651dbd7a1f, type: 3}
-  bulletTrailPrefab: {fileID: 3987156027170035156, guid: 555c25e338ea1f040b32aba35196a448, type: 3}
-  bloodPrefab: {fileID: 0}
 --- !u!1 &3375102967119790488
 GameObject:
   m_ObjectHideFlags: 0

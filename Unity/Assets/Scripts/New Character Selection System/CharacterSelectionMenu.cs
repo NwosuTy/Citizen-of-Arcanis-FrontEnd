@@ -9,7 +9,6 @@ public class CharacterSelectionMenu : MonoBehaviour
 
     [Header("Parameters")]
     [SerializeField] private float turnSpeed;
-    [SerializeField] private string sceneToLoad;
     [SerializeField] private CharacterUIDisplaySlot characterUIDisplaySlot;
     [field: SerializeField] public CharacterData[] characterDatas {  get; private set; }
 
@@ -103,6 +102,6 @@ public class CharacterSelectionMenu : MonoBehaviour
         }
 
         PlayerPrefs.SetInt("SelectedCharacterIndex", selectedCharacterIndex);
-        SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Single);
+        SceneManager.LoadSceneAsync("DemoPrincipalScene", LoadSceneMode.Single);
     }
 }

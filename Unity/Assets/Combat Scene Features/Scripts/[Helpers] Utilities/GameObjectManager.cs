@@ -8,6 +8,7 @@ public class GameObjectManager : MonoBehaviour
     public static ObjectPool<GameObject> metalBulletHolesPool { get; private set; }
     public static ObjectPool<GameObject> cementBulletHolesPool { get; private set; }
 
+
     [Header("Impact Objects")]
     [SerializeField] private GameObject woodBulletHoles;
     [SerializeField] private GameObject metalBulletHoles;
@@ -15,6 +16,7 @@ public class GameObjectManager : MonoBehaviour
     [SerializeField] protected TrailRenderer bulletTrailPrefab;
 
     [Header("Objects To Spawn")]
+    [SerializeField] private UIBar healthBarPrefab;
     [SerializeField] private GameObject bloodPrefab;
 
     private void Awake()

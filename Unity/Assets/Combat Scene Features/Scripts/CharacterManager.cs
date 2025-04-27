@@ -24,7 +24,7 @@ public class CharacterManager : MonoBehaviour
     public CharacterCombat CombatManager { get; private set; }
     public CharacterStatistic StatsManager { get; private set; }
     public CharacterMovement MovementManager { get; private set; }
-    public CharacterAnimatorRigController rigController { get; private set; }
+    public CharacterAnimatorRigController RigController { get; private set; }
 
     //AI Components
     public NavMeshPath navMeshPath;
@@ -34,6 +34,8 @@ public class CharacterManager : MonoBehaviour
 
     //Player Componets
     public InputManager PlayerInput { get; private set; }
+    public CharacterCameraController CameraController { get; private set; }
+    public CharacterInteractionScript InteractionScript { get; private set; }
 
     //Parameters
     public float AngleTarget { get; private set; }
@@ -60,7 +62,10 @@ public class CharacterManager : MonoBehaviour
     public CharacterType characterType;
     [SerializeField] private float stopDistance;
     [SerializeField] private float sphereRadius;
+
+    [Header("Properties")]
     [SerializeField] private LayerMask targetMask;
+    [field: SerializeField] public Transform CameraTarget { get; private set; }
     [field: SerializeField] public Sprite CharacterImage { get; private set; }
 
     [field: Header("State Machine")]
@@ -80,70 +85,86 @@ public class CharacterManager : MonoBehaviour
         StatsManager = GetComponent<CharacterStatistic>();
 
         MovementManager = GetComponent<CharacterMovement>();
-        rigController = GetComponentInChildren<CharacterAnimatorRigController>();
-
-        //Character Type Based Components
-        if (characterType == CharacterType.Player)
-        {
-            PlayerInput = GetComponent<InputManager>();
-            if(PlayerInput == null)
-            {
-                PlayerInput = gameObject.AddComponent<InputManager>();
-            }
-        }
-        else
-        {
-            Agent = GetComponentInChildren<NavMeshAgent>();
-            if(Agent == null)
-            {
-                GameObject aiObject = new GameObject();
-                aiObject.transform.SetParent(transform);
-                Agent = aiObject.AddComponent<NavMeshAgent>();
-
-                Agent.stoppingDistance = stopDistance;
-                aiObject.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
-            }
-        }
+        RigController = GetComponentInChildren<CharacterAnimatorRigController>();
     }
 
     private void Start()
     {
-        InitializeStates();
-        StatsManager.ResetStats();
-
         if (characterType == CharacterType.Player)
         {
-            CharacterInventoryManager.Instance.SetCharacterManager(this, null);
+            PlayerInput = GetComponent<InputManager>();
+            if (PlayerInput == null)
+            {
+                PlayerInput = gameObject.AddComponent<InputManager>();
+                InteractionScript = GetComponent<CharacterInteractionScript>();
+                CameraController = gameObject.AddComponent<CharacterCameraController>();
+
+                CameraController.SetCameraTarget(CameraTarget);
+            }
+            CharacterInventoryManager.Instance.SetCharacterManager(this);
         }
+        else
+        {
+            Agent = GetComponentInChildren<NavMeshAgent>();
+            if (Agent == null)
+            {
+                GameObject aiObject = new();
+                aiObject.transform.SetParent(transform);
+
+                gameObject.AddComponent<DialogueTrigger>();
+                Agent = aiObject.AddComponent<NavMeshAgent>();
+
+                InitializeStates();
+                Agent.stoppingDistance = stopDistance;
+                aiObject.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+            }
+        }
+        StatsManager.ResetStats();
+    }
+
+    //Character Type Based Components
+    public void SetCharacterType(CharacterType type)
+    {
+        characterType = type;
     }
 
     private void Update()
     {
-        if (isDead)
+        if(isDead)
         {
             return;
         }
-        float delta = Time.deltaTime;
 
+        float delta = Time.deltaTime;
         isGrounded = Controller.isGrounded;
 
+        AnimatorManagaer.SetAnimatorBool(Anim);
         if (characterType == CharacterType.Player)
         {
             PlayerInput.InputManager_Update();
+            InteractionScript.InteractionUpdate();
         }
 
         if (characterType == CharacterType.AI)
         {
             HandleStateChange();
         }
-        AnimatorManagaer.SetAnimatorBool(Anim);
-
+  
         SetTargetDetails();
         CombatManager.Combat_Update(delta);
         MovementManager.CharacterMovement_Update(delta);
-        if (rigController != null)
+        if (RigController != null)
         {
-            rigController.CharacterAnimationRig_Updater(delta);
+            RigController.CharacterAnimationRig_Updater(delta);
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (characterType == CharacterType.Player)
+        {
+            PlayerInput.ResetInput();
+            CameraController.CameraRotation();
         }
     }
 

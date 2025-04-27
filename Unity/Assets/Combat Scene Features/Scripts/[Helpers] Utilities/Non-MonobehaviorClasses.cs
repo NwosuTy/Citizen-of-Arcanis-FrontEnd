@@ -123,12 +123,12 @@ public class WeaponRecoil
     [SerializeField] private Vector2[] recoilPattern;
 
     [Header("Components")]
-    [SerializeField] private CinemachineFreeLook freeLook;
+    [SerializeField] private CinemachineVirtualCameraBase freeLook;
     [SerializeField] private CinemachineImpulseSource impulseSource;
 
-    public void Initialize(Transform cameraObj, CinemachineFreeLook freeLook, CinemachineImpulseSource impulseSource)
+    public void Initialize(Transform cameraObj, CinemachineVirtualCameraBase virtualCamera, CinemachineImpulseSource impulseSource)
     {
-        this.freeLook = freeLook;
+        this.freeLook = virtualCamera;
         cameraObject = cameraObj;
         this.impulseSource = impulseSource;
     }
@@ -142,8 +142,8 @@ public class WeaponRecoil
     {
         if(time > 0.0f)
         {
-            freeLook.m_YAxis.Value -= ((verticalRecoil / 1000) * delta) / duration;
-            freeLook.m_XAxis.Value -= ((horizontalRecoil / 1000) * delta) / duration;
+            //freeLook.m_YAxis.Value -= ((verticalRecoil / 1000) * delta) / duration;
+            //freeLook.m_XAxis.Value -= ((horizontalRecoil / 1000) * delta) / duration;
             time -= delta;
         }
     }

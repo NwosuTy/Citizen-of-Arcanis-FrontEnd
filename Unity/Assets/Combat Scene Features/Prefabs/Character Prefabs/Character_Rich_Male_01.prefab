@@ -981,7 +981,6 @@ GameObject:
   - component: {fileID: 7983777001258694378}
   - component: {fileID: 832956702252146582}
   - component: {fileID: 1283628757290478395}
-  - component: {fileID: 3761940412008978528}
   m_Layer: 3
   m_Name: Character_Rich_Male_01
   m_TagString: Untagged
@@ -1084,6 +1083,7 @@ MonoBehaviour:
   targetMask:
     serializedVersion: 2
     m_Bits: 8
+  <CameraTarget>k__BackingField: {fileID: 0}
   <CharacterImage>k__BackingField: {fileID: 21300000, guid: 0ffc0193750c76447bd17c4ef6b12556, type: 3}
   activeState: {fileID: 0}
   <Patrol>k__BackingField: {fileID: 11400000, guid: 57300d976c9042d448e56db1b7a31c6f, type: 2}
@@ -1116,8 +1116,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthBar: {fileID: 0}
   enduranceBar: {fileID: 0}
+  duration: 0
   healthLevel: 10
   enduranceLevel: 10
+  hoverOffset: {x: 0, y: 2, z: 0}
 --- !u!114 &832956702252146582
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1169,22 +1171,6 @@ MonoBehaviour:
   GunWeaponHolder: {fileID: 0}
   MeleeWeaponHolder: {fileID: 0}
   <CombatCharacter>k__BackingField: {fileID: 11400000, guid: 92b26e7a395795c48a119f12202731d2, type: 2}
---- !u!114 &3761940412008978528
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3822064132948784576}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec14378329cec5c4fb5e6e7d926dd0cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dialogueTextsArray:
-  - {fileID: 4900000, guid: e544047ae03b8024cb29a92923c2fc61, type: 3}
-  - {fileID: 4900000, guid: 520c085b81c25414fb5aa2e25515b198, type: 3}
-  - {fileID: 4900000, guid: 15b9c61df7c178f41852a02010f25461, type: 3}
 --- !u!1 &4129038869974313272
 GameObject:
   m_ObjectHideFlags: 0

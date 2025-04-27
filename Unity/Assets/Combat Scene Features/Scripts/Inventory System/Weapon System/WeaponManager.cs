@@ -10,9 +10,8 @@ public class WeaponManager : MonoBehaviour
     private Ray ray;
     private int bulletLeft;
 
-    private Image crossHairImg;
-    private CinemachineFreeLook freeLookCamera;
     private CinemachineImpulseSource impulseSource;
+    private CinemachineVirtualCameraBase shooterCam;
 
     [Header("Gun Status")]
     [SerializeField] private int fireRate = 25;
@@ -22,7 +21,6 @@ public class WeaponManager : MonoBehaviour
     [field: Header("Parameters")]
     [field: SerializeField] public WeaponType type { get; private set; }
     [SerializeField] private AnimatorOverrideController _overrideController;
-    [field: SerializeField] public LayerMask DamageableMask { get; private set; }
     [field: SerializeField] public PickableObject pickableObject { get; private set; }
 
     [Header("Gun Parameters")]
@@ -31,6 +29,10 @@ public class WeaponManager : MonoBehaviour
     [SerializeField] private Transform grip, rest;
     [field: SerializeField] public Vector3 RestLockedPosition { get; private set; }
     [field: SerializeField] public Vector3 RestOriginalPosition { get; private set; }
+
+    [field: Header("Layer Masks")]
+    [field: SerializeField] public LayerMask EnemyMask { get; private set; }
+    [field: SerializeField] public LayerMask DamageableMask { get; private set; }
 
     [Header("Gun Parameters (FX)")]
     [SerializeField] private Transform muzzlePoint;
@@ -50,32 +52,22 @@ public class WeaponManager : MonoBehaviour
         DamageCollider = GetComponentInChildren<CharacterDamageCollider>(); 
     }
 
-    public void Initialize(CharacterManager character, PlaceHolderCombatScript pcs)
+    public void Initialize(CharacterManager character)
     {
         bulletLeft = maxBullets;
-        if(pcs == null)
-        {
-            character.CombatManager.AssignWeapon(this);
-            character.Anim.runtimeAnimatorController = _overrideController;
-        }
-        else
-        {
-            pcs.AssignWeapon(this);
-        }
+        character.CombatManager.AssignWeapon(this);
+        character.Anim.runtimeAnimatorController = _overrideController;
+
         if (DamageCollider != null)
         {
-            DamageCollider.SetCharacter(character, pcs);
+            DamageCollider.SetCharacter(character);
         }
 
         if(type == WeaponType.Gun)
         {
-            CombatManager combatManager = CombatManager.Instance;
-
-            crossHairImg = combatManager.CrossHairImg;
-            freeLookCamera = combatManager.FreeLookCamera;
-
-            weaponRecoil.Initialize(combatManager.CameraObject, freeLookCamera, impulseSource);
-            if(character != null) character.rigController.SetTwoBoneIKConstraint(grip, rest);
+            shooterCam = character.CameraController.ShooterVirtualCamera;
+            if (character != null) character.RigController.SetTwoBoneIKConstraint(grip, rest);
+            weaponRecoil.Initialize(CombatManager.Instance.CameraObject, shooterCam, impulseSource);
         }
     }
 
@@ -89,31 +81,37 @@ public class WeaponManager : MonoBehaviour
         bulletLeft += difference;
     }
 
-    public void SetCrossHairImage(Image crossHair)
-    {
-        crossHairImg = crossHair;
-    }
-
-    public void WeaponManager_Update(float delta)
+    public void WeaponManager_Update(Vector3 targetPosition, CharacterManager character, float delta)
     {
         weaponRecoil.HandleRecoil(delta);
+        Vector3 direction = targetPosition - muzzlePoint.position;
+
+        ray = new(muzzlePoint.position, direction);
+        Image crossHairImage = character.CameraController.CrossHairImg;
+
+        if (Physics.Raycast(ray, gunRange, EnemyMask))
+        {
+            crossHairImage.color = Color.green;
+            return;
+        }
+        crossHairImage.color = Color.white;
     }
 
-    public void HandleAction(Vector3 targetPosition, CharacterManager characterManager, PlaceHolderCombatScript pcs)
+    public void HandleAction(Vector3 targetPosition, CharacterManager characterManager)
     {
         if(type == WeaponType.Gun)
         {
-            HandleAction_Gun(targetPosition, characterManager, pcs);
+            HandleAction_Gun(targetPosition, characterManager);
         }
     }
 
-    private void HandleAction_Gun(Vector3 targetPosition, CharacterManager characterManager, PlaceHolderCombatScript pcs)
+    private void HandleAction_Gun(Vector3 targetPosition, CharacterManager characterManager)
     {
         if(characterManager != null)
         characterManager.CombatManager.currentAction = null;
 
         HandleVFX();
-        HandleShooting(targetPosition, characterManager, pcs);
+        HandleShooting(targetPosition, characterManager);
     }
 
     #region Gun Parameters
@@ -126,26 +124,23 @@ public class WeaponManager : MonoBehaviour
         }
     }
 
-    private void HandleShooting(Vector3 targetPosition, CharacterManager character, PlaceHolderCombatScript pcs)
+    private void HandleShooting(Vector3 targetPosition, CharacterManager character)
     {
-        Vector3 direction = targetPosition - muzzlePoint.position;
-        Ray ray = new(muzzlePoint.position, direction);
-
-        crossHairImg.color = Color.white;
         weaponRecoil.GenerateRecoilPattern();
         if(Physics.Raycast(ray, out RaycastHit hitInfo, gunRange, DamageableMask))
         {
             CharacterManager shotCharacter = hitInfo.collider.GetComponentInParent<CharacterManager>();
             StartCoroutine(HandleTrailFX(muzzlePoint.position, hitInfo.point));
-            bool sameTema = (pcs == null && shotCharacter.currentTeam != character.currentTeam);
-
+            
             if (shotCharacter == null)
             {
                 InstantiateBulletHoles(hitInfo);
+                return;
             }
-            else if(shotCharacter != null && sameTema)
+
+            bool sameTeam = (shotCharacter.currentTeam != character.currentTeam);
+            if(sameTeam)
             {
-                crossHairImg.color = Color.green;
                 shotCharacter.StatsManager.TakeDamage(2, AttackType.Heavy);
             }
             return;

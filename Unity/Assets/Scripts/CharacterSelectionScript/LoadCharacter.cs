@@ -1,7 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
+using Cinemachine;
 
 /// <summary>
 /// Handles the loading and instantiation of character prefabs based on player selection.
@@ -10,87 +9,95 @@ using TMPro;
 /// </summary>
 public class LoadCharacter : MonoBehaviour
 {
-    /// <summary>
-    /// Array of character prefabs that can be instantiated.
-    /// These should be assigned in the Unity Inspector.
-    /// </summary>
-    public GameObject[] characterPrefab;
-    /// <summary>
-    /// Array of drone prefabs that can be instantiated.
-    /// These should be assigned in the Unity Inspector.
-    /// </summary>
-    public GameObject[] dronePrefab;
-    /// <summary>
-    /// Transform reference for the position where the character will be spawned.
-    /// Should be set in the Unity Inspector.
-    /// </summary>
+    private int selectedIndex;
+    private CharacterManager spawnedCharacter;
+
+    [Header("Parameters")]  
+    [Tooltip("Transform reference for the position where the character will be spawned")]
     public Transform spawnPoint;
-    /// <summary>
-    /// TextMeshPro UI component to display the selected character's name.
-    /// Optional - can be left unassigned if character name display is not needed.
-    /// </summary>
-    public TMP_Text label;
-    [Header("General Property")]
     [SerializeField] private Transform cameraAimObject;
 
-    /// <summary>
-    /// Initializes the character and its drone loading process when the script starts.
-    /// Retrieves the selected character index from PlayerPrefs and instantiates the corresponding prefab.
-    /// Also updates the character name label if one is assigned.
-    /// </summary>
+    [Header("UI Elements")]
+    [SerializeField] private PlayerUI playerUI;
+
+    [Header("Camera Objects")]
+    [SerializeField] private CinemachineVirtualCamera gunCamera;
+    [SerializeField] private CinemachineVirtualCamera thirdPersonCamera;
+
+    [Header("Instantiated Objects")]
+    [Tooltip(" Array of drone prefabs that can be instantiated.")]
+    public GameObject[] dronePrefab;
+    [Tooltip("Array of character prefabs that can be instantiated.")]
+    public CharacterManager[] characterManagerPrefabs;
+
     void Start()
     {
-        int selectedCharacter = PlayerPrefs.GetInt("selectedCharacter", 0); 
-        if (selectedCharacter < 0 || selectedCharacter >= characterPrefab.Length)
+        CreateCharacter();
+        CreateDroneObject();
+    }
+
+    private void CreateCharacter()
+    {
+        selectedIndex = PlayerPrefs.GetInt("SelectedCharacterIndex", 0);
+        if (selectedIndex < 0 || selectedIndex >= characterManagerPrefabs.Length)
         {
             Debug.LogError("�ndice de personaje seleccionado est� fuera de rango. Verifica los prefabs asignados en el inspector.");
             return;
         }
+        CharacterManager prefab = characterManagerPrefabs[selectedIndex];
+        spawnedCharacter = Instantiate(prefab, spawnPoint.position, Quaternion.identity);
+        spawnedCharacter.SetCharacterType(CharacterType.Player);
 
-        GameObject prefab = characterPrefab[selectedCharacter];
-        GameObject clone = Instantiate(prefab, spawnPoint.position, Quaternion.identity);
+        SetCharacterParameters();
+        SetMiniMapAndCameraProperties(spawnedCharacter.CameraTarget);
+    }
 
+    private void CreateDroneObject()
+    {
+        int droneIndex = selectedIndex % dronePrefab.Length;
+        GameObject drone = Instantiate(dronePrefab[droneIndex], spawnPoint.position + new Vector3(0, 2, -1), Quaternion.identity);
+
+        // Set up the drone to follow the character
+        DroneFollower droneFollower = drone.AddComponent<DroneFollower>();
+        droneFollower.SetDrone_Target(spawnedCharacter);
+
+        // Assign the main camera to the drone 
+        Camera mainCamera = Camera.main;
+        if (mainCamera != null)
+        {
+            droneFollower.SetCameraTransform(mainCamera.transform);
+            return;
+        }
+        Debug.LogWarning("No se encontró la cámara principal en la escena.");
+    }
+
+    private void SetMiniMapAndCameraProperties(Transform playerTransform)
+    {
         MinimapController minimapController = FindObjectOfType<MinimapController>();
+
         if (minimapController != null)
         {
-            minimapController.player = clone.transform;
-            CombatManager combatManager = CombatManager.Instance;
-
-            PlaceHolderCombatScript pcs = clone.GetComponent<PlaceHolderCombatScript>();
-            combatManager.FreeLookCamera.Follow = clone.transform;
-            combatManager.FreeLookCamera.LookAt = clone.transform;
-            pcs.SetCrossHair(cameraAimObject);
+            minimapController.player = playerTransform;
+            SetCameraProperty(gunCamera, playerTransform);
+            SetCameraProperty(thirdPersonCamera, playerTransform);
         }
+    }
 
-        if (label != null)
+    private void SetCharacterParameters()
+    {
+        if(spawnedCharacter == null)
         {
-            label.text = prefab.name;
+            return;
         }
 
-        // Instantiate the corresponding drone if available
-        if (selectedCharacter < dronePrefab.Length)
-        {
-            GameObject drone = Instantiate(dronePrefab[selectedCharacter], spawnPoint.position + new Vector3(0, 2, -1), Quaternion.identity);
+        playerUI.SetParameters(spawnedCharacter);
+        spawnedCharacter.currentTeam = Team.Blue;
+        spawnedCharacter.CombatManager.SetCrossHair(cameraAimObject);
+    }
 
-            // Set up the drone to follow the character
-            DroneFollower droneFollower = drone.AddComponent<DroneFollower>();
-            droneFollower.target = clone.transform;
-
-            // Assign the main camera to the drone 
-            Camera mainCamera = Camera.main;
-            if (mainCamera != null)
-            {
-                droneFollower.cameraTransform = mainCamera.transform;
-            }
-            else
-            {
-                Debug.LogWarning("No se encontró la cámara principal en la escena.");
-            }
-
-        }
-        else
-        {
-            Debug.LogWarning("No se encontró un drone asignado para este personaje.");
-        }
+    private void SetCameraProperty(CinemachineVirtualCameraBase camera, Transform playerTransform)
+    {
+        camera.Follow = playerTransform;
+        camera.LookAt = playerTransform;
     }
 }

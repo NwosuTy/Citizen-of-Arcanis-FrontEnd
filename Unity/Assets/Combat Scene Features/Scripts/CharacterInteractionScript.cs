@@ -18,10 +18,11 @@ public class CharacterInteractionScript : MonoBehaviour
 
     private void Start()
     {
+        interactUI.SetActive(false);
         colliderArray = new Collider[20];
     }
 
-    private void Update()
+    public void InteractionUpdate()
     {
         DialogueManager instance = DialogueManager.Instance;
         if(instance != null && instance.dialogueIsPlaying)
@@ -31,28 +32,22 @@ public class CharacterInteractionScript : MonoBehaviour
         }
 
         IInteractable interactable = GetInteractableObject();
-        if(interactable != null )
+        bool inCombat = interactable is DialogueTrigger &&  (characterManager != null && characterManager.combatMode);
+        if (interactable == null || inCombat)
         {
-            bool inCombat = (characterManager != null && characterManager.combatMode);
-            if (interactable is DialogueTrigger && inCombat)
-            {
-                return;
-            }
-
-            interactText.text = interactable.GetInteractText();
-            interactUI.SetActive(true);
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                interactable.Interact();
-                interactUI.SetActive(false);
-            }
+            interactUI.SetActive(false);
+            return;
         }
-        else
+
+        interactText.text = interactable.GetInteractText();
+        interactUI.SetActive(true);
+
+        if (characterManager.PlayerInput.interactInput)
         {
+            interactable.Interact();
             interactUI.SetActive(false);
         }
     }
-
     private IInteractable GetInteractableObject()
     {
         int count = Physics.OverlapSphereNonAlloc(transform.position, detectRadius, colliderArray);
@@ -75,5 +70,4 @@ public class CharacterInteractionScript : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectRadius);
     }
-
 }

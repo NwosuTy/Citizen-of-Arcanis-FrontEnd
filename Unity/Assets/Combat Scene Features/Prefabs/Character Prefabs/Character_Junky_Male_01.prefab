@@ -437,7 +437,6 @@ GameObject:
   - component: {fileID: 1992344807784710550}
   - component: {fileID: 7279221582756301557}
   - component: {fileID: 4854839359513519584}
-  - component: {fileID: 3120672346686710025}
   m_Layer: 3
   m_Name: Character_Junky_Male_01
   m_TagString: Untagged
@@ -540,6 +539,7 @@ MonoBehaviour:
   targetMask:
     serializedVersion: 2
     m_Bits: 8
+  <CameraTarget>k__BackingField: {fileID: 0}
   <CharacterImage>k__BackingField: {fileID: 21300000, guid: ace7acb69b42b604c942e2611e2427f0, type: 3}
   activeState: {fileID: 0}
   <Patrol>k__BackingField: {fileID: 11400000, guid: 57300d976c9042d448e56db1b7a31c6f, type: 2}
@@ -572,8 +572,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthBar: {fileID: 0}
   enduranceBar: {fileID: 0}
+  duration: 0
   healthLevel: 10
   enduranceLevel: 10
+  hoverOffset: {x: 0, y: 2, z: 0}
 --- !u!114 &7279221582756301557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -625,22 +627,6 @@ MonoBehaviour:
   GunWeaponHolder: {fileID: 0}
   MeleeWeaponHolder: {fileID: 0}
   <CombatCharacter>k__BackingField: {fileID: 11400000, guid: 82bf5d42430ef8d4393d57c305b39e1a, type: 2}
---- !u!114 &3120672346686710025
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1824903047239912380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec14378329cec5c4fb5e6e7d926dd0cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dialogueTextsArray:
-  - {fileID: 4900000, guid: e544047ae03b8024cb29a92923c2fc61, type: 3}
-  - {fileID: 4900000, guid: 520c085b81c25414fb5aa2e25515b198, type: 3}
-  - {fileID: 4900000, guid: 15b9c61df7c178f41852a02010f25461, type: 3}
 --- !u!1 &2164119585532582156
 GameObject:
   m_ObjectHideFlags: 0

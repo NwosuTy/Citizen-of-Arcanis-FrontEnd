@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEngine.GridBrushBase;
 
 public class CharacterMovement : MonoBehaviour
 {
@@ -49,8 +50,11 @@ public class CharacterMovement : MonoBehaviour
 
     public void PlayerMovement(float delta)
     {
-        HandleMovement(delta);
-        HandleRotation(delta);
+        CharacterCombat combat = characterManager.CombatManager;
+        bool isLockedIn = (characterManager.isLockedIn || combat.HasGun());
+
+        HandleMovement(delta, isLockedIn);
+        HandleRotation(delta, isLockedIn);
     }
 
     private void HandleGravity(float delta)
@@ -80,27 +84,46 @@ public class CharacterMovement : MonoBehaviour
         characterManager.Controller.Move(verticalVelocity * delta);
     }
 
-    private void HandleRotation(float delta)
-    { 
-        if(cameraObject == null )
-        {
-            cameraObject = Camera.main.transform;
-            return;
-        }
-        float yawCamera = cameraObject.rotation.eulerAngles.y;
-        Quaternion targetRotation = Quaternion.Euler(0f, yawCamera, 0f);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+    private void HandleRotation(float delta, bool isLockedIn)
+    {
+        transform.rotation = GetTargetRotation(delta, isLockedIn);
     }
 
-    private void HandleMovement(float delta)
+    private Quaternion GetTargetRotation(float delta, bool isLockedIn)
+    {
+        Quaternion targetRotation;
+
+        if (isLockedIn)
+        {
+            float yawCamera = cameraObject.rotation.eulerAngles.y;
+            targetRotation = Quaternion.Euler(0f, yawCamera, 0f);
+        }
+        else
+        {
+            Vector3 rotationDirection = cameraObject.forward * characterManager.PlayerInput.verticalMoveInput;
+            rotationDirection += cameraObject.right * characterManager.PlayerInput.horizontalMoveInput;
+
+            rotationDirection.Normalize();
+            rotationDirection.y = 0.0f;
+            if (rotationDirection == Vector3.zero)
+            {
+                rotationDirection = transform.forward;
+            }
+            targetRotation = Quaternion.LookRotation(rotationDirection);
+        }
+        return Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * delta);
+    }
+
+    private void HandleMovement(float delta, bool isLockedIn)
     {
         if (characterManager.isGrounded != true)
         {
             return;
         }
+        InputManager input = characterManager.PlayerInput;
 
-        float verticalInput = characterManager.PlayerInput.verticalMoveInput;
-        float horizontalInput = characterManager.PlayerInput.horizontalMoveInput;
+        float verticalInput = input.verticalMoveInput;
+        float horizontalInput = input.horizontalMoveInput;
         CharacterController characterController = characterManager.Controller;
 
         moveDirection = cameraObject.forward * verticalInput;
@@ -118,7 +141,10 @@ public class CharacterMovement : MonoBehaviour
         {
             characterController.Move(walkingSpeed * moveDirection * delta);
         }
-        characterManager.AnimatorManagaer.SetBlendTreeParameter(verticalInput, horizontalInput, characterManager.isSprinting, delta);
+
+        float horizontalKey = (isLockedIn) ? horizontalInput : 0.0f;
+        float verticalKey = (isLockedIn) ? verticalInput : input.moveAmount;
+        characterManager.AnimatorManagaer.SetBlendTreeParameter(verticalKey, horizontalKey, characterManager.isSprinting, delta);
     }
 
     public void MoveToDestination(float speed, Vector3 destination)

@@ -13,9 +13,12 @@ public class DialogueTrigger : MonoBehaviour, IInteractable
     private void Awake()
     {
         character = GetComponent<CharacterManager>();
-        interactText = $"Press E To Interact With {this.gameObject.name}";
+        dialogueTextsArray = Resources.LoadAll<TextAsset>("Dialogue Stories");
     }
-
+    private void Start()
+    {
+        interactText = $"Press E To Interact With {gameObject.name}";
+    }
     public void Interact()
     {
         character.dontMove = true;

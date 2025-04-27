@@ -66,7 +66,7 @@ public class AttackState : AIState
         if(combat.weaponManager.type == WeaponType.Gun)
         {
             character.isAttacking = true;
-            combat.HandleWeaponAction(delta);
+            combat.HandleWeaponAction();
             combat.Invoke(nameof(ResetPerformAttack), 0.35f);
             return;
         }
