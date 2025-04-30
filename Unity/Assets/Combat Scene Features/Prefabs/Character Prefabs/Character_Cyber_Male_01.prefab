@@ -3044,8 +3044,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d713d4458cdf69f4797ac609695c087e, type: 2}
   - {fileID: 11400000, guid: 8557d7f3eeba7114c917e3840b014574, type: 2}
   currentAction: {fileID: 0}
-  GunWeaponHolder: {fileID: 0}
-  MeleeWeaponHolder: {fileID: 0}
+  GunWeaponHolder: {fileID: 266024458463425049}
+  MeleeWeaponHolder: {fileID: 35890051618491924}
   <CombatCharacter>k__BackingField: {fileID: 11400000, guid: 576571e0310902b4b8521149f946fef4, type: 2}
 --- !u!114 &5564773201326711105
 MonoBehaviour:

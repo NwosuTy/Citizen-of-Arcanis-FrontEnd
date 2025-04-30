@@ -26,7 +26,7 @@ public class CharacterCameraController : MonoBehaviour
     [Tooltip("How far in degrees can you move the camera up")]
     [SerializeField] private float TopClamp = 30.0f;
     [Tooltip("How far in degrees can you move the camera down")]
-    [SerializeField] private float BottomClamp = -30.0f;
+    [SerializeField] private float BottomClamp = -10.0f;
     [Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
     [SerializeField] private Transform CinemachineCameraTarget;
 

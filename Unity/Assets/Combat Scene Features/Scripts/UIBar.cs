@@ -8,10 +8,12 @@ public class UIBar : MonoBehaviour
 
     [SerializeField] private Slider slider;
 
-    public void SetBillboard(Camera mc, Transform t)
+    public void SetBillboard(Camera mc, Transform t, float value)
     {
-        mainCamera = mc;
         character = t;
+        mainCamera = mc;
+    
+        SetMaxValue(value);
     }
 
     public void SetMaxValue(float value)

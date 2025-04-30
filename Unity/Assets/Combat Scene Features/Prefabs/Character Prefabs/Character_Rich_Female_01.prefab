@@ -1801,8 +1801,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d713d4458cdf69f4797ac609695c087e, type: 2}
   - {fileID: 11400000, guid: 8557d7f3eeba7114c917e3840b014574, type: 2}
   currentAction: {fileID: 0}
-  GunWeaponHolder: {fileID: 0}
-  MeleeWeaponHolder: {fileID: 0}
+  GunWeaponHolder: {fileID: 7656882609318545087}
+  MeleeWeaponHolder: {fileID: 6128379671832827007}
   <CombatCharacter>k__BackingField: {fileID: 11400000, guid: a4d9deb5f374d324796bd50c989d8270, type: 2}
 --- !u!114 &3285693696861761380
 MonoBehaviour:
@@ -3389,7 +3389,7 @@ MonoBehaviour:
     m_Mid: {fileID: 6889106670564282547}
     m_Tip: {fileID: 2176504257764504554}
     m_Target: {fileID: 0}
-    m_Hint: {fileID: 7656882609318545087}
+    m_Hint: {fileID: 7109727370916630027}
     m_TargetPositionWeight: 1
     m_TargetRotationWeight: 1
     m_HintWeight: 1

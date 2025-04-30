@@ -13,6 +13,7 @@ public class DialoguePanelChoices : MonoBehaviour
     {
         dialoguechoice = choice;
         choiceText.text = dialoguechoice.text;
+        choiceButton.onClick.RemoveAllListeners();
         choiceButton.onClick.AddListener(() => MakeChoice(choiceIndex, uiPanel));
     }
 

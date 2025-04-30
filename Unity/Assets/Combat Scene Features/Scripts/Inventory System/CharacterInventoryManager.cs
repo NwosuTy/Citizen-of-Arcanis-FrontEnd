@@ -5,6 +5,7 @@ public class CharacterInventoryManager : MonoBehaviour
 {
     InventorySlotUI slotUI;
     PickableObject spawnedItem;
+    private Transform cameraObject;
     public static CharacterInventoryManager Instance { get; private set; }
 
     private List<ItemClass> itemList = new();
@@ -24,6 +25,11 @@ public class CharacterInventoryManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    private void Start()
+    {
+        cameraObject = Camera.main.transform;
     }
 
     private void Update()
@@ -88,7 +94,7 @@ public class CharacterInventoryManager : MonoBehaviour
 
         if(spawnedItem.weaponManager != null)
         {
-            spawnedItem.weaponManager.Initialize(characterManager);
+            spawnedItem.weaponManager.Initialize(cameraObject, characterManager);
         }
         item.UpdateItemCount(false);
         spawnedItem.RemoveRigidBody();

@@ -111,24 +111,19 @@ public class RewardBox
 [System.Serializable]
 public class WeaponRecoil
 {
-    private int index;    
-    private Transform cameraObject;
-
+    private int index;
     private float time;
-    private float verticalRecoil;
-    private float horizontalRecoil;
+    private Transform cameraObject;
 
     [Header("Parameters")]
     [SerializeField] private float duration;
     [SerializeField] private Vector2[] recoilPattern;
 
     [Header("Components")]
-    [SerializeField] private CinemachineVirtualCameraBase freeLook;
     [SerializeField] private CinemachineImpulseSource impulseSource;
 
-    public void Initialize(Transform cameraObj, CinemachineVirtualCameraBase virtualCamera, CinemachineImpulseSource impulseSource)
+    public void Initialize(Transform cameraObj, CinemachineImpulseSource impulseSource)
     {
-        this.freeLook = virtualCamera;
         cameraObject = cameraObj;
         this.impulseSource = impulseSource;
     }
@@ -153,8 +148,8 @@ public class WeaponRecoil
         time = duration;
         impulseSource.GenerateImpulse(cameraObject.forward);
 
-        verticalRecoil = recoilPattern[index].y;
-        horizontalRecoil = recoilPattern[index].x;
+        //float verticalRecoil = recoilPattern[index].y;
+        //float horizontalRecoil = recoilPattern[index].x;
 
         index = NextIndex();
     }

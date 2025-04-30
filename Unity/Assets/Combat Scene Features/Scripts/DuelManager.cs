@@ -7,6 +7,8 @@ public class DuelManager : MonoBehaviour
 {
     public static DuelManager Instance;
     private List<int> indexList = new();
+
+    private Transform cameraObject;
     public DuelState DuelState { get; private set; }
 
     private CombatManager combatManager;
@@ -19,9 +21,10 @@ public class DuelManager : MonoBehaviour
     [SerializeField] private Transform enemySpawnPoint;
     [SerializeField] private Transform playerSpawnPoint;
 
-    [Header("General Property")]
+    [Header("Camera Objects")]
     [SerializeField] private Transform cameraAimObject;
-    [SerializeField] private CinemachineFreeLook freeLookCamera;
+    [SerializeField] private CinemachineVirtualCamera gunCamera;
+    [SerializeField] private CinemachineVirtualCamera thirdPersonCamera;
 
     [Header("Weapon Objects")]
     [SerializeField] private WeaponManager[] weaponManagers;
@@ -42,14 +45,17 @@ public class DuelManager : MonoBehaviour
     private void Start()
     {
         DuelState = DuelState.OnGoing;
+
+        cameraObject = Camera.main.transform;
         combatManager = CombatManager.Instance;
 
         SetObject(enemySpawnPoint, combatManager.OppositionCombatPrefab, CharacterType.AI);
         SetObject(playerSpawnPoint, combatManager.PlayerCombatPrefab, CharacterType.Player);
 
-        SetCameraTarget();
         uiManager.PrepareTimer();
         OnDuelStateChanged += HandleDuelStateChanged;
+        SetCameraProperty(gunCamera, player.transform);
+        SetCameraProperty(thirdPersonCamera, player.transform);
     }
 
     private void Update()
@@ -107,10 +113,10 @@ public class DuelManager : MonoBehaviour
         this.rewardSystem = rewardSystem;
     }
 
-    private void SetCameraTarget()
+    private void SetCameraProperty(CinemachineVirtualCameraBase camera, Transform playerTransform)
     {
-        freeLookCamera.Follow = player.transform;
-        freeLookCamera.LookAt = player.transform;
+        camera.Follow = playerTransform;
+        camera.LookAt = playerTransform;
     }
 
     private void PrepareWeapon(CharacterManager characterManager)
@@ -127,7 +133,7 @@ public class DuelManager : MonoBehaviour
         spawnedItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
 
         spawnedItem.pickableObject.SetPhysicsSystem(false);
-        spawnedItem.Initialize(characterManager);
+        spawnedItem.Initialize(cameraObject, characterManager);
         characterManager.CombatManager.AssignWeapon(spawnedItem);
     }
 
