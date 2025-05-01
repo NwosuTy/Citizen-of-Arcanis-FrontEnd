@@ -1,3 +1,4 @@
+using DevionGames;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -5,14 +6,16 @@ public class InputManager : MonoBehaviour
 {
     private InputControls control;
     private CharacterManager characterManager;
+    public static InputManager Instance { get; private set; }
 
     private int clickCount = 0;
     private float lastClickTime = 0.0f;
 
     private bool attackInput;
     private Vector2 movementInput;
+    [HideInInspector] public bool jumpInput;
     [SerializeField] private float doubleClickTime = 0.3f;
-    public bool jumpInput { get; private set; }
+    
     public bool dashInput { get; private set; }
     public bool lockedInput { get; private set; }
     public bool interactInput { get; private set; }
@@ -27,6 +30,12 @@ public class InputManager : MonoBehaviour
 
     private void Awake()
     {
+        if(Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
         characterManager = GetComponent<CharacterManager>();
     }
 
@@ -39,8 +48,9 @@ public class InputManager : MonoBehaviour
             control.BasicControl.CameraMovement.performed += ctx => cameraInput = ctx.ReadValue<Vector2>();
             control.BasicControl.CharacterMovement.performed += ctx => movementInput = ctx.ReadValue<Vector2>();
 
-            control.BasicControl.Jump.performed += ctx => jumpInput = true;
             control.BasicControl.Interact.performed += ctx => interactInput = true;
+            control.BasicControl.Jump.started += ctx => jumpInput = ctx.ReadValueAsButton();
+            control.BasicControl.Jump.canceled += ctx => jumpInput = ctx.ReadValueAsButton();
 
             control.AuxillaryControl.Dash.performed += ctx => dashInput = true;
             control.AuxillaryControl.Dash.canceled += ctx => dashInput = false;
@@ -86,7 +96,6 @@ public class InputManager : MonoBehaviour
 
     public void ResetInput()
     {
-        jumpInput = false;
         interactInput = false;
         lightAttackInput = false;
         heavyAttackInput = false;

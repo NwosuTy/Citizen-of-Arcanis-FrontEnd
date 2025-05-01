@@ -56,6 +56,8 @@ public class DialoguePanel : MonoBehaviour
         speakerName.text = speaker.name;
         speakerObject.gameObject.SetActive(false);
         speakerObject.gameObject.SetActive(true);
+
+        DialogueManager.Instance.canContinue = false;
         typingCoroutine = StartCoroutine(StartTypingText(dialogueText));
     }
 
@@ -103,13 +105,13 @@ public class DialoguePanel : MonoBehaviour
     {
         speakerDialogue.text = "";
         bool textFullyRevealed = false;
+        InputManager inputManager = InputManager.Instance;
         DialogueManager dialogueManager = DialogueManager.Instance;
-        dialogueManager.canContinue = false;
-        yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space) != true);
 
+        inputManager.jumpInput = false;
         foreach (char c in text)
         {
-            if (Input.GetKeyDown(KeyCode.Space) && textFullyRevealed != true)
+            if (inputManager.jumpInput && textFullyRevealed != true)
             {
                 speakerDialogue.text = text;
                 textFullyRevealed = true;
@@ -118,7 +120,7 @@ public class DialoguePanel : MonoBehaviour
             speakerDialogue.text += c;
             yield return typingSpeed;
         }
-        yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space) != true);
+        yield return new WaitUntil(() => inputManager.jumpInput != true);
         dialogueManager.canContinue = true;
     }
 }

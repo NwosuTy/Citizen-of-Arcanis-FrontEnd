@@ -67,7 +67,8 @@ public class AttackState : AIState
         {
             character.isAttacking = true;
             combat.HandleWeaponAction();
-            combat.Invoke(nameof(ResetPerformAttack), 0.35f);
+            combat.currentRecovery = 2.25f;
+            combat.Invoke(nameof(ResetPerformAttack), 3.25f);
             return;
         }
         combat.currentAction = currentAttack;
