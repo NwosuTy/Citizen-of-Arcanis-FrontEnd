@@ -128,7 +128,8 @@ public class CharacterCombat : MonoBehaviour
     private void Attack(InputManager input)
     {
         characterManager.isAttacking = (input.lightAttackInput == true || input.heavyAttackInput == true);
-        if(characterManager.isAttacking != true || CharacterInventoryManager.Instance.Panel.isMouseOverPanel)
+        if(characterManager.isAttacking != true || 
+            CharacterInventoryManager.Instance.Panel.isMouseOverPanel || DialogueManager.Instance.dialogueIsPlaying)
         {
             return;
         }
@@ -182,6 +183,11 @@ public class CharacterCombat : MonoBehaviour
     public void ResetPerformAttack()
     {
         characterManager.Attack.ResetPerformAttack();
+    }
+
+    public void SetDuellingCharacter()
+    {
+        CombatManager.Instance.AssignPlayer(CombatCharacter.characterManager);
     }
 
     private void InitializeAttackActions()

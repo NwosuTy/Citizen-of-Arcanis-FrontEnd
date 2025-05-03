@@ -74,7 +74,7 @@ public class CharacterStatistic : MonoBehaviour
         }
         if(hoveringHealthBarAI != null)
         {
-            hoveringHealthBarAI.SetBillboard(mainCamera, transform);
+            hoveringHealthBarAI.SetBillboard(mainCamera, transform, currentHealth);
             hoveringHealthBarAI.gameObject.SetActive(showHealthBar);
         }
     }

@@ -30,12 +30,12 @@ public class CharacterMovement : MonoBehaviour
 
     private void Awake()
     {
+        cameraObject = Camera.main.transform;
         characterManager = GetComponent<CharacterManager>();
     }
 
     private void Start()
     {
-        cameraObject = Camera.main.transform;
         fallingTimerHash = Animator.StringToHash("inAirTimer");
     }
 
@@ -93,7 +93,7 @@ public class CharacterMovement : MonoBehaviour
     {
         Quaternion targetRotation;
 
-        if (isLockedIn)
+        if (isLockedIn || characterManager.combatMode)
         {
             float yawCamera = cameraObject.rotation.eulerAngles.y;
             targetRotation = Quaternion.Euler(0f, yawCamera, 0f);

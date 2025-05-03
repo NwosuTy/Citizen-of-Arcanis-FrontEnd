@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 
 public class InventoryManagerPanel_UI : MonoBehaviour
 {
@@ -134,31 +133,8 @@ public class InventoryManagerPanel_UI : MonoBehaviour
         inventoryPanel.SetActive(false);
     }
 
-    public void SetIsMouseOverPanel(bool status)
-    {
-        isMouseOverPanel = status;
-    }
-
     public InventorySlotUI FindInactiveSlot(List<InventorySlotUI> slotList)
     {
         return slotList.Find(x => x.IsActive != true);
-    }
-
-    public InventorySlotUI FindSlotUI(PickableObject item)
-    {
-        InventorySlotUI slot = null;
-        bool isCurrency = item.ItemType == ItemType.Currency;
-
-        if(isCurrency)
-        {
-            slot = GetSlot(item, currencySlotList);
-        }
-        else { slot = GetSlot(item, collectiblesSlotList); }
-        return slot;
-    }
-
-    private InventorySlotUI GetSlot(PickableObject item, List<InventorySlotUI> slotList)
-    {
-        return slotList.Find(x => x.IsActive == true && x.Item.pickedObj.ItemName == item.ItemName);
     }
 }

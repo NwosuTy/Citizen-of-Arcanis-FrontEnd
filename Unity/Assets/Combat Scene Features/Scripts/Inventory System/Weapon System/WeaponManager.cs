@@ -9,6 +9,7 @@ public class WeaponManager : MonoBehaviour
     //Private Variables
     private Ray ray;
     private int bulletLeft;
+    private float accumulatedTime;
 
     private CinemachineImpulseSource impulseSource;
     private CinemachineVirtualCameraBase shooterCam;
@@ -52,7 +53,7 @@ public class WeaponManager : MonoBehaviour
         DamageCollider = GetComponentInChildren<CharacterDamageCollider>(); 
     }
 
-    public void Initialize(CharacterManager character)
+    public void Initialize(Transform cameraObject, CharacterManager character)
     {
         bulletLeft = maxBullets;
         character.CombatManager.AssignWeapon(this);
@@ -65,9 +66,12 @@ public class WeaponManager : MonoBehaviour
 
         if(type == WeaponType.Gun)
         {
-            shooterCam = character.CameraController.ShooterVirtualCamera;
+            if (character.characterType == CharacterType.Player)
+            {
+                shooterCam = character.CameraController.ShooterVirtualCamera;
+            }
+            weaponRecoil.Initialize(cameraObject, impulseSource);
             if (character != null) character.RigController.SetTwoBoneIKConstraint(grip, rest);
-            weaponRecoil.Initialize(CombatManager.Instance.CameraObject, shooterCam, impulseSource);
         }
     }
 
@@ -87,14 +91,17 @@ public class WeaponManager : MonoBehaviour
         Vector3 direction = targetPosition - muzzlePoint.position;
 
         ray = new(muzzlePoint.position, direction);
-        Image crossHairImage = character.CameraController.CrossHairImg;
 
-        if (Physics.Raycast(ray, gunRange, EnemyMask))
+        if(character.characterType == CharacterType.Player)
         {
-            crossHairImage.color = Color.green;
-            return;
+            Image crossHairImage = character.CameraController.CrossHairImg;
+            if (Physics.Raycast(ray, gunRange, EnemyMask))
+            {
+                crossHairImage.color = Color.green;
+                return;
+            }
+            crossHairImage.color = Color.white;
         }
-        crossHairImage.color = Color.white;
     }
 
     public void HandleAction(Vector3 targetPosition, CharacterManager characterManager)
@@ -124,7 +131,19 @@ public class WeaponManager : MonoBehaviour
         }
     }
 
-    private void HandleShooting(Vector3 targetPosition, CharacterManager character)
+    private void HandleShooting(Vector3 targetPosition, CharacterManager characterManager)
+    {
+        accumulatedTime += Time.deltaTime;
+        float fireInterval = 1.0f / fireRate;
+
+        while (accumulatedTime > 0.0f)
+        {
+            FireGun(targetPosition, characterManager);
+            accumulatedTime -= fireInterval;
+        }
+    }
+
+    private void FireGun(Vector3 targetPosition, CharacterManager character)
     {
         weaponRecoil.GenerateRecoilPattern();
         if(Physics.Raycast(ray, out RaycastHit hitInfo, gunRange, DamageableMask))

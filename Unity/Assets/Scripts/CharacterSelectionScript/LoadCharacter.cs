@@ -49,6 +49,7 @@ public class LoadCharacter : MonoBehaviour
         spawnedCharacter.SetCharacterType(CharacterType.Player);
 
         SetCharacterParameters();
+        spawnedCharacter.CombatManager.SetDuellingCharacter();
         SetMiniMapAndCameraProperties(spawnedCharacter.CameraTarget);
     }
 

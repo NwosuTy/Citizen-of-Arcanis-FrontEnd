@@ -48,17 +48,18 @@ public class DialogueManager : MonoBehaviour
 
     private void Update()
     {
-        if (!dialogueIsPlaying)
+        if(!dialogueIsPlaying)
         {
             return;
         }
 
         if (skipDialogue)
         {
+            skipDialogue = false;
             StartCoroutine(ExitDialogueMode());
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && canContinue && currentDialogueStory.currentChoices.Count == 0)
+        if (InputManager.Instance.jumpInput && canContinue && currentDialogueStory.currentChoices.Count == 0)
         {
             ContinueDialogueStory();
         }
@@ -112,11 +113,12 @@ public class DialogueManager : MonoBehaviour
         yield return exitPanelSeconds;
         
         dialogueIsPlaying = false;
-        character.isTalking = false;
         character.dontMove = false;
         currentDialogueStory = null;
+        character.isTalking = false;
+
         dialogueUIPanel.ExitPanel();
-        skipDialogue = false;
+        character.Agent.enabled = true;
 
         // If a duel was triggered, inform CombatManager and load the combat scene
         if (duelTriggered)
