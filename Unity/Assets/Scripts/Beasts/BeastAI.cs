@@ -8,16 +8,21 @@ public class BeastAI : MonoBehaviour
 
     private Transform player;
     private NavMeshAgent agent;
+    private Animator animator;
 
     public float attackCooldown = 2f;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
+        if (!player)
+            return;
+
         if (currentState == State.Chasing)
         {
             agent.SetDestination(player.position);
@@ -25,18 +30,18 @@ public class BeastAI : MonoBehaviour
 
         if (currentState == State.Attacking)
         {
+            //TODO: ATTACK LOGIC
             transform.LookAt(player);
-
-            Debug.LogWarning("Attack");
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.LogWarning(other.tag);
         if (other.CompareTag("Player"))
         {
+            player = other.transform;
             currentState = State.Chasing;
+            animator.SetBool("isMoving", true);
         }
     }
 
@@ -44,9 +49,9 @@ public class BeastAI : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            player = other.transform;
             currentState = State.Idle;
             agent.ResetPath();
+            animator.SetBool("isMoving", false);
         }
     }
 
