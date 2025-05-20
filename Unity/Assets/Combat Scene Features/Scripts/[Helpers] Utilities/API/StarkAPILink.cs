@@ -38,21 +38,19 @@ public static class StarkAPILink
         {
             userId = u_Id,
             tokenIds = new[] { (int)itemType },
-            amounts = new[] { 1 }
+            amounts = new[] { 1 },
+            recipient = "0x066EE9d5F6791270d7cD1314ddB9fc8f7EdCb59E2847e2b13D57A06e7c988D63"
         };
         yield return PostJson(url, body, onSuccess, onError);
     }
 
 
     // Use item for user
-    public static IEnumerator UseItem(string userId, string itemId, Action<string> onSuccess, Action<string> onError)
+    public static IEnumerator UseItem(string u_Id, string itemId, int q, Action<string> onSuccess, Action<string> onError)
     {
-        string url = $"{ApiBaseURL}/use-item";
-        var body = new
-        {
-            userId = userId,
-            item_id = itemId
-        };
+        string url = $"{ApiBaseURL}/inventory/{u_Id}";
+
+        var body = new UseItemRequest(int.Parse(itemId), q);
         yield return PostJson(url, body, onSuccess, onError);
     }
 

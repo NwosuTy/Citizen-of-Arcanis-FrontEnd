@@ -42,6 +42,20 @@ public class MintRequest
     public string userId;
     public int[] tokenIds;
     public int[] amounts;
+    public string recipient;
+}
+
+[System.Serializable]
+public class UseItemRequest
+{
+    public int nftId;
+    public int quantity;
+
+    public UseItemRequest(int nftId, int quantity)
+    {
+        this.nftId = nftId;
+        this.quantity = quantity;
+    }
 }
 
 

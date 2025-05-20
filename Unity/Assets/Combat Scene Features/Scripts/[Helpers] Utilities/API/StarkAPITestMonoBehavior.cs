@@ -13,6 +13,7 @@ public class StarkAPITestMonoBehavior : MonoBehaviour
     [Header("UI References")]
     [SerializeField] private TMP_Text resultText;
     [SerializeField] private TMP_InputField itemIdInput;
+    [SerializeField] private TMP_InputField itemAmntInput;
     [SerializeField] private TMP_InputField playerIdInput;
     [SerializeField] private TMP_Dropdown itemTypeDropdown;
 
@@ -38,7 +39,8 @@ public class StarkAPITestMonoBehavior : MonoBehaviour
 
         useItemBtn.onClick.AddListener(() =>
         {
-            StartCoroutine(StarkAPILink.UseItem(playerIdInput.text, itemIdInput.text, OnSuccess, OnError));
+            int amount = int.TryParse(itemAmntInput.text, out int result) ? result : 1;
+            StartCoroutine(StarkAPILink.UseItem(playerIdInput.text, itemIdInput.text, amount, OnSuccess, OnError));
         });
     }
 
