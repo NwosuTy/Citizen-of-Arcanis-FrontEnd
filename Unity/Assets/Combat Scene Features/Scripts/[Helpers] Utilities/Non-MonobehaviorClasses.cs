@@ -37,6 +37,29 @@ public enum WeaponType
 #region Classes
 
 [System.Serializable]
+public class MintRequest
+{
+    public string userId;
+    public int[] tokenIds;
+    public int[] amounts;
+    public string recipient;
+}
+
+[System.Serializable]
+public class UseItemRequest
+{
+    public int nftId;
+    public int quantity;
+
+    public UseItemRequest(int nftId, int quantity)
+    {
+        this.nftId = nftId;
+        this.quantity = quantity;
+    }
+}
+
+
+[System.Serializable]
 public struct BoundInt
 {
     [Range(1,360)] public int minValue;
