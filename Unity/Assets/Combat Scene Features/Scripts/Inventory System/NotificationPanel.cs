@@ -2,7 +2,6 @@ using TMPro;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System;
 
 public class NotificationPanel : MonoBehaviour
 {
@@ -44,7 +43,7 @@ public class NotificationPanel : MonoBehaviour
             ItemClass reward = rewardBox.itemsList[i];
 
             content.gameObject.SetActive(true);
-            ItemType itemType = reward.pickedObj.ItemType;
+            ItemType itemType = reward.pickedObj.TypeOfItem;
 
             if (itemType == ItemType.Currency)
             { 

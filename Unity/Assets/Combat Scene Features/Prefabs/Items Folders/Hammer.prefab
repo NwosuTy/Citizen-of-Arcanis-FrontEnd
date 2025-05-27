@@ -187,7 +187,7 @@ MonoBehaviour:
   <rewardRate>k__BackingField: 3
   <ItemName>k__BackingField: Hammer
   <ItemImage>k__BackingField: {fileID: 21300000, guid: f6293f20fd85aa143bead12afd67ebbb, type: 3}
-  <ItemType>k__BackingField: 1
+  <TypeOfItem>k__BackingField: 1
 --- !u!114 &3667227814751392977
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,9 +205,6 @@ MonoBehaviour:
   simulationSpeed: 3
   <type>k__BackingField: 1
   _overrideController: {fileID: 22100000, guid: 7b5b050b75dfa1746b407ecfbe01c009, type: 2}
-  <DamageableMask>k__BackingField:
-    serializedVersion: 2
-    m_Bits: 0
   <pickableObject>k__BackingField: {fileID: 1114029271913720396}
   maxBullets: 0
   isShooting: 0
@@ -215,13 +212,18 @@ MonoBehaviour:
   rest: {fileID: 0}
   <RestLockedPosition>k__BackingField: {x: 0, y: 0, z: 0}
   <RestOriginalPosition>k__BackingField: {x: 0, y: 0, z: 0}
+  <EnemyMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 0
+  <DamageableMask>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 0
   muzzlePoint: {fileID: 0}
   muzzleFlash: []
   <DamageCollider>k__BackingField: {fileID: 0}
   weaponRecoil:
     duration: 0
     recoilPattern: []
-    freeLook: {fileID: 0}
     impulseSource: {fileID: 0}
 --- !u!1 &7514929307608163568
 GameObject:

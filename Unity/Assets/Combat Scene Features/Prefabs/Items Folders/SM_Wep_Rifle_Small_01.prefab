@@ -111,7 +111,7 @@ MonoBehaviour:
   <rewardRate>k__BackingField: 7
   <ItemName>k__BackingField: Rifle
   <ItemImage>k__BackingField: {fileID: 21300000, guid: 89479ce24d0552b4085ba9f6606df4e9, type: 3}
-  <ItemType>k__BackingField: 1
+  <TypeOfItem>k__BackingField: 1
 --- !u!114 &8692947385491521309
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -139,9 +139,6 @@ MonoBehaviour:
   <EnemyMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 8
-  <ObstacleMask>k__BackingField:
-    serializedVersion: 2
-    m_Bits: 4294967295
   <DamageableMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 201
@@ -168,7 +165,6 @@ MonoBehaviour:
     - {x: -1, y: 10}
     - {x: 2, y: 10}
     - {x: 5, y: 10}
-    freeLook: {fileID: 0}
     impulseSource: {fileID: 0}
 --- !u!54 &3612221724614646554
 Rigidbody:

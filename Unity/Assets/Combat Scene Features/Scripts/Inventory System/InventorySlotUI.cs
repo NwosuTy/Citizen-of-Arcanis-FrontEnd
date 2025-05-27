@@ -25,7 +25,6 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
     [Header("Slot UI Parameters")]
     [SerializeField] private Image itemIcon;
     [SerializeField] private Button itemButton;
-    [SerializeField] private TextMeshProUGUI itemName;
     [SerializeField] private TextMeshProUGUI itemCountUI;
 
     [Header("Click Parameters")]
@@ -70,8 +69,24 @@ public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IDragHandler
             Debug.Log("No Item In Slot To Select");
             return;
         }
+
+        CharacterInventoryManager inventoryManager = CharacterInventoryManager.Instance;
+        CharacterManager player = inventoryManager.characterManager;
+
+        if(player.combatMode)
+        {
+            inventoryManager.EquipWeapon(Item);
+        }
+        else
+        {
+            //If Control Is Pressed Down Add Multiple Items
+            if(player.PlayerInput.holdControl != true)
+            {
+                inventoryManager.selectedItemPanel.ResetPanel();
+            }
+            inventoryManager.selectedItemPanel.OpenPanel(Item);
+        }
         inventoryManagerPanel.ResetInactiveTime();
-        CharacterInventoryManager.Instance.EquipWeapon(Item);
     }
 
     public void DropItem()

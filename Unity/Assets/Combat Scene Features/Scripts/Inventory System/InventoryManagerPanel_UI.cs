@@ -46,10 +46,13 @@ public class InventoryManagerPanel_UI : MonoBehaviour
         }
 
         hasInitialized = true;
-
-        DisablePanel();
         closeButton.onClick.AddListener(DisablePanel);
         notifPanels.ForEach(x => x.gameObject.SetActive(false));
+    }
+
+    private void Start()
+    {
+        DisablePanel();
     }
 
     private void Update()
@@ -74,7 +77,7 @@ public class InventoryManagerPanel_UI : MonoBehaviour
     {
         PickableObject pickedObj = itemClass.pickedObj;
 
-        if(pickedObj.ItemType == ItemType.Currency)
+        if(pickedObj.TypeOfItem == ItemType.Currency)
         {
             InitializeSlotUI(itemClass, currencySlotList);
             return;
@@ -131,6 +134,7 @@ public class InventoryManagerPanel_UI : MonoBehaviour
     {
         ResetInactiveTime();
         inventoryPanel.SetActive(false);
+        CharacterInventoryManager.Instance.selectedItemPanel.ClosePanel();
     }
 
     public InventorySlotUI FindInactiveSlot(List<InventorySlotUI> slotList)

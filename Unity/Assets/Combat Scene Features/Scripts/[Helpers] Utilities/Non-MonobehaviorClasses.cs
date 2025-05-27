@@ -69,6 +69,7 @@ public struct BoundInt
 [System.Serializable]
 public class ItemClass
 {
+    public int id;
     public int itemCount;
     public PickableObject pickedObj;
     public InventorySlotUI SlotUI { get; private set; }
@@ -100,6 +101,20 @@ public class ItemClass
 
         if(itemCount <= 0) itemCount = 0;
         SlotUI.UpdateSlotUI(alpha);
+    }
+}
+
+public class MintedItem
+{
+    public int Count { get; private set; }
+    public int TokenID { get; private set; }
+    public string Name { get; private set; }
+
+    public MintedItem(int tokenID, int itemCount, string name)
+    {
+        Name = name;
+        TokenID = tokenID;
+        Count = itemCount;
     }
 }
 

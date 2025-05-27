@@ -347,7 +347,7 @@ MonoBehaviour:
   <rewardRate>k__BackingField: 7
   <ItemName>k__BackingField: Pistol
   <ItemImage>k__BackingField: {fileID: 21300000, guid: 616c6704ecc307e47a7135055645be15, type: 3}
-  <ItemType>k__BackingField: 1
+  <TypeOfItem>k__BackingField: 1
 --- !u!114 &8927555516968111289
 MonoBehaviour:
   m_ObjectHideFlags: 0

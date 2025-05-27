@@ -284,6 +284,15 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Control"",
+                    ""type"": ""Button"",
+                    ""id"": ""d1b64d10-9fbb-4117-91c8-8564d054fc37"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -352,6 +361,17 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
                     ""action"": ""AttackInput"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f8029bf9-87cf-4361-be9b-020b5e8736ab"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Control"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -397,6 +417,7 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
         m_AuxillaryControl_Dash = m_AuxillaryControl.FindAction("Dash", throwIfNotFound: true);
         m_AuxillaryControl_LockedIn = m_AuxillaryControl.FindAction("LockedIn", throwIfNotFound: true);
         m_AuxillaryControl_AttackInput = m_AuxillaryControl.FindAction("AttackInput", throwIfNotFound: true);
+        m_AuxillaryControl_Control = m_AuxillaryControl.FindAction("Control", throwIfNotFound: true);
     }
 
     ~@InputControls()
@@ -537,6 +558,7 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_AuxillaryControl_Dash;
     private readonly InputAction m_AuxillaryControl_LockedIn;
     private readonly InputAction m_AuxillaryControl_AttackInput;
+    private readonly InputAction m_AuxillaryControl_Control;
     public struct AuxillaryControlActions
     {
         private @InputControls m_Wrapper;
@@ -544,6 +566,7 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
         public InputAction @Dash => m_Wrapper.m_AuxillaryControl_Dash;
         public InputAction @LockedIn => m_Wrapper.m_AuxillaryControl_LockedIn;
         public InputAction @AttackInput => m_Wrapper.m_AuxillaryControl_AttackInput;
+        public InputAction @Control => m_Wrapper.m_AuxillaryControl_Control;
         public InputActionMap Get() { return m_Wrapper.m_AuxillaryControl; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -562,6 +585,9 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
             @AttackInput.started += instance.OnAttackInput;
             @AttackInput.performed += instance.OnAttackInput;
             @AttackInput.canceled += instance.OnAttackInput;
+            @Control.started += instance.OnControl;
+            @Control.performed += instance.OnControl;
+            @Control.canceled += instance.OnControl;
         }
 
         private void UnregisterCallbacks(IAuxillaryControlActions instance)
@@ -575,6 +601,9 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
             @AttackInput.started -= instance.OnAttackInput;
             @AttackInput.performed -= instance.OnAttackInput;
             @AttackInput.canceled -= instance.OnAttackInput;
+            @Control.started -= instance.OnControl;
+            @Control.performed -= instance.OnControl;
+            @Control.canceled -= instance.OnControl;
         }
 
         public void RemoveCallbacks(IAuxillaryControlActions instance)
@@ -622,5 +651,6 @@ public partial class @InputControls: IInputActionCollection2, IDisposable
         void OnDash(InputAction.CallbackContext context);
         void OnLockedIn(InputAction.CallbackContext context);
         void OnAttackInput(InputAction.CallbackContext context);
+        void OnControl(InputAction.CallbackContext context);
     }
 }

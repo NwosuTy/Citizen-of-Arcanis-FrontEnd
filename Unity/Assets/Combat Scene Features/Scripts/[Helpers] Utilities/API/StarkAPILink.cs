@@ -30,15 +30,15 @@ public static class StarkAPILink
     }
 
     // Mint item for user
-    public static IEnumerator MintItem(string u_Id, ItemType itemType, Action<string> onSuccess, Action<string> onError)
+    public static IEnumerator MintItem(string u_Id, int[] itemIds, int[] itemAmounts, Action<string> onSuccess, Action<string> onError)
     {
         string url = $"{ApiBaseURL}/starknet/batch/mint";
 
         MintRequest body = new()
         {
             userId = u_Id,
-            tokenIds = new[] { (int)itemType },
-            amounts = new[] { 1 },
+            tokenIds = itemIds,
+            amounts = itemAmounts,
             recipient = "0x066EE9d5F6791270d7cD1314ddB9fc8f7EdCb59E2847e2b13D57A06e7c988D63"
         };
         yield return PostJson(url, body, onSuccess, onError);

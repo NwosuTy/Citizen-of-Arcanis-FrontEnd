@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PickableObject : MonoBehaviour, IInteractable
 {
@@ -10,7 +10,7 @@ public class PickableObject : MonoBehaviour, IInteractable
     [field: SerializeField] public int rewardRate { get; private set; }
     [field: SerializeField] public string ItemName { get; private set; }
     [field: SerializeField] public Sprite ItemImage { get; private set; }
-    [field: SerializeField] public ItemType ItemType { get; private set; }
+    [field: SerializeField] public ItemType TypeOfItem { get; private set; }
 
     public void Interact()
     {

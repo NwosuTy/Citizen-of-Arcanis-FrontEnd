@@ -20,6 +20,7 @@ public class InputManager : MonoBehaviour
     public bool lockedInput { get; private set; }
     public bool interactInput { get; private set; }
 
+    public bool holdControl { get; private set; }
     public bool lightAttackInput { get; private set; }
     public bool heavyAttackInput { get; private set; }
 
@@ -47,6 +48,9 @@ public class InputManager : MonoBehaviour
 
             control.BasicControl.CameraMovement.performed += ctx => cameraInput = ctx.ReadValue<Vector2>();
             control.BasicControl.CharacterMovement.performed += ctx => movementInput = ctx.ReadValue<Vector2>();
+
+            control.AuxillaryControl.Control.performed += ctx => holdControl = true;
+            control.AuxillaryControl.Control.canceled += ctx => holdControl = false;
 
             control.BasicControl.Interact.performed += ctx => interactInput = true;
             control.BasicControl.Jump.started += ctx => jumpInput = ctx.ReadValueAsButton();

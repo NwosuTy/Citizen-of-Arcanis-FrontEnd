@@ -153,4 +153,4 @@ MonoBehaviour:
   <rewardRate>k__BackingField: 0
   <ItemName>k__BackingField: Bread
   <ItemImage>k__BackingField: {fileID: 21300000, guid: 9d9a63f0c431ee549ae20aeda3236658, type: 3}
-  <ItemType>k__BackingField: 1
+  <TypeOfItem>k__BackingField: 1

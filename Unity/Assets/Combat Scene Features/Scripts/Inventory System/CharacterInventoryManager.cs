@@ -9,11 +9,12 @@ public class CharacterInventoryManager : MonoBehaviour
     public static CharacterInventoryManager Instance { get; private set; }
 
     private List<ItemClass> itemList = new();
-    private CharacterManager characterManager;
+    public CharacterManager characterManager { get; private set; }
 
     [Header("Parameters")]
     [SerializeField] private ItemClass activeItem = new(0, null);
     [field: SerializeField] public InventoryManagerPanel_UI Panel { get; private set; }
+    [field: SerializeField] public SelectedItemPanel selectedItemPanel { get; private set; }
 
     private void Awake()
     {
@@ -43,6 +44,7 @@ public class CharacterInventoryManager : MonoBehaviour
         {
             UnEquipWeapon();
         }
+        selectedItemPanel.SelectedItem_Update();
     }
 
     public void SetCharacterManager(CharacterManager cm)

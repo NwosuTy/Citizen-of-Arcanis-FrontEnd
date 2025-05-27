@@ -262,6 +262,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Control",
+                    "type": "Button",
+                    "id": "d1b64d10-9fbb-4117-91c8-8564d054fc37",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -328,6 +337,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "AttackInput",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f8029bf9-87cf-4361-be9b-020b5e8736ab",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Control",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
