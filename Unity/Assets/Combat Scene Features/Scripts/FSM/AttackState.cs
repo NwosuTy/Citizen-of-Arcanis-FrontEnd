@@ -1,5 +1,5 @@
-using System.Collections;
 using UnityEngine;
+
 
 [CreateAssetMenu(fileName = "Attack", menuName = "AIState/AttackState")]
 public class AttackState : AIState

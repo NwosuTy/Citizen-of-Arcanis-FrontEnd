@@ -65,6 +65,10 @@ public class InputManager : MonoBehaviour
 
     private void OnDisable()
     {
+        if(control == null)
+        {
+            return;
+        }
         control.Disable();
     }
 

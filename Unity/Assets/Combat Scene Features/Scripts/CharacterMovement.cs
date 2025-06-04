@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.AI;
-using static UnityEngine.GridBrushBase;
 
 public class CharacterMovement : MonoBehaviour
 {
@@ -134,12 +133,12 @@ public class CharacterMovement : MonoBehaviour
 
         if (characterManager.isSprinting)
         {
-            characterController.Move(sprintingSpeed * moveDirection * delta);
+            characterController.Move(delta * sprintingSpeed * moveDirection);
             characterManager.StatsManager.ReduceEndurance(sprintEnduranceCost);
         }
         else
         {
-            characterController.Move(walkingSpeed * moveDirection * delta);
+            characterController.Move(delta * walkingSpeed * moveDirection);
         }
 
         float horizontalKey = (isLockedIn) ? horizontalInput : 0.0f;
@@ -165,7 +164,7 @@ public class CharacterMovement : MonoBehaviour
             agent.SetPath(characterManager.navMeshPath);
         }
 
-        if (!NavMesh.SamplePosition(destination, out NavMeshHit hit, 1.0f, NavMesh.AllAreas))
+        if (!NavMesh.SamplePosition(destination, out _, 1.0f, NavMesh.AllAreas))
         {
             return;
         }
