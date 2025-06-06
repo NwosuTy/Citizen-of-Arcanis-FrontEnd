@@ -85,14 +85,16 @@ public class CharacterCombat : MonoBehaviour
     public void Combat_Update(float delta)
     {
         bool hasGun = HasGun();
-        targetPosition = GetTargetPosition();
+        if (crossHairTransform != null)
+        {
+            targetPosition = GetTargetPosition();
+        }
         CharacterType type = characterManager.characterType;
 
         if (hasGun)
         {
             weaponManager.WeaponManager_Update(targetPosition, characterManager, delta);
         }
-
         if (type == CharacterType.AI)
         {
             HandleRecoveryTimer(delta);
@@ -116,7 +118,6 @@ public class CharacterCombat : MonoBehaviour
         {
             return;
         }
-
         currentRecovery -= delta;
     }
 
@@ -125,11 +126,25 @@ public class CharacterCombat : MonoBehaviour
         canCombo = (status == ComboStatus.Can);
     }
 
+    private bool DoNotAttack()
+    {
+        if (DialogueManager.Instance != null)
+        {
+            return DialogueManager.Instance.dialogueIsPlaying;
+        }
+        if (CharacterInventoryManager.Instance != null)
+        {
+            return CharacterInventoryManager.Instance.Panel.isMouseOverPanel;
+        }
+        return false;
+    }
+
     private void Attack(InputManager input)
     {
         characterManager.isAttacking = (input.lightAttackInput == true || input.heavyAttackInput == true);
-        if(characterManager.isAttacking != true || 
-            CharacterInventoryManager.Instance.Panel.isMouseOverPanel || DialogueManager.Instance.dialogueIsPlaying)
+
+        bool cantAttack = DoNotAttack();
+        if(characterManager.isAttacking != true || cantAttack)
         {
             return;
         }

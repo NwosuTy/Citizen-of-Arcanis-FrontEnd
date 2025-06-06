@@ -101,7 +101,7 @@ public class CharacterManager : MonoBehaviour
 
                 CameraController.SetCameraTarget(CameraTarget);
             }
-            CharacterInventoryManager.Instance.SetCharacterManager(this);
+            if(CharacterInventoryManager.Instance != null) CharacterInventoryManager.Instance.SetCharacterManager(this);
         }
         else
         {

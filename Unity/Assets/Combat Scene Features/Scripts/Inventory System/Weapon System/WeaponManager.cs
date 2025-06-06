@@ -122,7 +122,6 @@ public class WeaponManager : MonoBehaviour
     }
 
     #region Gun Parameters
-
     private void HandleVFX()
     {
         foreach (var particle in muzzleFlash)

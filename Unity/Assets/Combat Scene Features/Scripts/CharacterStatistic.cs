@@ -14,7 +14,7 @@ public class CharacterStatistic : MonoBehaviour
     private int[] lightDamageAnimationArray;
     private int[] heavyDamageAnimationArray;
 
-    private CharacterManager characterManager;
+    public CharacterManager characterManager { get; private set; }
 
     [Header("Components")]
     [SerializeField] private UIBar healthBar;

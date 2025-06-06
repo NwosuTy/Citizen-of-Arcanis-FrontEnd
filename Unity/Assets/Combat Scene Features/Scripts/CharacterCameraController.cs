@@ -1,6 +1,7 @@
 using UnityEngine;
 using Cinemachine;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
 public class CharacterCameraController : MonoBehaviour
 {
@@ -33,9 +34,10 @@ public class CharacterCameraController : MonoBehaviour
     private void Awake()
     {
         characterManager = GetComponent<CharacterManager>();
-        CrossHairImg = GameObject.Find("Crosshair").GetComponent<Image>();
-        MainVirtualCamera = GameObject.Find("Main Virtual Camera").GetComponent<CinemachineVirtualCamera>();
-        ShooterVirtualCamera = GameObject.Find("Gun Virtual Camera").GetComponent<CinemachineVirtualCamera>();
+
+        CrossHairImg = GameObjectFinder.GetComponentByName<Image>("Crosshair");
+        MainVirtualCamera = GameObjectFinder.GetComponentByName<CinemachineVirtualCamera>("Main Virtual Camera");
+        ShooterVirtualCamera = GameObjectFinder.GetComponentByName<CinemachineVirtualCamera>("Gun Virtual Camera");
     }
 
     public void SetCameraTarget(Transform target)
@@ -66,10 +68,9 @@ public class CharacterCameraController : MonoBehaviour
 
     public void EnableShooterGraphics(bool status)
     {
-        CrossHairImg.gameObject.SetActive(status);
-
-        MainVirtualCamera.gameObject.SetActive(!status);
-        ShooterVirtualCamera.gameObject.SetActive(status);
+        if(CrossHairImg != null) CrossHairImg.gameObject.SetActive(status);
+        if (MainVirtualCamera != null) MainVirtualCamera.gameObject.SetActive(!status);
+        if (ShooterVirtualCamera != null) ShooterVirtualCamera.gameObject.SetActive(status);
     }
 
     private float Sensitivity()
