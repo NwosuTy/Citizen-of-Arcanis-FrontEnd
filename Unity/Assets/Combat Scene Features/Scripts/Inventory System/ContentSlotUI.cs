@@ -38,7 +38,7 @@ public class ContentSlotUI : MonoBehaviour
         itemsList = new List<PickableObject>(itemArray);
     }
 
-    private void DisplayContent(int count, PickableObject item)
+    public void DisplayContent(int count, PickableObject item)
     {
         itemName.text = item.ItemName;
         itemIcon.sprite = item.ItemImage;

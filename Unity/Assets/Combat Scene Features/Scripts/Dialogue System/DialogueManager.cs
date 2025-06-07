@@ -125,6 +125,7 @@ public class DialogueManager : MonoBehaviour
         {
             CombatManager.Instance.StartDuel(character.CombatManager.CombatCharacter.characterManager);
         }
+        else { CombatManager.Instance.hasMercenary = false; }
     }
 
     private void CheckWhoIsSpeaking(List<string> currentTag)

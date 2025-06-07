@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 using Cinemachine;
 
@@ -10,7 +9,7 @@ using Cinemachine;
 public class LoadCharacter : MonoBehaviour
 {
     private int selectedIndex;
-    private CharacterManager spawnedCharacter;
+    public CharacterManager spawnedCharacter { get; private set; }
 
     [Header("Parameters")]  
     [Tooltip("Transform reference for the position where the character will be spawned")]
@@ -46,7 +45,9 @@ public class LoadCharacter : MonoBehaviour
         }
         CharacterManager prefab = characterManagerPrefabs[selectedIndex];
         spawnedCharacter = Instantiate(prefab, spawnPoint.position, Quaternion.identity);
+
         spawnedCharacter.SetCharacterType(CharacterType.Player);
+        GetComponent<MercenarySpawner>().SetTarget(spawnedCharacter);
 
         SetCharacterParameters();
         spawnedCharacter.CombatManager.SetDuellingCharacter();

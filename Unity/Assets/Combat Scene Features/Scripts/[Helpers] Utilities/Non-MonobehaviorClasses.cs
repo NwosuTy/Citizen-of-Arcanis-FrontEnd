@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Cinemachine;
+using static UnityEngine.InputSystem.LowLevel.InputStateHistory;
 
 #region Enums
 
@@ -128,6 +129,16 @@ public class RewardBox
         boxname = "";
         itemsList.Clear();
         finishedCleaning = true;
+    }
+
+    public void HandleRewarding()
+    {
+        for (int i = 0; i < itemsList.Count; i++)
+        {
+            ItemClass itemClass = itemsList[i];
+            CharacterInventoryManager.Instance.AddUnExistingItem(itemClass);
+        }
+        EmptyBox();
     }
 }
 

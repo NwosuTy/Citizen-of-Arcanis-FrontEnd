@@ -8,6 +8,7 @@ public class DuelManager : MonoBehaviour
     public static DuelManager Instance;
     private List<int> indexList = new();
 
+    private WeaponManager weapon;
     private Transform cameraObject;
     public DuelState DuelState { get; private set; }
 
@@ -95,17 +96,11 @@ public class DuelManager : MonoBehaviour
         {
             yield return new WaitForSeconds(2.5f);
             yield return StartCoroutine(rewardSystem.HandleFillUpRewardBox(DuelState));
-            
-            RewardBox rewardBox = rewardSystem.rewardBox;
-            for (int i = 0; i < rewardBox.itemsList.Count; i++)
-            {
-                ItemClass itemClass = rewardBox.itemsList[i];
-                CharacterInventoryManager.Instance.AddUnExistingItem(itemClass);
-            }
-            rewardSystem.rewardBox.EmptyBox();
+
+            rewardSystem.rewardBox.HandleRewarding();
             yield return new WaitUntil(() => rewardSystem.rewardBox.finishedCleaning);
         }
-        StartCoroutine(LevelLoader.LoadSceneAsync("DemoPrincipalScene"));
+        LevelLoader.HandleLoadLevel("DemoPrincipalScene", () => combatManager.HandleLoot(weapon, DuelState), this);
     }
 
     public void SetRewardSystem(RewardSystem rewardSystem)
@@ -121,7 +116,7 @@ public class DuelManager : MonoBehaviour
 
     private void PrepareWeapon(CharacterManager characterManager)
     {
-        WeaponManager weapon = GetRandomWeapon(null);
+        weapon = GetRandomWeapon(null);
         if (weapon == null)
         {
             Debug.LogError("No weapon found");
@@ -167,6 +162,7 @@ public class DuelManager : MonoBehaviour
             enemy = newCharacter;
             PrepareWeapon(enemy);
             enemy.currentTeam = Team.Red;
+            newCharacter.findTarget = true;
         }
         else
         {
