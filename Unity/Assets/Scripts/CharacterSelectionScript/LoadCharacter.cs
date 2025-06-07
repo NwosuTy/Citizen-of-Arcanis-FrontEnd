@@ -18,6 +18,7 @@ public class LoadCharacter : MonoBehaviour
 
     [Header("UI Elements")]
     [SerializeField] private PlayerUI playerUI;
+    [SerializeField] private CharacterManager ccc;
 
     [Header("Camera Objects")]
     [SerializeField] private CinemachineVirtualCamera gunCamera;
@@ -25,14 +26,13 @@ public class LoadCharacter : MonoBehaviour
 
     [Header("Instantiated Objects")]
     [Tooltip(" Array of drone prefabs that can be instantiated.")]
-    public GameObject[] dronePrefab;
+    public PlayerCompanion[] companions;
     [Tooltip("Array of character prefabs that can be instantiated.")]
     public CharacterManager[] characterManagerPrefabs;
 
     void Start()
     {
         CreateCharacter();
-        CreateDroneObject();
     }
 
     private void CreateCharacter()
@@ -43,34 +43,24 @@ public class LoadCharacter : MonoBehaviour
             Debug.LogError("�ndice de personaje seleccionado est� fuera de rango. Verifica los prefabs asignados en el inspector.");
             return;
         }
-        CharacterManager prefab = characterManagerPrefabs[selectedIndex];
-        spawnedCharacter = Instantiate(prefab, spawnPoint.position, Quaternion.identity);
-
+        CharacterManager spawnedCharacter = Instantiate(characterManagerPrefabs[selectedIndex], spawnPoint);
+        ccc = spawnedCharacter;
         spawnedCharacter.SetCharacterType(CharacterType.Player);
         GetComponent<MercenarySpawner>().SetTarget(spawnedCharacter);
 
-        SetCharacterParameters();
+        CreateDroneObject(spawnedCharacter);
+        SetCharacterParameters(spawnedCharacter);
         spawnedCharacter.CombatManager.SetDuellingCharacter();
         SetMiniMapAndCameraProperties(spawnedCharacter.CameraTarget);
     }
 
-    private void CreateDroneObject()
+    private void CreateDroneObject(CharacterManager player)
     {
-        int droneIndex = selectedIndex % dronePrefab.Length;
-        GameObject drone = Instantiate(dronePrefab[droneIndex], spawnPoint.position + new Vector3(0, 2, -1), Quaternion.identity);
+        int droneIndex = Random.Range(0, companions.Length);
+        PlayerCompanion companion = Instantiate(companions[droneIndex], player.transform.position + new Vector3(3, 3, -3), Quaternion.identity);
 
-        // Set up the drone to follow the character
-        DroneFollower droneFollower = drone.AddComponent<DroneFollower>();
-        droneFollower.SetDrone_Target(spawnedCharacter);
-
-        // Assign the main camera to the drone 
-        Camera mainCamera = Camera.main;
-        if (mainCamera != null)
-        {
-            droneFollower.SetCameraTransform(mainCamera.transform);
-            return;
-        }
-        Debug.LogWarning("No se encontró la cámara principal en la escena.");
+        companion.SetFollowCharacter(player);
+        companion.transform.SetParent(spawnPoint);
     }
 
     private void SetMiniMapAndCameraProperties(Transform playerTransform)
@@ -85,16 +75,16 @@ public class LoadCharacter : MonoBehaviour
         }
     }
 
-    private void SetCharacterParameters()
+    private void SetCharacterParameters(CharacterManager player)
     {
-        if(spawnedCharacter == null)
+        if(player == null)
         {
             return;
         }
 
-        playerUI.SetParameters(spawnedCharacter);
-        spawnedCharacter.currentTeam = Team.Blue;
-        spawnedCharacter.CombatManager.SetCrossHair(cameraAimObject);
+        playerUI.SetParameters(player);
+        player.currentTeam = Team.Blue;
+        player.CombatManager.SetCrossHair(cameraAimObject);
     }
 
     private void SetCameraProperty(CinemachineVirtualCameraBase camera, Transform playerTransform)
