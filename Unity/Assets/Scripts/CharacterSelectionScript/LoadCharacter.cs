@@ -9,6 +9,7 @@ using Cinemachine;
 public class LoadCharacter : MonoBehaviour
 {
     private int selectedIndex;
+    public CharacterManager spawnedCharacter { get; private set; }
 
     [Header("Parameters")]  
     [Tooltip("Transform reference for the position where the character will be spawned")]
@@ -45,6 +46,7 @@ public class LoadCharacter : MonoBehaviour
         CharacterManager spawnedCharacter = Instantiate(characterManagerPrefabs[selectedIndex], spawnPoint);
         ccc = spawnedCharacter;
         spawnedCharacter.SetCharacterType(CharacterType.Player);
+        GetComponent<MercenarySpawner>().SetTarget(spawnedCharacter);
 
         CreateDroneObject(spawnedCharacter);
         SetCharacterParameters(spawnedCharacter);

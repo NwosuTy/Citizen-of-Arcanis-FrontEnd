@@ -145,6 +145,16 @@ public class RewardBox
         itemsList.Clear();
         finishedCleaning = true;
     }
+
+    public void HandleRewarding()
+    {
+        for (int i = 0; i < itemsList.Count; i++)
+        {
+            ItemClass itemClass = itemsList[i];
+            CharacterInventoryManager.Instance.AddUnExistingItem(itemClass);
+        }
+        EmptyBox();
+    }
 }
 
 [System.Serializable]
