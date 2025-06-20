@@ -3,8 +3,16 @@ using Cinemachine;
 using UnityEngine.Pool;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 #region Enums
+
+public enum DriverExperience
+{
+    Novice,
+    Mid_Snr,
+    Expert
+}
 
 public enum ItemType
 {
@@ -18,12 +26,32 @@ public enum CompanionState
     High_Alert
 }
 
+public enum CarDrive_Type
+{
+    AllWheels,
+    RearWheels,
+    FrontWheels
+}
+
+public enum SpeedType
+{
+    MPH,
+    KPH
+}
+
 public enum DuelState
 {
     Win,
     Draw,
     Lost,
     OnGoing
+}
+
+public enum BrakeCondition
+{
+    NeverBrake,
+    TargetDirectionDifference,
+    TargetDistance
 }
 
 public enum ItemBoxTier //More For Design
@@ -72,8 +100,13 @@ public struct BoundInt
 {
     [Range(1,360)] public int minValue;
     [Range(1,360)] public int maxValue;
-}
 
+    public BoundInt(int min, int max)
+    {
+        minValue = min;
+        maxValue = max;
+    }
+}
 
 [System.Serializable]
 public struct BoundFloat
@@ -302,6 +335,93 @@ public static class TrailFX
         trail.emitting = false;
         trailTransform.position = end;
         trailPool.Release(trail);
+    }
+}
+
+[System.Serializable]
+public class WayPointPath
+{
+    [Header("Path Parameters")]
+    [SerializeField] private float[] distances;
+    [SerializeField] private Vector3[] nodePosition;
+    [field: SerializeField] public List<Transform> PathNodes { get; private set; }
+
+    public void RefreshPath(DriverExperience exp, Transform target, WayPointNode node)
+    {
+        PathNodes.Clear();
+        switch(exp)
+        {
+            case DriverExperience.Novice:
+                HandleNonExpert(3, target, node);
+                break;
+            case DriverExperience.Mid_Snr:
+                HandleNonExpert(5, target, node);
+                break;
+            case DriverExperience.Expert:
+                HandleExpert(target, node);
+                break;
+        }
+        CachePositionsAndRotations();
+    }
+
+    private void HandleNonExpert(int maxRange, Transform target, WayPointNode currentNode)
+    {
+        Transform node = null;
+        while(node != target)
+        {
+            int rnd = Random.Range(0, maxRange);
+            node = GetNode(rnd >= 2, target.position, currentNode);
+            PathNodes.Add(node);
+        }
+    }
+
+    private void HandleExpert(Transform target, WayPointNode currentNode)
+    {
+        Transform node = null;
+        while (node != target)
+        {
+            node = GetNode(true, target.position, currentNode);
+            PathNodes.Add(node);
+        }
+    }
+
+    private Transform GetNode(bool distanceBased, Vector3 target, WayPointNode node)
+    {
+        if(distanceBased != true)
+        {
+            return node.GetNextNodeRandomly().transform;
+        }
+        return node.GetNextNodeDistanceBased(target).transform;
+    }
+
+    private void CachePositionsAndRotations()
+    {
+        int count = PathNodes.Count;
+        distances = new float[count + 1];
+        nodePosition = new Vector3[count + 1];
+        
+        float accumulateDistance = 0;
+        for (int i = 0; i < count; ++i)
+        {
+            var t1 = PathNodes[(i) % count];
+            var t2 = PathNodes[(i + 1) % count];
+            if (t1 == null || t2 == null)
+            {
+                continue;
+            }
+
+            Vector3 p1 = t1.position;
+            Vector3 p2 = t2.position;
+            nodePosition[i] = PathNodes[i % count].position;
+
+            distances[i] = accumulateDistance;
+            accumulateDistance += (p1 - p2).magnitude;
+        }
+    }
+
+    public RoutePoint GetRoutePoint(float dist)
+    {
+        return MathPhysics_Helper.GetRoutePoint(nodePosition, distances, dist);
     }
 }
 #endregion
