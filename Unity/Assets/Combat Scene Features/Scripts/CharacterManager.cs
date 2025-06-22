@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 
 public enum CharacterType
 {
@@ -27,6 +28,7 @@ public class CharacterManager : MonoBehaviour
     public CharacterAnimatorRigController RigController { get; private set; }
 
     //AI Components
+    public UnityEvent Assignment;
     public NavMeshPath navMeshPath;
     private Collider[] targetColliders;
     public NavMeshAgent Agent { get; private set; }
@@ -58,6 +60,8 @@ public class CharacterManager : MonoBehaviour
 
     [Header("Status")]
     public bool combatMode;
+    public bool findTarget;
+    public bool hasReached;
     public Team currentTeam;
     public CharacterType characterType;
     [SerializeField] private float stopDistance;
@@ -78,6 +82,7 @@ public class CharacterManager : MonoBehaviour
     private void Awake()
     {
         Anim = GetComponent<Animator>();
+        Assignment.RemoveAllListeners();
         Controller = GetComponent<CharacterController>();
 
         AnimatorManagaer = GetComponent<CharacterAnim>();
@@ -251,9 +256,14 @@ public class CharacterManager : MonoBehaviour
             CharacterManager potentialTarget = targetColliders[i].GetComponentInParent<CharacterManager>();
             if(potentialTarget != null && potentialTarget.currentTeam != currentTeam)
             {
-                Target = potentialTarget;
+                SetTarget(potentialTarget);
             }
         }
+    }
+
+    public void SetTarget(CharacterManager target)
+    {
+        Target = target;
     }
 
     private void SetTargetDetails()
@@ -265,7 +275,7 @@ public class CharacterManager : MonoBehaviour
 
         if (Target == null)
         {
-            if (combatMode) { FindTarget(); }
+            if (findTarget) { FindTarget(); }
             return;
         }
 

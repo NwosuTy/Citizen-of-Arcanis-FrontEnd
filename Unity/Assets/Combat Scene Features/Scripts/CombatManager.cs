@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using DevionGames.InventorySystem;
 
 public class CombatManager : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class CombatManager : MonoBehaviour
     [field: SerializeField] public CharacterManager OppositionCombatPrefab { get; private set; }
 
     [Header("Parameters")]
+    public bool hasMercenary;
     [SerializeField] private float transitionDelay;
     [SerializeField] private Animator sceneTransitionAnimator;
 
@@ -49,6 +51,18 @@ public class CombatManager : MonoBehaviour
     {
         OppositionCombatPrefab = npc;
         StartCoroutine(LoadCombatScene());
+    }
+
+    public void HandleLoot(WeaponManager weapon, DuelState duelState)
+    {
+        if (duelState != DuelState.Lost && hasMercenary == true)
+        {
+            MercenarySpawner spawner = FindAnyObjectByType<MercenarySpawner>();
+            if (spawner != null)
+            {
+                spawner.RewardPlayer(weapon.pickableObject);
+            }
+        }
     }
 
     private IEnumerator LoadCombatScene()

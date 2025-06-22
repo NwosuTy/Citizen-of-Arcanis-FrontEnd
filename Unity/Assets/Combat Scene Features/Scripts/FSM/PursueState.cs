@@ -27,12 +27,18 @@ public class PursueState : AIState
         {
             animManager.SetBlendTreeParameter(1.0f, 0.0f, false, Time.deltaTime);
             moveManager.MoveToDestination(1.0f, characterManager.PositionOfTarget);
+            return this;
         }
-        else
+
+        if(characterManager.combatMode != true)
         {
-            characterManager.isMoving = false;
-            return SwitchState(characterManager, characterManager.Combat);
+            if (characterManager.hasReached != true)
+            {
+                characterManager.Assignment?.Invoke();
+            }
+            return this;
         }
-        return this;
+        characterManager.isMoving = false;
+        return SwitchState(characterManager, characterManager.Combat);
     }
 }
