@@ -13,15 +13,15 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Player
+  - Character
   - Water
   - UI
   - Floor
   - Wall
   - Vehicle
   - Post-Processing Volume
-  - 
-  - 
+  - Props
+  - Damage Layer
   - 
   - 
   - 
