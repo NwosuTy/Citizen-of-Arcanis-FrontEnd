@@ -1,18 +1,16 @@
-﻿// AIVehicleDirector.cs
-using UnityEngine;
-using System.Collections;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(VehicleMovement))]
 public class AIVehicleDirector : MonoBehaviour
 {
     private WayPointNode currentNode;
-    private DrivingStates activeState;
     private VehicleManager vehicleManager;
-    private ReservationGridClass reservationGrid;
+    private ReservationGrid reservationGrid;
     public Transform Target { get; private set; }
     public RoutePoint ProgressPoint { get; private set; }
 
     private float speed;
+    private bool hasPath;
     private int progressNum;
     private Vector3 lastPosition;
     private float progressDistance;
@@ -26,15 +24,16 @@ public class AIVehicleDirector : MonoBehaviour
 
     [Header("Parameters")]
     public float RandomPerlin = 0.5f;
-    public float DesiredSpeed = 200f;
     public float AccelWanderSpeed = 0.1f;
     public float AccelWanderAmount = 0.1f;
     public float SteerSensitivity = 0.05f;
     public float AccelSensitivity = 0.04f;
     [SerializeField] private float steeringSmoothTime = 0.25f;
 
-    [Header("Path Progression")]
+    [Header("Assigned Path")]
     [SerializeField] private WayPointPath assignedPath;
+
+    [Header("Path Progression")]
     [SerializeField] private WayPointController circuit;
     [SerializeField] private float pointToPointThreshold = 4f;
     [SerializeField] private float lookAheadForTargetOffset = 5f;
@@ -48,17 +47,29 @@ public class AIVehicleDirector : MonoBehaviour
     [SerializeField] private float lateralWanderDistance = 1f;
     [SerializeField] private float avoidanceSlowdownFactor = 0.5f;
 
+    [Header("Parking / Restart (config)")]
+    [Tooltip("Minimum seconds to stay in park before starting a new journey")]
+    [SerializeField] private float minParkTime = 3f;
+    [Tooltip("Maximum seconds to stay in park before starting a new journey")]
+    [SerializeField] private float maxParkTime = 7.5f;
+    [ReadOnlyInspector] public float distanceToFinalPos;
+    [ReadOnlyInspector] public float distancebtwFinalNode;
+
     [Header("State Machines")]
     public ParkState park;
     public NormalState normal;
     public ReverseState reverse;
     public OvertakeState overtake;
     public EmergencyStopState emergencyStop;
+    [ReadOnlyInspector] public DrivingStates activeState;
+
+    public float MinParkTime => minParkTime;
+    public float MaxParkTime => maxParkTime;
+    public WayPointController Circuit => circuit;
 
     public enum ProgressStyle
     {
         PointToPoint,
-        FreeFlowRoutine,
         SmoothAlongRoute
     }
 
@@ -70,23 +81,23 @@ public class AIVehicleDirector : MonoBehaviour
 
     public void Start()
     {
-        // instantiate states
-        park = Instantiate(park);
-        normal = Instantiate(normal);
-        reverse = Instantiate(reverse);
-        overtake = Instantiate(overtake);
-        emergencyStop = Instantiate(emergencyStop);
+        // instantiate states (timers local)
+        if (park != null) park = Instantiate(park);
+        if (normal != null) normal = Instantiate(normal);
+        if (reverse != null) reverse = Instantiate(reverse);
+        if (overtake != null) overtake = Instantiate(overtake);
+        if (emergencyStop != null) emergencyStop = Instantiate(emergencyStop);
 
-        if(circuit != null) reservationGrid = circuit.ReservationGrid;
+        if (circuit != null) reservationGrid = circuit.ReservationGrid;
         Reset();
+        hasPath = assignedPath != null && assignedPath.HasPath;
     }
 
     private void Reset()
     {
         if (circuit == null)
-        {
             return;
-        }
+
         progressNum = 0;
         progressDistance = 0f;
 
@@ -95,18 +106,21 @@ public class AIVehicleDirector : MonoBehaviour
 
         if (progressStyle != ProgressStyle.SmoothAlongRoute && circuit != null)
         {
-            currentNode = circuit.GetClosestNodeToObject(transform, 180f);
-            Target.SetPositionAndRotation(currentNode.transform.position, currentNode.transform.rotation);
+            currentNode = circuit.GetClosestNodeInFrontOfObject(transform, 180f);
+            if (currentNode != null)
+                Target.SetPositionAndRotation(currentNode.transform.position, currentNode.transform.rotation);
         }
-        activeState = overtake.SwitchState(normal, vehicleManager);
+
+        if (park != null)
+            activeState = normal.SwitchState(park, vehicleManager);
     }
 
     /// <summary>
     /// Called each frame by VehicleManager.Update(delta)
     /// </summary>
-    public void VehicleDirector_Update(float delta)
+    public void VehicleDirector_Update()
     {
-        if(circuit == null || reservationGrid == null)
+        if (circuit == null || reservationGrid == null)
         {
             return;
         }
@@ -115,114 +129,94 @@ public class AIVehicleDirector : MonoBehaviour
         {
             return;
         }
-        AdvancePath(delta);
-        HandleStateChange();
-
-        //Register new reservation at look-ahead position
-        var pos = transform.position + transform.forward * lookAheadForTargetOffset;
-        var res = new PathReservation(2.5f, pos, vehicleManager.GetInstanceID());
-        reservationGrid.RegisterReservation(res);
+        AdvancePath();
     }
 
-    private void AdvancePath(float delta)
+    private void AdvancePath()
     {
-        switch (progressStyle)
+        // If no path -> park and do not advance
+        if (assignedPath == null || assignedPath.PathNodes == null || assignedPath.PathNodes.Count == 0)
         {
-            case ProgressStyle.PointToPoint:
-                PointRoutine();
-                break;
-            case ProgressStyle.FreeFlowRoutine:
-                FreeFlowRoutine(delta);
-                break;
-            case ProgressStyle.SmoothAlongRoute:
-                SmoothAlongRoutine(delta);
-                break;
+            if (activeState != park && park != null)
+            {
+                activeState = activeState.SwitchState(park, vehicleManager);
+            }
+            return;
         }
-        Debug.DrawLine(transform.position, Target.position, Color.green);
+
+        distancebtwFinalNode = vehicleManager.Movement.StopDistance;
+        distanceToFinalPos = assignedPath.DistanceToFinalDestination(transform.position);
+        bool completedPath = distanceToFinalPos < vehicleManager.Movement.StopDistance;
+        if (completedPath)
+        {
+            if (activeState != park && park != null)
+            {
+                activeState = activeState.SwitchState(park, vehicleManager);
+            }
+            return;
+        }
+
+        // Only progress when hasPath == true (so we don't try to advance while generating)
+        if (hasPath)
+        {
+            switch (progressStyle)
+            {
+                case ProgressStyle.PointToPoint:
+                    PointRoutine();
+                    break;
+                case ProgressStyle.SmoothAlongRoute:
+                    SmoothAlongRoutine();
+                    break;
+            }
+        }
     }
 
-    private void HandleStateChange()
+    public void StateChangeAndCheckReservations()
     {
-        if (activeState == null)
+        if (vehicleManager.playerControlled)
         {
             return;
         }
-        var next = activeState.HandleAction(vehicleManager);
-        if (next != null) activeState = next;
+
+        if (activeState != null)
+        {
+            var next = activeState.HandleAction(vehicleManager);
+            if (next != null)
+            {
+                activeState = next;
+            }
+        }
+        // dynamic look-ahead based on speed to reduce false positives
+        float dynamicLookahead = lookAheadForTargetOffset + speed * lookAheadForTargetFactor;
+        var pos = transform.position + transform.forward * dynamicLookahead;
+        float dynamicRadius = Mathf.Max(avoidanceRadius, speed * 0.02f); // tiny scale by speed
+        var res = new PathReservation(dynamicRadius, pos, vehicleManager.GetInstanceID());
+        reservationGrid.RegisterReservation(res);
     }
 
     #region Path Progression
 
     private void PointRoutine()
     {
-        if (assignedPath == null || assignedPath.PathNodes.Count == 0)
-        {
-            progressStyle = ProgressStyle.FreeFlowRoutine;
-            return;
-        }
-
         float distance = Vector3.Distance(Target.position, transform.position);
         if (distance < pointToPointThreshold)
         {
             progressNum = (progressNum + 1) % assignedPath.PathNodes.Count;
         }
         var node = assignedPath.PathNodes[progressNum];
-        UpdateRouteProgress(node.position, node.rotation);
+        UpdateRouteProgress(node.transform.position, node.transform.rotation);
     }
 
-    private void SmoothAlongRoutine(float delta)
+    private void SmoothAlongRoutine()
     {
-        if (assignedPath.PathNodes.Count == 0)
-        {
-            progressStyle = ProgressStyle.FreeFlowRoutine;
-            return;
-        }
-        CalculateSpeed(delta);
+        speed = vehicleManager.Movement.GetLinearSpeed;
 
         RoutePoint rp = assignedPath.GetRoutePoint(progressDistance + lookAheadForTargetOffset + lookAheadForTargetFactor * speed);
         UpdateRouteProgress(rp.position, Quaternion.LookRotation(rp.direction));
     }
 
-    private void FreeFlowRoutine(float delta)
-    {
-        CalculateSpeed(delta);
-        float distance = Vector3.Distance(Target.position, transform.position);
-        if (distance < pointToPointThreshold)
-        {
-            WayPointNode nextNode = currentNode.GetNextNodeRandomly(null);
-            currentNode = (nextNode != null) ? nextNode : circuit.GetClosestNodeToObject(transform, 180);
-            StartCoroutine(SmoothLookAheadToTarget(delta, currentNode));
-        }
-        lastPosition = transform.position;
-    }
-
-    private IEnumerator SmoothLookAheadToTarget(float delta, WayPointNode node)
-    {
-        float elapsed = 0f;
-
-        Target.GetPositionAndRotation(out Vector3 startPos, out Quaternion startRot);
-        node.transform.GetPositionAndRotation(out Vector3 endPos, out Quaternion endRot);
-
-        while (elapsed < steeringSmoothTime)
-        {
-            float t = elapsed / steeringSmoothTime;
-            Vector3 pos = Vector3.Lerp(startPos, endPos, t);
-            Quaternion rot = Quaternion.Slerp(startRot, endRot, t);
-            Target.SetPositionAndRotation(pos, rot);
-
-            elapsed += delta;
-            yield return null;
-        }
-    }
-
-    private void CalculateSpeed(float delta)
-    {
-        if (delta > 0)
-        {
-            float sqrMag = (transform.position - lastPosition).sqrMagnitude;
-            speed = Mathf.Sqrt(sqrMag) / delta;
-        }
-    }
+    public float GetAdaptiveDesiredSpeed(float baseSpeed) => 
+        vehicleManager.Movement.GetAdaptiveDesiredSpeed(baseSpeed, progressDistance, assignedPath);
 
     private void UpdateRouteProgress(Vector3 pos, Quaternion rot)
     {
@@ -240,19 +234,54 @@ public class AIVehicleDirector : MonoBehaviour
 
     #endregion
 
+    /// <summary>
+    /// Called by ParkState when its parking timer finishes.
+    /// Director keeps responsibility to create/refresh a new path.
+    /// </summary>
+    public void ParkCompleted()
+    {
+        ClearPath();
+        WayPointNode start = null;
+        WayPointNode finalDestinationNode = null;
+
+        if (circuit != null)
+        {
+            if (assignedPath != null)
+            {
+                WayPointNode exclude = assignedPath.FinalDestinationNode;
+                finalDestinationNode = circuit.GetNode(vehicleManager.transform, exclude, out start);
+            }
+        }
+
+        if (assignedPath == null || circuit == null || finalDestinationNode == null)
+        {
+            return;
+        }
+        assignedPath.RefreshPath(vehicleManager.driverExperience, start, finalDestinationNode);
+        //Reduce Speed When 65% of Route Has Been Completed
+        vehicleManager.Movement.SetStopDistance(assignedPath.DistanceBetweenLastTwoNodes() * 0.35f);
+        hasPath = assignedPath.HasPath;
+    }
+
+    public void ClearPath()
+    {
+        hasPath = false;
+        assignedPath?.Clear();
+    }
+
     #region Conflict & Overtake Helpers
 
     public bool CheckForConflict(out PathReservation other)
     {
         other = default;
         if (reservationGrid == null) return false;
-        var r = new PathReservation(2.5f, transform.position + transform.forward * 5f, vehicleManager.GetInstanceID());
+        var r = new PathReservation(avoidanceRadius, transform.position + transform.forward * 5f, vehicleManager.GetInstanceID());
         return reservationGrid.CheckConflict(r, out other);
     }
 
     public bool CheckYieldCondition()
     {
-        // TODO
+        // TODO - implement traffic yield logic
         return false;
     }
 
@@ -295,16 +324,12 @@ public class AIVehicleDirector : MonoBehaviour
     };
 
     /// <summary>
-    /// Your avoidance helper.
-    /// </summary>
-    /// <summary>
     /// Compute a steering target that avoids nearby vehicles.
     /// </summary>
     private Vector3 ComputeTargetWithAvoidance(ref float desiredSpeed, Vector3 originalTarget)
     {
         Vector3 adjustedTarget = originalTarget;
 
-        // Build a look‑ahead reservation
         var reservation = new PathReservation
         {
             Vehicle_ID = vehicleManager.GetInstanceID(),
@@ -315,28 +340,25 @@ public class AIVehicleDirector : MonoBehaviour
 
         if (conflictDetected)
         {
-            // start avoidance window
             avoidOtherCarTime = Time.time + avoidanceDuration;
             avoidOtherCarSlowdown = avoidanceSlowdownFactor;
             avoidPathOffset = Random.value > 0.5f ? avoidanceRadius : -avoidanceRadius;
 
-            // immediate swerve
             adjustedTarget += transform.right * avoidPathOffset;
             Debug.DrawLine(transform.position, adjustedTarget, Color.red);
         }
         else if (Time.time < avoidOtherCarTime)
         {
-            // still in avoidance window
             adjustedTarget += transform.right * avoidPathOffset;
             desiredSpeed *= avoidOtherCarSlowdown;
         }
         else
         {
-            // subtle Perlin wander when clear
             float wander = (Mathf.PerlinNoise(Time.time * lateralWanderSpeed, RandomPerlin) * 2 - 1);
             adjustedTarget += wander * lateralWanderDistance * transform.right;
         }
         return adjustedTarget;
     }
+
     #endregion
 }

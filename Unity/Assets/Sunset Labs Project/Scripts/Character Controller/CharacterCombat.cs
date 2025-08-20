@@ -24,6 +24,7 @@ public class CharacterCombat : MonoBehaviour
     [Header("Combat Status")]
     public bool canCombo;
     public AttackType attackType;
+    [SerializeField] private bool isSciFi;
 
     [Header("Parameters")]
     public int damageModifier;
@@ -235,6 +236,10 @@ public class CharacterCombat : MonoBehaviour
 
     public void SetDuellingCharacter()
     {
+        if(CombatManager.Instance == null)
+        {
+            return;
+        }
         CombatManager.Instance.AssignPlayer(CombatCharacter.characterManager);
     }
 
@@ -242,10 +247,10 @@ public class CharacterCombat : MonoBehaviour
     {
         GameObject newObject = new();
 
-        CharacterDamageCollider leftLeg = GetDamageCollider("Ball_L", newObject);
-        CharacterDamageCollider rightLeg = GetDamageCollider("Ball_R", newObject);
-        CharacterDamageCollider leftHand = GetDamageCollider("Hand_L", newObject);
-        CharacterDamageCollider rightHand = GetDamageCollider("Hand_R", newObject);
+        CharacterDamageCollider leftLeg = GetDamageCollider(GameObjectName(true, "L"), newObject);
+        CharacterDamageCollider rightLeg = GetDamageCollider(GameObjectName(true, "R"), newObject);
+        CharacterDamageCollider leftHand = GetDamageCollider(GameObjectName(false, "L"), newObject);
+        CharacterDamageCollider rightHand = GetDamageCollider(GameObjectName(false, "R"), newObject);
 
         CreateHurtBox(newObject, 11);
         damageColliders = new[]{ leftHand, rightHand, leftLeg, rightLeg };
@@ -253,13 +258,27 @@ public class CharacterCombat : MonoBehaviour
         DestroyImmediate(newObject);
     }
 
+    private string GameObjectName(bool isLeg, string suffix)
+    {
+        string objectName;
+        if (isLeg)
+        {
+            objectName = (isSciFi) ? "Ball_" : "Foot.";
+        }
+        else
+        {
+            objectName = (isSciFi) ? "Hand_" : "Hand.";
+        }
+        return objectName + suffix;
+    }
+
     private CharacterDamageCollider GetDamageCollider(string name, GameObject go)
     {
         LayerMask layer = 11;
         string colliderName = name + " Damage Collider";
-        Transform parent = GameObjectFinder.FindChildRecursively(transform, name);
+        Transform parent = GameObjectTool.FindChildRecursively(transform, name);
 
-        if(GameObjectFinder.TryFindChildRecursively(parent, colliderName, out Transform t))
+        if(GameObjectTool.TryFindChildRecursively(parent, colliderName, out Transform t))
         {
             DestroyImmediate(t.gameObject);
         }
@@ -278,7 +297,7 @@ public class CharacterCombat : MonoBehaviour
     {
         Transform t;
         string objectName = "Body Damage Collider";
-        if (GameObjectFinder.TryFindChildRecursively(transform, objectName, out t))
+        if (GameObjectTool.TryFindChildRecursively(transform, objectName, out t))
         {
             DestroyImmediate(t.gameObject);
         }
@@ -291,8 +310,8 @@ public class CharacterCombat : MonoBehaviour
         capsule.center = new Vector3(0, 0.85f, 0);
 
         objectName = "Head Damage Collider";
-        Transform parent = GameObjectFinder.FindChildRecursively(transform, "Head");
-        if (GameObjectFinder.TryFindChildRecursively(transform, objectName, out t))
+        Transform parent = GameObjectTool.FindChildRecursively(transform, "Head");
+        if (GameObjectTool.TryFindChildRecursively(transform, objectName, out t))
         {
             DestroyImmediate(t.gameObject);
         }

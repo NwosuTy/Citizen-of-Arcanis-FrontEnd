@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class CharacterStatistic : MonoBehaviour
+public class CharacterStatistic : MonoBehaviour, IDamagabele
 {
     private int currentHealth;
     private bool showHealthBar;

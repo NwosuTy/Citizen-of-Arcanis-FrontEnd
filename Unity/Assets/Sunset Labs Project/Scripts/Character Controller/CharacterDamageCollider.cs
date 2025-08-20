@@ -64,6 +64,7 @@ public class CharacterDamageCollider : MonoBehaviour
         int count = Physics.OverlapSphereNonAlloc(transform.position, attackRadius, collidersArray, enemyLayerMask);
         for(int i = 0; i <  count; i++)
         {
+            Debug.Log($"Damaging {collidersArray[i].name}");
             DamgeEnemy(collidersArray[i]);
         }
     }
@@ -84,6 +85,10 @@ public class CharacterDamageCollider : MonoBehaviour
 
     private void DamgeEnemy(Collider other)
     {
+        if (other.TryGetComponent(out IDamagabele damagabele))
+        {
+            damagabele.TakeDamage(0, AttackType.Light);
+        }
         CharacterManager damaged = other.GetComponentInParent<CharacterManager>();
 
         if (damaged == null)
@@ -114,7 +119,11 @@ public class CharacterDamageCollider : MonoBehaviour
 
         CharacterCombat combat = characterCausingDamage.CombatManager;
         AttackActions currentAttack = combat.currentAction;
+
         int damage = combat.damageModifier * currentAttack.damageValue;
-        damaged.StatsManager.TakeDamage(damage, currentAttack.attackType);
+        if(damaged.TryGetComponent(out IDamagabele damagabele))
+        {
+            damagabele.TakeDamage(damage, currentAttack.attackType);
+        }
     }
 }

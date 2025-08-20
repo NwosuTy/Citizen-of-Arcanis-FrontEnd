@@ -1,15 +1,10 @@
 using UnityEngine;
 using Unity.Cinemachine;
 
-/// <summary>
-/// Handles the loading and instantiation of character prefabs based on player selection.
-/// This script is used in game scenes where the selected character needs to be spawned.
-/// It reads the player's character selection from PlayerPrefs and instantiates the corresponding prefab.
-/// </summary>
 public class LoadCharacter : MonoBehaviour
 {
     private int selectedIndex;
-    public CharacterManager spawnedCharacter { get; private set; }
+    public CharacterManager SpawnedCharacter { get; private set; }
 
     [Header("Parameters")]  
     [Tooltip("Transform reference for the position where the character will be spawned")]
@@ -18,7 +13,6 @@ public class LoadCharacter : MonoBehaviour
 
     [Header("UI Elements")]
     [SerializeField] private PlayerUI playerUI;
-    [SerializeField] private CharacterManager ccc;
 
     [Header("Camera Objects")]
     [SerializeField] private CinemachineCamera gunCamera;
@@ -28,25 +22,27 @@ public class LoadCharacter : MonoBehaviour
     [Tooltip(" Array of drone prefabs that can be instantiated.")]
     public PlayerCompanion[] companions;
     [Tooltip("Array of character prefabs that can be instantiated.")]
-    public CharacterManager[] characterManagerPrefabs;
+    [field: SerializeField] public CharacterData[] CharacterDatas { get; private set; }
 
-    void Start()
+    private void Awake()
     {
+        CharacterDatas = Resources.LoadAll<CharacterData>("Character Data");
         CreateCharacter();
     }
 
     private void CreateCharacter()
     {
         selectedIndex = PlayerPrefs.GetInt("SelectedCharacterIndex", 0);
-        if (selectedIndex < 0 || selectedIndex >= characterManagerPrefabs.Length)
+        if (selectedIndex < 0 || selectedIndex >= CharacterDatas.Length)
         {
             Debug.LogError("�ndice de personaje seleccionado est� fuera de rango. Verifica los prefabs asignados en el inspector.");
             return;
         }
-        CharacterManager spawnedCharacter = Instantiate(characterManagerPrefabs[selectedIndex], spawnPoint);
-        ccc = spawnedCharacter;
+        CharacterManager spawnedCharacter = Instantiate(CharacterDatas[selectedIndex].PlayableCharacter, spawnPoint);
+
+        NPCController.Instance.player = spawnedCharacter;
+        spawnedCharacter.name = CharacterDatas[selectedIndex].characterName;
         spawnedCharacter.SetCharacterType(CharacterType.Player);
-        GetComponent<MercenarySpawner>().SetTarget(spawnedCharacter);
 
         CreateDroneObject(spawnedCharacter);
         SetCharacterParameters(spawnedCharacter);

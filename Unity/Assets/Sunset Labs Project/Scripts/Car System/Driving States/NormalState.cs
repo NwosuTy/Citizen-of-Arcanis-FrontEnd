@@ -1,5 +1,4 @@
-﻿// NormalState.cs
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(menuName = "DrivingStates/NormalState")]
 public class NormalState : DrivingStates
@@ -9,29 +8,37 @@ public class NormalState : DrivingStates
     public override DrivingStates HandleAction(VehicleManager vm)
     {
         GetDirectorAndMovement(vm, out var dir, out var move);
+        if (dir == null || move == null)
+        {
+            return this;
+        }
 
-        // 1) Yield (traffic only)
         if (vm.drivingBehavior == DrivingBehavior.Traffic && dir.CheckYieldCondition())
+        {
             return SwitchState(dir.park, vm);
+        }
 
-        // 2) Stuck → Reverse
-        if (Mathf.Abs(move.CurrentSpeed) < stuckThreshold)
+        if (move.CurrentSpeed < stuckThreshold)
         {
             stuckTimer += Time.deltaTime;
             if (stuckTimer > stuckTimeLimit)
+            {
                 return SwitchState(dir.reverse, vm);
+            }
         }
         else
         {
             stuckTimer = 0f;
         }
 
-        // 3) Cautious speed reduction (unchanged)
-        float baseSpeed = dir.DesiredSpeed * dir.BehaviorSpeedFactor(vm.drivingBehavior);
-        float desiredSpeed = baseSpeed;
-        Vector3 fwd = move.CurrentSpeed > baseSpeed * 0.1f
-                      ? vm.RB.velocity
-                      : vm.transform.forward;
+        // base speed and cautious adjustments
+        float desiredSpeed = 0.0f;
+        float baseSpeed = vm.Movement.topSpeed * dir.BehaviorSpeedFactor(vm.drivingBehavior);
+        if (vm.drivingBehavior == DrivingBehavior.Traffic)
+        {
+            desiredSpeed = dir.GetAdaptiveDesiredSpeed(baseSpeed);
+        }
+        Vector3 fwd = move.CurrentSpeed > baseSpeed * 0.1f ? vm.RB.velocity : vm.transform.forward;
 
         switch (move.BrakeConditionType)
         {
@@ -54,30 +61,29 @@ public class NormalState : DrivingStates
                     break;
                 }
             case BrakeCondition.NeverBrake:
+            default:
                 break;
         }
 
-        // 4) Conflict → Overtake or block (unchanged)
+        // conflict handling
         if (dir.CheckForConflict(out _))
         {
             if (vm.drivingBehavior == DrivingBehavior.Racing)
             {
                 dir.BlockOvertake();
                 ThrottleToSpeed(vm, baseSpeed * 0.8f, dir.AccelSensitivity);
-                vm.Movement.Move(vm.horizontalInput, vm.verticalInput);
                 return this;
             }
             dir.StartOvertake();
             return SwitchState(dir.overtake, vm);
         }
 
-        // 5) Normal steering & throttle, with avoidance
+        // steering & throttle with avoidance
         Vector3 rawTarget = dir.ComputeNormalTarget(ref desiredSpeed);
 
         SteerToTarget(vm, dir.transform.InverseTransformPoint(rawTarget));
         ThrottleToSpeed(vm, desiredSpeed, dir.AccelSensitivity);
 
-        vm.Movement.Move(vm.horizontalInput, vm.verticalInput);
         return this;
     }
 

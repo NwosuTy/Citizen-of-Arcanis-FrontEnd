@@ -4,13 +4,14 @@ using UnityEngine;
 public class EmergencyStopState : DrivingStates
 {
     private float timer;
-    private float stopDuration = 1.0f;
+    [SerializeField] private float stopDuration = 1.0f;
 
     public override DrivingStates HandleAction(VehicleManager vm)
     {
+        // zero steering, full brake
         vm.horizontalInput = 0f;
-        vm.verticalInput = -1f;
-        vm.Movement.Move(vm.horizontalInput, vm.verticalInput);
+        vm.verticalInput = 0f;
+        vm.brakeInput = 1f;
 
         timer += Time.deltaTime;
         if (timer > stopDuration)

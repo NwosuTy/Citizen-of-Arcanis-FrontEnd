@@ -5,45 +5,49 @@ public class ReverseState : DrivingStates
 {
     private float timer;
 
-    [SerializeField] private float minTime = 1.5f;
-    [SerializeField] private float duration = 2.0f;
+    [SerializeField] private float minTime = 1.0f;
+    [SerializeField] private float duration = 2.2f;
     [SerializeField] private float reverseSpeed = -2.5f;
-    [SerializeField] private float turnSpeedDegrees = 90f;
+    [SerializeField] private float lookBehindDistance = 4.0f;
 
     public override DrivingStates HandleAction(VehicleManager vm)
     {
-        var rigidBody = vm.RB;
-        float delta = Time.deltaTime;
-        Transform transform = vm.transform;
+        if (vm == null) return this;
 
-        timer += delta;
+        timer += Time.deltaTime;
         GetDirectorAndMovement(vm, out var dir, out var move);
+        if (dir == null || move == null) return this;
 
-        // Calculate vector pointing to the target
-        Vector3 toTarget = dir.Target.position - transform.position;
-        toTarget.y = 0f;
+        // compute a look-behind point so the car swerves naturally while reversing
+        Vector3 dirToTarget = (vm.transform.position - dir.Target.position);
+        dirToTarget.y = 0f;
+        if (dirToTarget.sqrMagnitude < 0.01f)
+            dirToTarget = -vm.transform.forward;
 
-        if (toTarget.sqrMagnitude > 0.001f)
-        {
-            // Desired rotation toward the target
-            Quaternion desiredRotation = Quaternion.LookRotation(toTarget, Vector3.up);
+        Vector3 lookPoint = vm.transform.position + dirToTarget.normalized * lookBehindDistance;
 
-            // Smoothly rotate the Rigidbody toward the target
-            Quaternion rot = Quaternion.RotateTowards(rigidBody.rotation,desiredRotation,turnSpeedDegrees * delta);
-            rigidBody.MoveRotation(rot);
-        }
+        // Convert to director-local space and steer — reverse=true inverts steering
+        Vector3 local = dir.transform.InverseTransformPoint(lookPoint);
+        SteerToTarget(vm, local, reverse: true);
 
-        // Drive in reverse
-        ReverseThrottle(vm, reverseSpeed);
-        move.Move(vm.horizontalInput, vm.verticalInput);
+        // set reverse throttle intent (writes brakeInput for reverse)
+        ReverseThrottle(vm, dir, move, reverseSpeed);
 
-        // Optionally enforce a fixed reverse velocity
-        rigidBody.velocity = transform.forward * reverseSpeed;
+        // Exit when done
         if (timer > duration || (timer > minTime && Mathf.Abs(move.CurrentSpeed) < 0.5f))
         {
             return SwitchState(dir.normal, vm);
         }
         return this;
+    }
+
+    private void ReverseThrottle(VehicleManager vm, AIVehicleDirector dir, VehicleMovement move, float reverseSpeed)
+    {
+        if (dir == null || move == null) return;
+        // how urgently to back up: if current forward speed exists reduce reverse magnitude some
+        float needed = Mathf.Clamp01((Mathf.Abs(reverseSpeed) - move.CurrentSpeed) * dir.AccelSensitivity * 0.8f);
+        vm.verticalInput = 0f;
+        vm.brakeInput = 2 * needed; // brakeInput used for reverse magnitude in physics layer
     }
 
     protected override void ResetStateParameters(VehicleManager vm)

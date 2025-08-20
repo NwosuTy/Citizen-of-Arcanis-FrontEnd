@@ -3,62 +3,15 @@ using System.Collections.Generic;
 
 public class WayPointNode : MonoBehaviour
 {
-    public enum NodeDirection
-    {
-        Left,
-        Right,
-        Forward
-    }
-    private List<int> indexList = new List<int>();
-
     [Header("Parameters")]
     public Vector2 offset;
     [SerializeField] private List<WayPointNode> connectedNodes = new();
 
-    private void OnDrawGizmosSelected()
-    {
-        DisplayNodeGizmos();
-    }
+    public Vector3 NodePosition => transform.position;
+    public List<WayPointNode> ConnectedNodes => connectedNodes;
 
-    public WayPointNode GetNextNodeRandomly()
-    {
-        return connectedNodes[Random.Range(0, connectedNodes.Count)];
-    }
-
-    public WayPointNode GetNextNodeRandomly(WayPointNode exclude)
-    {
-        indexList.Clear();
-        for(int i = 0; i < connectedNodes.Count;  i++)
-        {
-            if(connectedNodes[i] == exclude)
-            {
-                continue;
-            }
-            indexList.Add(i);
-        }
-        int rnd = Random.Range(0, indexList.Count);
-        return connectedNodes[indexList[rnd]];
-    }
-
-    public WayPointNode GetNextNodeDistanceBased(Vector3 target)
-    {
-        WayPointNode nextNode = null;
-        float maxDistance = float.MaxValue;
-
-        for(int i = 0; i < connectedNodes.Count; ++i)
-        {
-            Transform node = connectedNodes[i].transform;
-            float distance = Vector3.SqrMagnitude(node.position - target);
-
-            if(distance < maxDistance)
-            {
-                maxDistance = distance;
-                nextNode = connectedNodes[i];
-            }
-        }
-        return nextNode;
-    }
-
+    private void OnDrawGizmosSelected() => DisplayNodeGizmos();
+    
     public void DisplayNodeGizmos()
     {
         Gizmos.color = Color.red;
@@ -76,36 +29,17 @@ public class WayPointNode : MonoBehaviour
         }
     }
 
-    public void CreateNewNode(NodeDirection dir)
+    public void CreateNewNode()
     {
-        Vector3 offset = GetOffset(dir);
-        CreateNewConnectorNode(offset);
+        CreateNewConnectorNode();
     }
 
-    private Vector3 GetOffset(NodeDirection dir)
+    private void CreateNewConnectorNode()
     {
-        if(NodeDirection.Left == dir)
-        {
-            return new Vector3(-offset.x, 0, 0);
-        }
-        else if(NodeDirection.Right == dir)
-        {
-            return new Vector3(offset.x, 0, 0);
-        }
-        return new Vector3(0, 0, offset.y);
-    }
-
-    private void CreateNewConnectorNode(Vector3 offset)
-    {
-        GameObject newObj = new()
-        {
-            name = "Node"
-        };
-        newObj.transform.position = transform.position + offset;
-
+        GameObject newObj = new("Node");
+        newObj.transform.position = transform.position;
         newObj.transform.SetParent(transform.parent);
         WayPointNode newNode = newObj.AddComponent<WayPointNode>();
-
         AddNewNode(newNode);
         newNode.AddNewNode(this);
         newNode.offset = this.offset;
@@ -113,10 +47,75 @@ public class WayPointNode : MonoBehaviour
 
     public void AddNewNode(WayPointNode node)
     {
-        if(connectedNodes.Contains(node))
-        {
-            return;
-        }
+        if (node == null || connectedNodes.Contains(node)) return;
         connectedNodes.Add(node);
+    }
+
+    /// <summary>
+    /// Returns a random connected node that is NOT in visited (if visited provided).
+    /// Uses reservoir sampling to avoid extra allocations.
+    /// </summary>
+    public WayPointNode GetNextNodeRandomly(HashSet<WayPointNode> visited = null)
+    {
+        // keep list clean
+        connectedNodes.RemoveAll(x => x == null);
+        int count = connectedNodes.Count;
+        if (count == 0) return null;
+
+        WayPointNode selected = null;
+        int seen = 0;
+        for (int i = 0; i < count; i++)
+        {
+            var candidate = connectedNodes[i];
+            if (candidate == null) continue;
+            if (visited != null && visited.Contains(candidate)) continue;
+
+            seen++;
+            // reservoir selection: pick current candidate with probability 1/seen
+            if (Random.Range(0, seen) == 0)
+            {
+                selected = candidate;
+            }
+        }
+        return selected;
+    }
+
+    /// <summary>
+    /// Returns the connected node (not in visited) that is closest to target.
+    /// </summary>
+    public WayPointNode GetNextNodeDistanceBased(Vector3 target, HashSet<WayPointNode> visited = null)
+    {
+        WayPointNode best = null;
+        float bestSq = float.MaxValue;
+        connectedNodes.RemoveAll(x => x == null);
+
+        for (int i = 0; i < connectedNodes.Count; i++)
+        {
+            var candidate = connectedNodes[i];
+            if (candidate == null)
+            {
+                continue;
+            }
+            if (visited != null && visited.Contains(candidate))
+            {
+                continue;
+            }
+
+            float sq = (candidate.transform.position - target).sqrMagnitude;
+            if (sq < bestSq)
+            {
+                bestSq = sq;
+                best = candidate;
+            }
+        }
+        return best;
+    }
+
+    /// <summary>
+    /// Convenience wrapper used by callers.
+    /// </summary>
+    public WayPointNode GetNextNode(bool distanceBased, Vector3 target, HashSet<WayPointNode> visited = null)
+    {
+        return distanceBased ? GetNextNodeDistanceBased(target, visited) : GetNextNodeRandomly(visited);
     }
 }

@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Handles engine forces, gear logic and speed capping.
+/// </summary>
+[RequireComponent(typeof(VehicleManager))]
 public class VehiclePhysicsController : MonoBehaviour
 {
     private VehicleManager carManager;
@@ -15,7 +19,7 @@ public class VehiclePhysicsController : MonoBehaviour
     public float MaxSpeed => carManager.Movement.topSpeed;
 
     [Header("Engine Status")]
-    [SerializeField] private SpeedType speedType;
+    [SerializeField] private SpeedType speedType = SpeedType.MPH;
     [SerializeField] private float revRangeBoundary = 1f;
 
     [Header("Engine Parameters")]
@@ -79,13 +83,9 @@ public class VehiclePhysicsController : MonoBehaviour
         float upperLimit = inverseGear * (gearNum + 1);
 
         if (gearNum > 0 && engineRPM < lowerLimit)
-        {
             gearNum--;
-        }
         if (engineRPM > upperLimit && gearNum < (noOfGears - 1))
-        {
             gearNum++;
-        }
     }
 
     private void CalculateRevs(VehicleMovement move)
@@ -102,7 +102,6 @@ public class VehiclePhysicsController : MonoBehaviour
     private void CalculateGearFactor(VehicleMovement move)
     {
         float engineRPM = 1f / noOfGears;
-
         float targetFactor = Mathf.InverseLerp(
             Multiplier(engineRPM, gearNum),
             Multiplier(engineRPM, gearNum + 1),
@@ -115,11 +114,14 @@ public class VehiclePhysicsController : MonoBehaviour
 
     private void AddDownForce(Rigidbody rb)
     {
+        if (rb == null) return;
         rb.AddForce(downForce * rb.velocity.magnitude * -transform.up);
     }
 
     private void CapSpeed(VehicleMovement move, Rigidbody rb)
     {
+        if (rb == null || move == null) return;
+
         float speed = rb.velocity.magnitude;
         switch (speedType)
         {
@@ -138,7 +140,9 @@ public class VehiclePhysicsController : MonoBehaviour
 
     private void SteerHelper(Rigidbody rigidBody, WheelManager wheelManager)
     {
-        for (int i = 0; i < 4; i++)
+        if (rigidBody == null || wheelManager == null) return;
+
+        for (int i = 0; i < Mathf.Min(4, wheelManager.WheelColliders.Count); i++)
         {
             wheelManager.WheelColliders[i].GetGroundHit(out WheelHit wheelHit);
             if (wheelHit.normal == Vector3.zero) continue;
@@ -156,33 +160,36 @@ public class VehiclePhysicsController : MonoBehaviour
     private void ApplyDrive(float accelerate, float footBrake, VehicleMovement move, WheelManager wheel)
     {
         int wheelCount = carManager.WheelCountInt;
-
         float gearRatio = gearRatios[Mathf.Clamp(gearNum, 0, gearRatios.Length - 1)];
         float totalTorque = currentTorque * gearRatio * finalDrive;
 
         int driveWheels = carManager.drive_Type == CarDrive_Type.AllWheels ? wheelCount : 2;
         float torquePerWheel = Mathf.Max((totalTorque / driveWheels) * accelerate, 50f);
 
+        var colliders = wheel.WheelColliders;
+
+        // Apply torque
         for (int i = 0; i < wheelCount; i++)
         {
-            if (carManager.drive_Type == CarDrive_Type.AllWheels ||
-                (carManager.drive_Type == CarDrive_Type.FrontWheels && i < 2) ||
-                (carManager.drive_Type == CarDrive_Type.RearWheels && i >= 2))
-            {
-                wheel.WheelColliders[i].motorTorque = torquePerWheel;
-            }
+            bool shouldDrive = (carManager.drive_Type == CarDrive_Type.AllWheels) ||
+                               (carManager.drive_Type == CarDrive_Type.FrontWheels && i < 2) ||
+                               (carManager.drive_Type == CarDrive_Type.RearWheels && i >= 2);
+
+            if (shouldDrive)
+                colliders[i].motorTorque = torquePerWheel;
         }
 
+        // Braking / reverse logic
         for (int i = 0; i < wheelCount; i++)
         {
             if (move.CurrentSpeed > 5 && Vector3.Angle(transform.forward, carManager.RB.velocity) < 50f)
             {
-                wheel.WheelColliders[i].brakeTorque = move.BrakeTorque * footBrake;
+                colliders[i].brakeTorque = move.BrakeTorque * footBrake;
             }
             else if (footBrake > 0)
             {
-                wheel.WheelColliders[i].brakeTorque = 0f;
-                wheel.WheelColliders[i].motorTorque = -move.ReverseTorque * footBrake;
+                colliders[i].brakeTorque = 0f;
+                colliders[i].motorTorque = -move.ReverseTorque * footBrake;
             }
         }
     }

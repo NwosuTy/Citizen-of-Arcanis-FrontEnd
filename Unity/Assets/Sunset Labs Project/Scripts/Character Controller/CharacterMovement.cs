@@ -6,7 +6,7 @@ public class CharacterMovement : MonoBehaviour
     private CharacterManager characterManager;
 
     private Vector3 moveDirection;
-    public Transform cameraObject { get; protected set; }
+    public Transform CameraObject { get; protected set; }
 
     //Gravity
     private int fallingTimerHash;
@@ -25,11 +25,11 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] protected float gravityForce = -30.0f;
     [field: SerializeField] public bool fallingVelocitySet { get; protected set; } = false;
     [Tooltip("Force at which character is sticking to the ground")][SerializeField] protected float groundedForce = -20f;
-    [Tooltip("Force at which character begins to fall")][field: SerializeField] public float fallStartVelocity { get; protected set; } = -5.0f;
+    [Tooltip("Force at which character begins to fall")][field: SerializeField] public float FallStartVelocity { get; protected set; } = -5.0f;
 
     private void Awake()
     {
-        cameraObject = Camera.main.transform;
+        CameraObject = Camera.main.transform;
         characterManager = GetComponent<CharacterManager>();
     }
 
@@ -73,7 +73,7 @@ public class CharacterMovement : MonoBehaviour
             if (characterManager.isJumping != true && fallingVelocitySet != true)
             {
                 fallingVelocitySet = true;
-                verticalVelocity.y = fallStartVelocity;
+                verticalVelocity.y = FallStartVelocity;
             }
 
             fallingTimer += delta;
@@ -95,8 +95,8 @@ public class CharacterMovement : MonoBehaviour
 
         if(hasGun != true)
         {
-            Vector3 rotationDirection = cameraObject.forward * characterManager.PlayerInput.verticalMoveInput;
-            rotationDirection += cameraObject.right * characterManager.PlayerInput.horizontalMoveInput;
+            Vector3 rotationDirection = CameraObject.forward * characterManager.PlayerInput.verticalMoveInput;
+            rotationDirection += CameraObject.right * characterManager.PlayerInput.horizontalMoveInput;
 
             rotationDirection.Normalize();
             rotationDirection.y = 0.0f;
@@ -108,7 +108,7 @@ public class CharacterMovement : MonoBehaviour
         }
         else
         {
-            float yawCamera = cameraObject.rotation.eulerAngles.y;
+            float yawCamera = CameraObject.rotation.eulerAngles.y;
             targetRotation = Quaternion.Euler(0f, yawCamera, 0f);
         }
         return Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * delta);
@@ -126,8 +126,8 @@ public class CharacterMovement : MonoBehaviour
         float horizontalInput = input.horizontalMoveInput;
         CharacterController characterController = characterManager.Controller;
 
-        moveDirection = cameraObject.forward * verticalInput;
-        moveDirection += cameraObject.right * horizontalInput;
+        moveDirection = CameraObject.forward * verticalInput;
+        moveDirection += CameraObject.right * horizontalInput;
 
         moveDirection.Normalize();
         moveDirection.y = 0.0f;

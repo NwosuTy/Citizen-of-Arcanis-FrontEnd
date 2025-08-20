@@ -1,7 +1,10 @@
-using UnityEngine;
-using Unity.VisualScripting;
 using System.Collections.Generic;
+using UnityEngine;
 
+/// <summary>
+/// Manages wheel colliders and visual transforms. Keeps runtime behavior allocation-free.
+/// Editor-only helper should populate colliders if missing.
+/// </summary>
 public class WheelManager : MonoBehaviour
 {
     private VehicleManager carManager;
@@ -12,7 +15,7 @@ public class WheelManager : MonoBehaviour
     private List<Transform> wheelTransforms = new();
     public List<WheelCollider> WheelColliders { get; private set; } = new();
 
-    [field: Header("Wheel Colliders")]
+    [field: Header("Wheel Colliders (assign in editor)")]
     [field: SerializeField] public WheelCollider FL_Wheel { get; private set; }
     [field: SerializeField] public WheelCollider FR_Wheel { get; private set; }
     [field: SerializeField] public WheelCollider BL_Wheel { get; private set; }
@@ -33,66 +36,81 @@ public class WheelManager : MonoBehaviour
     [SerializeField] private float frictionMultiplier;
     [Range(0.8f, 1.7f)][SerializeField] private float friction = 0.8f;
     [Range(0.35f, 1.0f)][SerializeField] private float slipLimit = 0.4f;
-    
+
     private void Awake()
     {
-        if (FL_Wheel == null) { GetWheelColliders(); }
         carManager = GetComponentInParent<VehicleManager>();
     }
 
     private void Start()
     {
-        sidewardFriction = forwardFriction = friction;
+        // ensure colliders list references are stable
         WheelColliders = new() { FL_Wheel, FR_Wheel, BL_Wheel, BR_Wheel };
         wheelTransforms = new() { FL_Wheel_Transform, FR_Wheel_Transform, BL_Wheel_Transform, BR_Wheel_Transform };
 
+        sidewardFriction = forwardFriction = friction;
         SetUpWheels();
     }
 
     public void WheelManager_Update()
     {
         sidewardFriction = forwardFriction = friction;
-        carManager.PhysicsController.SetStiffness(forwardFriction, sidewardFriction);
+        carManager.PhysicsController?.SetStiffness(forwardFriction, sidewardFriction);
     }
 
     public bool IsGrounded()
     {
-        return (FL_Wheel.isGrounded && FR_Wheel.isGrounded && BL_Wheel.isGrounded && BR_Wheel.isGrounded);
-    }
-
-    public void GetWheelColliders()
-    {
-        if(FL_Wheel != null)
-        {
-            DestroyImmediate(FL_Wheel.transform.parent.gameObject);
-        }
-
-        Rigidbody rb = GetComponentInParent<Rigidbody>();
-        if (rb == null)
-        {
-            carManager = GetComponentInParent<VehicleManager>();
-            carManager.AddComponent<Rigidbody>();
-        }
-        GameObject o = new();
-        GameObject newObj = Instantiate(o, transform);
-
-        DestroyImmediate(o);
-        newObj.name = "Wheel Colliders";
-        FL_Wheel = CreateWheel(FL_Wheel_Transform, newObj.transform, "Front Left Wheel");
-        FR_Wheel = CreateWheel(FR_Wheel_Transform, newObj.transform, "Front Right Wheel");
-
-        BL_Wheel = CreateWheel(BL_Wheel_Transform, newObj.transform, "Back Left Wheel");
-        BR_Wheel = CreateWheel(BR_Wheel_Transform, newObj.transform, "Back Right Wheel");
-        WheelColliders = new() { FL_Wheel, FR_Wheel, BL_Wheel, BR_Wheel };
+        if (WheelColliders == null || WheelColliders.Count < 4) return false;
+        return (WheelColliders[0].isGrounded && WheelColliders[1].isGrounded &&
+                WheelColliders[2].isGrounded && WheelColliders[3].isGrounded);
     }
 
     public void VisualizeWheelMovement()
     {
         int wheelCount = carManager.WheelCountInt;
-        for (int i = 0; i < wheelCount; i++)
+        for (int i = 0; i < Mathf.Min(wheelCount, WheelColliders.Count); i++)
         {
-            HandleWheelVisualMovement(WheelColliders[i], wheelTransforms[i]);
+            HandleWheelVisualMovement(WheelColliders[i], wheelTransforms.Count > i ? wheelTransforms[i] : null);
         }
+    }
+
+    /// <summary>
+    /// Editor helper to create WheelCollider objects under a 'Wheel Colliders' gameobject.
+    /// This is safe to call in the editor. If colliders already exist, their parent will be destroyed and recreated.
+    /// </summary>
+    public void GetWheelColliders()
+    {
+        #if UNITY_EDITOR
+        if (FL_Wheel != null)
+        {
+            var parent = FL_Wheel.transform.parent;
+            if (parent != null && parent.name == "Wheel Colliders")
+                DestroyImmediate(parent.gameObject);
+        }
+        #endif
+
+        GameObject container = new("Wheel Colliders");
+        container.transform.SetParent(this.transform, false);
+
+        WheelCollider CreateCollider(Transform wheelTransform, string name)
+        {
+            GameObject go = new(name);
+            go.transform.SetParent(container.transform, false);
+            if (wheelTransform != null)
+            {
+                go.transform.SetPositionAndRotation(wheelTransform.position, wheelTransform.rotation);
+            }
+            var wc = go.AddComponent<WheelCollider>();
+            wc.radius = wheelRadius; // uses the existing field wheelRadius from this class
+            wc.center = wheelPosition;
+            return wc;
+        }
+
+        FL_Wheel = CreateCollider(FL_Wheel_Transform, "Front Left Wheel");
+        FR_Wheel = CreateCollider(FR_Wheel_Transform, "Front Right Wheel");
+        BL_Wheel = CreateCollider(BL_Wheel_Transform, "Back Left Wheel");
+        BR_Wheel = CreateCollider(BR_Wheel_Transform, "Back Right Wheel");
+        WheelColliders = new List<WheelCollider> { FL_Wheel, FR_Wheel, BL_Wheel, BR_Wheel };
     }
 
     public void SetWheelTransforms(Transform FL, Transform FR, Transform RR, Transform RL)
@@ -107,28 +125,26 @@ public class WheelManager : MonoBehaviour
     {
         switch (carManager.drive_Type)
         {
-            //Loop through all wheels
             case CarDrive_Type.AllWheels:
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < WheelColliders.Count; i++)
                 {
                     AdjustWheelTorque(WheelColliders[i], engine);
                 }
-            break;
-
+                break;
             case CarDrive_Type.RearWheels:
                 AdjustWheelTorque(WheelColliders[2], engine);
                 AdjustWheelTorque(WheelColliders[3], engine);
-            break;
-
+                break;
             case CarDrive_Type.FrontWheels:
                 AdjustWheelTorque(WheelColliders[0], engine);
                 AdjustWheelTorque(WheelColliders[1], engine);
-            break;
+                break;
         }
     }
 
     private void AdjustWheelTorque(WheelCollider wc, VehiclePhysicsController engine)
     {
+        if (wc == null || engine == null) return;
         wc.GetGroundHit(out WheelHit wheelHit);
         AdjustTorque(wheelHit.forwardSlip, engine);
     }
@@ -146,47 +162,30 @@ public class WheelManager : MonoBehaviour
         }
     }
 
-
     private void SetUpWheels()
     {
-        SetUpWheel(FL_Wheel);
-        SetUpWheel(FR_Wheel);
-        SetUpWheel(BR_Wheel);
-        SetUpWheel(BL_Wheel);
+        foreach (var wc in WheelColliders)
+            if (wc != null) SetUpWheel(wc);
     }
 
     private void SetUpWheel(WheelCollider wc)
     {
-        //Forward
-        WheelFrictionCurve curve = wc.forwardFriction;
-
+        var curve = wc.forwardFriction;
         curve.extremumSlip = wheelCurveContainer.fwd_extremumSlip;
         curve.asymptoteSlip = wheelCurveContainer.fwd_asymptoteSlip;
         curve.asymptoteValue = wheelCurveContainer.fwd_asymptoteValue;
         CheckVerticalMovement(forwardFriction, curve);
         wc.forwardFriction = curve;
 
-        //Sideways
+        curve = wc.sidewaysFriction;
         curve.extremumSlip = wheelCurveContainer.sid_extremumSlip;
         curve.asymptoteSlip = wheelCurveContainer.sid_asymptoteSlip;
         curve.asymptoteValue = wheelCurveContainer.sid_asymptoteValue;
         CheckVerticalMovement(sidewardFriction, curve);
         wc.sidewaysFriction = curve;
-    }
 
-    private WheelCollider CreateWheel(Transform wheel, Transform parent, string objName)
-    {
-        GameObject newObj = new()
-        {
-            name = objName
-        };
-        WheelCollider wheelCollider = newObj.AddComponent<WheelCollider>();
-        newObj.transform.SetPositionAndRotation(wheel.position, wheel.rotation);
-        newObj.transform.SetParent(parent);
-
-        wheelCollider.radius = wheelRadius;
-        wheelCollider.center = wheelPosition;
-        return wheelCollider;
+        wc.radius = wheelRadius;
+        wc.center = wheelPosition;
     }
 
     private void CheckVerticalMovement(float frictionDirection, WheelFrictionCurve curve)
@@ -194,9 +193,9 @@ public class WheelManager : MonoBehaviour
         curve.stiffness = (carManager.accelValue <= 0.01f) ? frictionDirection : frictionDirection * frictionMultiplier;
     }
 
-    //Simulate Wheel Movement and Rotation
     private void HandleWheelVisualMovement(WheelCollider wc, Transform t)
     {
+        if (wc == null || t == null) return;
         wc.GetWorldPose(out Vector3 pos, out Quaternion rot);
         t.SetPositionAndRotation(pos, rot);
     }

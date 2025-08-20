@@ -81,7 +81,7 @@ public class PlayerCompanion : MonoBehaviour
 
             if (targetDir == Vector3.zero)
             {
-                targetDir = transform.forward;
+                _ = transform.forward;
             }
         }
         return FollowTarget.forward;

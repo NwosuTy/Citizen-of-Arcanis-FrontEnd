@@ -10,16 +10,14 @@ public class WayPointNodeEditor : Editor
         base.OnInspectorGUI();
         WayPointNode node = (WayPointNode)target;
 
-        CreateNodeButton("Left Connector", node, WayPointNode.NodeDirection.Left);
-        CreateNodeButton("Right Connector", node, WayPointNode.NodeDirection.Right);
-        CreateNodeButton("Forward Connector", node, WayPointNode.NodeDirection.Forward);
+        CreateNodeButton("Create New Node", node);
     }
 
-    private void CreateNodeButton(string text, WayPointNode node, WayPointNode.NodeDirection dir)
+    private void CreateNodeButton(string text, WayPointNode node)
     {
         if (GUILayout.Button(text))
         {
-            node.CreateNewNode(dir);
+            node.CreateNewNode();
         }
     }
 }
@@ -77,6 +75,23 @@ public class IntEvenOrOddDrawer : PropertyDrawer
         }
         property.intValue = newValue;
         EditorGUI.EndProperty();
+    }
+}
+
+[CustomPropertyDrawer(typeof(ReadOnlyInspectorAttribute))]
+public class ReadOnlyInspectorDrawer : PropertyDrawer
+{
+    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    {
+        using (new EditorGUI.DisabledScope(true))
+        {
+            EditorGUI.PropertyField(position, property, label, true);
+        }
+    }
+
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+    {
+        return EditorGUI.GetPropertyHeight(property, label, true);
     }
 }
 
@@ -274,7 +289,7 @@ public class VehicleSetUpWindow : EditorWindow
         camera.nearClipPlane = 0.1f;
         camera.farClipPlane = 100.0f;
 
-        List<MeshFilter> meshFilters = new List<MeshFilter>(vehicleObject.GetComponentsInChildren<MeshFilter>(true));
+        List<MeshFilter> meshFilters = new(vehicleObject.GetComponentsInChildren<MeshFilter>(true));
         if(vehicleObject.TryGetComponent<MeshFilter>(out MeshFilter rootFilter))
         {
             meshFilters.Add(rootFilter);
@@ -336,8 +351,10 @@ public class VehicleSetUpWindow : EditorWindow
 
     private void AddComponents()
     {
-        VehicleManager vm = vehicleObject.GetComponent<VehicleManager>();
-        if(vm == null) { vehicleObject.AddComponent<VehicleManager>(); }
+        if (vehicleObject.TryGetComponent<VehicleManager>(out _) != true)
+        { 
+            vehicleObject.AddComponent<VehicleManager>();
+        }
 
         if (vehicleObject.TryGetComponent<Rigidbody>(out Rigidbody rb))
         {
