@@ -45,7 +45,7 @@ public class CharacterUIDisplaySlot : MonoBehaviour
                 characterSelectionMenu.displayedCharacter = uIDisplaySlot.characterData.DisplayedCharacter;
             }
             characterInstance.SetActive(uIDisplaySlot == this);
-            uIDisplaySlot.uiButton.image.color = (uIDisplaySlot == this) ? Color.green : Color.blue;
+            uIDisplaySlot.uiButton.image.color = (uIDisplaySlot == this) ? Color.green : Color.white;
         }
     }
 }

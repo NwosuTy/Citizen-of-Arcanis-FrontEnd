@@ -289,6 +289,12 @@ public static class GameObjectTool
         return objectList[indexList[rnd]];
     }
 
+    public static bool TryGetComponentInParent<T>(Transform parent, out T result) where T : Component
+    {
+        result = parent.GetComponentInParent<T>();
+        return (result != null);
+    }
+
     public static bool TryGetComponentInChildren<T>(Transform parent, out T result) where T : Component
     {
         result = parent.GetComponentInChildren<T>();

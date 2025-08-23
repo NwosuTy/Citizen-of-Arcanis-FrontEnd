@@ -62,6 +62,7 @@ public class CharacterInventoryManager : MonoBehaviour
         Panel.DisplayNotification($"UnEquiped {activeObj.ItemName}");
 
         Destroy(spawnedItem.gameObject);
+        characterManager.RigController.SetRigs(false);
 
         spawnedItem = null;
         activeItem = new(0, spawnedItem);
@@ -98,7 +99,6 @@ public class CharacterInventoryManager : MonoBehaviour
             spawnedItem.weaponManager.Initialize(cameraObject, characterManager);
         }
         item.UpdateItemCount(false);
-        spawnedItem.RemoveRigidBody();
         spawnedItem.gameObject.SetActive(true);
 
         slotUI.DropItem();

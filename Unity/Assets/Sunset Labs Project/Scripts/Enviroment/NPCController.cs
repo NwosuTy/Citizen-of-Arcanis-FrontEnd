@@ -290,6 +290,12 @@ public class NPCController : MonoBehaviour
         spawnTransform.SetPositionAndRotation(spawnPosition, Quaternion.identity);
         yield return new WaitUntil(() => spawnTransform.position == spawnPosition);
 
+        if(GameObjectTool.TryGetComponentInChildren(spawnTransform, out RandomSkinSelector rss))
+        {
+            rss.RandomSkin();
+        }
+
+        yield return null;
         spawnedObject.gameObject.SetActive(true);
         spawnedObject.canUpdate = true;
     }

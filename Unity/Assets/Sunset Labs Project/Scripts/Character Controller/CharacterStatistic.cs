@@ -14,7 +14,7 @@ public class CharacterStatistic : MonoBehaviour, IDamagabele
     private int[] lightDamageAnimationArray;
     private int[] heavyDamageAnimationArray;
 
-    public CharacterManager characterManager { get; private set; }
+    public CharacterManager Character { get; private set; }
 
     [Header("Components")]
     [SerializeField] private UIBar healthBar;
@@ -29,7 +29,7 @@ public class CharacterStatistic : MonoBehaviour, IDamagabele
 
     private void Awake()
     {
-        characterManager = GetComponent<CharacterManager>();
+        Character = GetComponent<CharacterManager>();
     }
 
     private void Start()
@@ -39,6 +39,11 @@ public class CharacterStatistic : MonoBehaviour, IDamagabele
 
         waitForSeconds = new(duration);
         deathAnimation = Animator.StringToHash("Death");
+    }
+
+    public CharacterManager TakingDamage_Character()
+    {
+        return Character;
     }
 
     public void SetBarUIs(UIBar hB, UIBar eB)
@@ -61,8 +66,8 @@ public class CharacterStatistic : MonoBehaviour, IDamagabele
 
     public void ResetStats()
     {
-        characterManager.isDead = false;
-        int multiplier = (characterManager.characterType == CharacterType.Player) ? 10 : 3;
+        Character.isDead = false;
+        int multiplier = (Character.characterType == CharacterType.Player) ? 10 : 3;
 
         currentHealth = healthLevel * multiplier;
         currentEndurance = enduranceLevel * multiplier;
@@ -88,16 +93,22 @@ public class CharacterStatistic : MonoBehaviour, IDamagabele
     {
         currentHealth -= damageValue;
         UpdateHealthBar();
-        CharacterAnim anim = characterManager.AnimatorManagaer;
+        CharacterAnim anim = Character.AnimatorManagaer;
 
         if(currentHealth <= 0)
         {
             currentHealth = 0;
-            characterManager.isDead = true;
+            Character.isDead = true;
             anim.PlayTargetAnimation(deathAnimation, true);
+            Invoke(nameof(ReleaseFromPool), 3.0f);
             return;
         }
         PlayDamageAnimation(anim, attackType);
+    }
+
+    private void ReleaseFromPool()
+    {
+        Character.mySpawnPool?.Release(Character);
     }
 
     public void PlayDamageAnimation(CharacterAnim anim, AttackType attackType)
@@ -115,7 +126,7 @@ public class CharacterStatistic : MonoBehaviour, IDamagabele
     private void UpdateHealthBar()
     {
         showHealthBar = true;
-        if(characterManager.characterType != CharacterType.AI || characterManager.combatMode)
+        if(Character.characterType != CharacterType.AI || Character.combatMode)
         {
             healthBar.SetCurrentValue(currentHealth);
             return;

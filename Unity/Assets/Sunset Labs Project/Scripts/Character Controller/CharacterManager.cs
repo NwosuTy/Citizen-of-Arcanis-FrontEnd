@@ -36,6 +36,7 @@ public class CharacterManager : MonoBehaviour
     public CharacterManager Target { get; private set; }
 
     //Player Componets
+    private Transform aimObject;
     public InputManager PlayerInput { get; private set; }
     public CharacterCameraController CameraController { get; private set; }
     public CharacterInteractionScript InteractionScript { get; private set; }
@@ -128,6 +129,7 @@ public class CharacterManager : MonoBehaviour
             }
         }
         StatsManager.ResetStats();
+        RigController.SetRigs(false);
     }
 
     //Character Type Based Components

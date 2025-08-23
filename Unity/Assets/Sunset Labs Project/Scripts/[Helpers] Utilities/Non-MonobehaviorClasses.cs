@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 public interface IDamagabele
 {
+    public CharacterManager TakingDamage_Character();
     public void TakeDamage(int damageValue, AttackType attackType);
 }
 

@@ -9,6 +9,7 @@ public class LoadCharacter : MonoBehaviour
     [Header("Parameters")]  
     [Tooltip("Transform reference for the position where the character will be spawned")]
     public Transform spawnPoint;
+    [SerializeField] private Transform aimObject;
     [SerializeField] private Transform cameraAimObject;
 
     [Header("UI Elements")]
@@ -40,7 +41,10 @@ public class LoadCharacter : MonoBehaviour
         }
         CharacterManager spawnedCharacter = Instantiate(CharacterDatas[selectedIndex].PlayableCharacter, spawnPoint);
 
-        NPCController.Instance.player = spawnedCharacter;
+        if (NPCController.Instance != null)
+        {
+            NPCController.Instance.player = spawnedCharacter;
+        }
         spawnedCharacter.name = CharacterDatas[selectedIndex].characterName;
         spawnedCharacter.SetCharacterType(CharacterType.Player);
 
@@ -80,6 +84,7 @@ public class LoadCharacter : MonoBehaviour
 
         playerUI.SetParameters(player);
         player.currentTeam = Team.Blue;
+        player.RigController.SetAimTarget(aimObject);
         player.CombatManager.SetCrossHair(cameraAimObject);
     }
 

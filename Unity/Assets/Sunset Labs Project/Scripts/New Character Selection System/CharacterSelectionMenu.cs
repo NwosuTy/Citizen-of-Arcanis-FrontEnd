@@ -89,6 +89,7 @@ public class CharacterSelectionMenu : MonoBehaviour
     {
         if(currentCharacterData == null)
         {
+            print("500");
             return;
         }
 
@@ -100,7 +101,6 @@ public class CharacterSelectionMenu : MonoBehaviour
                 break;
             }
         }
-
         PlayerPrefs.SetInt("SelectedCharacterIndex", selectedCharacterIndex);
         SceneManager.LoadSceneAsync("Main Scene", LoadSceneMode.Single);
     }

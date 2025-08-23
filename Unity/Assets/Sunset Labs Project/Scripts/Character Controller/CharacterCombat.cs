@@ -157,7 +157,7 @@ public class CharacterCombat : MonoBehaviour
         }
         if (CharacterInventoryManager.Instance != null)
         {
-            return CharacterInventoryManager.Instance.Panel.isMouseOverPanel;
+            return CharacterInventoryManager.Instance.Panel.IsMouseOverPanel;
         }
         return false;
     }
@@ -224,9 +224,18 @@ public class CharacterCombat : MonoBehaviour
         {
             return;
         }
-        int index = (mirrorAttack) ? colliderIndex + 1 : colliderIndex;
-        var damage = (CurrentWeapon == null) ? damageColliders[index] : CurrentWeapon.DamageCollider;
-        damage.SetColliderStatus(false);
+
+        CharacterDamageCollider damageCollider;
+        if(CurrentWeapon == null)
+        {
+            int index = (mirrorAttack) ? colliderIndex + 1 : colliderIndex;
+            damageCollider = damageColliders[index];
+        }
+        else
+        {
+            damageCollider = CurrentWeapon.DamageCollider;
+        }
+        damageCollider.SetColliderStatus(false);
     }
 
     public void ResetPerformAttack()

@@ -14,4 +14,9 @@ public class DamageTest : MonoBehaviour, IDamagabele
         selectedMaterial = GameObjectTool.GetRandomExcluding(selectedMaterial, materials);
         m_Renderer.material = selectedMaterial;
     }
+
+    public CharacterManager TakingDamage_Character()
+    {
+        return null;
+    }
 }
