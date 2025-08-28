@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public enum AttackType
 {
@@ -25,6 +26,7 @@ public class CharacterCombat : MonoBehaviour
     public bool canCombo;
     public AttackType attackType;
     [SerializeField] private bool isSciFi;
+    public List<WeaponManager> enemyPossibleWeapons = new();
 
     [Header("Parameters")]
     public int damageModifier;
@@ -304,9 +306,8 @@ public class CharacterCombat : MonoBehaviour
 
     private void CreateHurtBox(GameObject go, LayerMask layer)
     {
-        Transform t;
         string objectName = "Body Damage Collider";
-        if (GameObjectTool.TryFindChildRecursively(transform, objectName, out t))
+        if (GameObjectTool.TryFindChildRecursively(transform, objectName, out Transform t))
         {
             DestroyImmediate(t.gameObject);
         }
@@ -314,9 +315,9 @@ public class CharacterCombat : MonoBehaviour
 
         body.name = objectName;
         CapsuleCollider capsule = body.AddComponent<CapsuleCollider>();
-        capsule.height = 1.25f;
-        capsule.radius = 0.30f;
-        capsule.center = new Vector3(0, 0.85f, 0);
+        capsule.height = 1.50f;
+        capsule.radius = 0.425f;
+        capsule.center = new Vector3(0, 0.75f, 0);
 
         objectName = "Head Damage Collider";
         Transform parent = GameObjectTool.FindChildRecursively(transform, "Head");
@@ -328,12 +329,19 @@ public class CharacterCombat : MonoBehaviour
 
         head.name = objectName;
         SphereCollider sphere = head.AddComponent<SphereCollider>();
-        sphere.radius = 0.02f;
+        sphere.radius = 0.03f;
         sphere.center = new Vector3(0, 0.005f, 0.003f);
 
         head.layer = body.layer = layer;
         body.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
         head.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+        if(TryGetComponent(out CharacterController controller))
+        {
+            controller.radius = 0.3f;
+            controller.height = 1.6f;
+            controller.center = new Vector3(0,0.925f,0);
+        }
     }
 
     private void InitializeAttackActions()
@@ -348,6 +356,30 @@ public class CharacterCombat : MonoBehaviour
         {
             heavyActions[i] = Instantiate(heavyActions[i]);
             heavyActions[i].Initialize();
+        }
+    }
+
+    internal void CreateEnemyWeapons(WeaponManager exclude, WeaponManager[] potentialWeapons)
+    {
+        while (enemyPossibleWeapons.Count < 3)
+        {
+            exclude = GameObjectTool.GetRandomExcluding(exclude, potentialWeapons);
+            if (exclude == null)
+            {
+                Debug.LogError("No weapon found");
+                return;
+            }
+            Transform holder = WeaponHolder(exclude);
+            WeaponManager spawnedItem = Instantiate(exclude, holder);
+
+            spawnedItem.gameObject.SetActive(false);
+            spawnedItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+            spawnedItem.pickableObject.SetPhysicsSystem(false);
+            if (enemyPossibleWeapons.Contains(spawnedItem) != true)
+            {
+                enemyPossibleWeapons.Add(spawnedItem);
+            }
         }
     }
 }

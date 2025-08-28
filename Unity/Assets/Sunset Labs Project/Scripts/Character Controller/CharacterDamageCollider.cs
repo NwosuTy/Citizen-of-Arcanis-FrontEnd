@@ -64,7 +64,6 @@ public class CharacterDamageCollider : MonoBehaviour
         int count = Physics.OverlapSphereNonAlloc(transform.position, attackRadius, collidersArray, enemyLayerMask);
         for(int i = 0; i <  count; i++)
         {
-            Debug.Log($"Damaging {collidersArray[i].name}");
             DamgeEnemy(collidersArray[i]);
         }
     }
@@ -110,7 +109,6 @@ public class CharacterDamageCollider : MonoBehaviour
             return;
         }
         DamagedObjects.Add(damageable);
-
         CharacterCombat combat = characterCausingDamage.CombatManager;
         AttackActions currentAttack = combat.currentAction;
 

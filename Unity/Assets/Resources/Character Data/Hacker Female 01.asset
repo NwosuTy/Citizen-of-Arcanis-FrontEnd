@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Hacker Female 01
   <DisplayImage>k__BackingField: {fileID: 21300000, guid: eec5124eb6ae8fa47ab32e100b683586, type: 3}
-  <PlayableCharacter>k__BackingField: {fileID: 7162122568150467690, guid: 7f07ae6460bee454e8e90842c15f42c6, type: 3}
+  <PlayableCharacter>k__BackingField: {fileID: 8074906426418711997, guid: f81c967bf217e7547b8dd5bb5dc77876, type: 3}
   <DisplayedCharacter>k__BackingField: {fileID: 4131701935357003042, guid: 4aafba55361362d4e917b435f65e838d, type: 3}

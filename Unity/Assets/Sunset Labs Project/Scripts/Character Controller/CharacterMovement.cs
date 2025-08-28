@@ -120,6 +120,7 @@ public class CharacterMovement : MonoBehaviour
         {
             return;
         }
+
         InputManager input = characterManager.PlayerInput;
 
         float verticalInput = input.verticalMoveInput;
@@ -149,12 +150,24 @@ public class CharacterMovement : MonoBehaviour
 
     public void MoveToDestination(float speed, Vector3 destination)
     {
-        if(characterManager.dontMove)
+        if (characterManager.dontMove)
         {
             return;
         }
 
         NavMeshAgent agent = characterManager.Agent;
+        if(characterManager.mentalState == CombatMentalState.High_Alert)
+        {
+            MercenaryMovement(speed, destination, agent);
+            return;
+        }
+        int walkableIndex = NavMesh.GetAreaFromName("Walkable");
+        int areaMask = (walkableIndex >= 0) ? (1 << walkableIndex) : NavMesh.AllAreas;
+        NPCMovement(speed, areaMask, destination, agent);
+    }
+
+    private void MercenaryMovement(float speed, Vector3 destination, NavMeshAgent agent)
+    {
         characterManager.navMeshPath ??= new NavMeshPath();
         if (characterManager.navMeshPath.status != NavMeshPathStatus.PathComplete)
         {
@@ -168,6 +181,40 @@ public class CharacterMovement : MonoBehaviour
         if (!NavMesh.SamplePosition(destination, out _, 1.0f, NavMesh.AllAreas))
         {
             return;
+        }
+        Vector3 moveDirection = agent.desiredVelocity;
+        characterManager.Controller.Move(speed * Time.deltaTime * moveDirection);
+    }
+
+    private void NPCMovement(float speed, int areaMask, Vector3 destination, NavMeshAgent agent)
+    {
+        if (!agent.isOnNavMesh)
+        {
+            if (NavMesh.SamplePosition(agent.transform.position, out var sampleHit, 2.0f, areaMask))
+            {
+                agent.Warp(sampleHit.position);
+                agent.enabled = true;
+            }
+            else if (NavMesh.SamplePosition(destination, out var destHit, 2.0f, areaMask))
+            {
+                agent.Warp(destHit.position);
+                agent.enabled = true;
+            }
+            return;
+        }
+
+        characterManager.navMeshPath ??= new NavMeshPath();
+        if (characterManager.navMeshPath.status != NavMeshPathStatus.PathComplete)
+        {
+            characterManager.navMeshPath.ClearCorners();
+        }
+        if (!NavMesh.SamplePosition(destination, out var destinationHit, 1.0f, areaMask))
+        {
+            return;
+        }
+        if (agent.CalculatePath(destinationHit.position, characterManager.navMeshPath))
+        {
+            agent.SetPath(characterManager.navMeshPath);
         }
         Vector3 moveDirection = agent.desiredVelocity;
         characterManager.Controller.Move(speed * Time.deltaTime * moveDirection);

@@ -68,7 +68,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 0.16124667, y: 0.55417037, z: 0.08551054}
   m_Center: {x: -0.00018821341, y: 0.3221652, z: 0.005443383}
@@ -175,8 +175,6 @@ MonoBehaviour:
   isShooting: 0
   grip: {fileID: 6641831853723143972}
   rest: {fileID: 0}
-  <RestLockedPosition>k__BackingField: {x: 0, y: 0, z: 0}
-  <RestOriginalPosition>k__BackingField: {x: 0, y: 0, z: 0}
   <EnemyMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 0

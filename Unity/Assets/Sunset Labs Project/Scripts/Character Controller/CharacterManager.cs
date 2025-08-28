@@ -36,7 +36,6 @@ public class CharacterManager : MonoBehaviour
     public CharacterManager Target { get; private set; }
 
     //Player Componets
-    private Transform aimObject;
     public InputManager PlayerInput { get; private set; }
     public CharacterCameraController CameraController { get; private set; }
     public CharacterInteractionScript InteractionScript { get; private set; }
@@ -66,10 +65,12 @@ public class CharacterManager : MonoBehaviour
     public bool combatMode;
     public bool findTarget;
     public bool hasReached;
+    public bool hasAssignment;
     public Team currentTeam;
     public CharacterType characterType;
     [SerializeField] private float stopDistance;
     [SerializeField] private float sphereRadius;
+    public CombatMentalState mentalState = CombatMentalState.Friendly;
 
     [Header("Properties")]
     [SerializeField] private LayerMask targetMask;
@@ -117,16 +118,16 @@ public class CharacterManager : MonoBehaviour
             Agent = GetComponentInChildren<NavMeshAgent>();
             if (Agent == null)
             {
-                GameObject aiObject = new();
+                GameObject aiObject = new("NavMesh Agent");
                 aiObject.transform.SetParent(transform);
-
-                gameObject.AddComponent<DialogueTrigger>();
                 Agent = aiObject.AddComponent<NavMeshAgent>();
 
-                InitializeStates();
                 Agent.stoppingDistance = stopDistance;
+                Agent.obstacleAvoidanceType = ObstacleAvoidanceType.GoodQualityObstacleAvoidance;
                 aiObject.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
             }
+            InitializeStates();
+            gameObject.AddComponent<DialogueTrigger>();
         }
         StatsManager.ResetStats();
         RigController.SetRigs(false);
@@ -141,6 +142,11 @@ public class CharacterManager : MonoBehaviour
     private void Update()
     {
         if(isDead)
+        {
+            return;
+        }
+
+        if (DialogueManager.Instance != null && DialogueManager.Instance.dialogueIsPlaying == true)
         {
             return;
         }

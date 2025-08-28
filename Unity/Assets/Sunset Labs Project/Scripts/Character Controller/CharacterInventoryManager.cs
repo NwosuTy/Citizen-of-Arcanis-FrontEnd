@@ -132,7 +132,20 @@ public class CharacterInventoryManager : MonoBehaviour
         AddUnExistingItem(itemClass);
     }
 
-    public void AddUnExistingItem(ItemClass itemClass)
+    public void HandleItemAddition(ItemClass addItem)
+    {
+        ItemClass existingItem = itemList.Find(x => x.pickedObj == addItem.pickedObj);
+
+        if (existingItem != null)
+        {
+            existingItem.itemCount += addItem.itemCount;
+            Panel.HandleSlotInitialization(addItem);
+            return;
+        }
+        AddUnExistingItem(addItem);
+    }
+
+    private void AddUnExistingItem(ItemClass itemClass)
     {
         itemList.Add(itemClass);
         Panel.HandleSlotInitialization(itemClass);

@@ -41,23 +41,23 @@ public class LoadCharacter : MonoBehaviour
         }
         CharacterManager spawnedCharacter = Instantiate(CharacterDatas[selectedIndex].PlayableCharacter, spawnPoint);
 
-        if (NPCController.Instance != null)
-        {
-            NPCController.Instance.player = spawnedCharacter;
-        }
         spawnedCharacter.name = CharacterDatas[selectedIndex].characterName;
         spawnedCharacter.SetCharacterType(CharacterType.Player);
+        CreateDroneObject(spawnedCharacter, out PlayerCompanion companion);
 
-        CreateDroneObject(spawnedCharacter);
+        if (NPCController.Instance != null)
+        {
+            NPCController.Instance.SetPlayerAndCompanion(spawnedCharacter, companion);
+        }
         SetCharacterParameters(spawnedCharacter);
         spawnedCharacter.CombatManager.SetDuellingCharacter();
         SetMiniMapAndCameraProperties(spawnedCharacter.CameraTarget);
     }
 
-    private void CreateDroneObject(CharacterManager player)
+    private void CreateDroneObject(CharacterManager player, out PlayerCompanion companion)
     {
         int droneIndex = Random.Range(0, companions.Length);
-        PlayerCompanion companion = Instantiate(companions[droneIndex], player.transform.position + new Vector3(3, 3, -3), Quaternion.identity);
+        companion = Instantiate(companions[droneIndex], player.transform.position + new Vector3(3, 3, -3), Quaternion.identity);
 
         companion.SetFollowCharacter(player);
         companion.transform.SetParent(spawnPoint);

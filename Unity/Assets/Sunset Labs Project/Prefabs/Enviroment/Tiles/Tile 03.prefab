@@ -169,7 +169,7 @@ MonoBehaviour:
   m_Size: {x: 6, y: 0.3, z: 10}
   m_Center: {x: 0, y: 0.15, z: 0}
   m_Area: 1
-  m_AffectedAgents: ffffffff
+  m_AffectedAgents: 00000000
 --- !u!114 &4152384356471740643
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -185,7 +185,7 @@ MonoBehaviour:
   m_Size: {x: 2, y: 0.3, z: 6}
   m_Center: {x: 4, y: 0.15, z: 0}
   m_Area: 0
-  m_AffectedAgents: ffffffff
+  m_AffectedAgents: 00000000
 --- !u!114 &4737271580634971171
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -201,7 +201,7 @@ MonoBehaviour:
   m_Size: {x: 2, y: 0.3, z: 6}
   m_Center: {x: -4, y: 0.15, z: 0}
   m_Area: 0
-  m_AffectedAgents: ffffffff
+  m_AffectedAgents: 00000000
 --- !u!65 &2713840592845472560
 BoxCollider:
   m_ObjectHideFlags: 0

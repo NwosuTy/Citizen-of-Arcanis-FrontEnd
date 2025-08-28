@@ -458,7 +458,7 @@ MonoBehaviour:
   m_Size: {x: 10, y: 0.3, z: 6}
   m_Center: {x: 0, y: 0.15, z: 0}
   m_Area: 1
-  m_AffectedAgents: ffffffff
+  m_AffectedAgents: 00000000
 --- !u!114 &5110989379583881081
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -132,7 +132,7 @@ MonoBehaviour:
   m_Size: {x: 6, y: 0.3, z: 6}
   m_Center: {x: 0, y: 0.15, z: 0}
   m_Area: 1
-  m_AffectedAgents: ffffffff
+  m_AffectedAgents: 00000000
 --- !u!65 &6695852341054731216
 BoxCollider:
   m_ObjectHideFlags: 0

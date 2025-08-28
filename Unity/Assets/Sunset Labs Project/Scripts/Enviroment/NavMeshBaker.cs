@@ -14,19 +14,18 @@ public class NavMeshBaker : MonoBehaviour
     public NavMeshBuildEvent OnNavMeshBuild;
 
     private NavMeshData navMeshData;
-    private NavMeshSurface navMeshSurface;
-
     private List<NavMeshBuildSource> navMeshSources = new();
     private List<NavMeshBuildSource> cachedVolumeSources = new();
 
     [Header("NavMesh Tools")]
     [SerializeField] private float distanceThreshold = 10.0f;
+    [SerializeField] private NavMeshSurface navMeshSurface;
     [SerializeField] private Vector3 navMeshAreaBakeSize = new(20, 20, 20);
 
     private void Awake()
     {
         waitForSeconds = new(0.25f);
-        navMeshSurface = GetComponentInChildren<NavMeshSurface>();
+        navMeshData = new NavMeshData();
 
         navMeshData = new();
         NavMesh.AddNavMeshData(navMeshData);
@@ -67,8 +66,10 @@ public class NavMeshBaker : MonoBehaviour
 
         navMeshSources.Clear();
         LayerMask surfaceMask = navMeshSurface.layerMask;
+        NavMeshData navMeshData = navMeshSurface.navMeshData;
         bool surfaceChildren = navMeshSurface.collectObjects.Equals(CollectObjects.Children);
-        if(surfaceChildren)
+
+        if (surfaceChildren)
         {
             NavMeshBuilder.CollectSources(transform, surfaceMask, navMeshSurface.useGeometry, navMeshSurface.defaultArea, mark, navMeshSources);
         }
@@ -77,9 +78,9 @@ public class NavMeshBaker : MonoBehaviour
             NavMeshBuilder.CollectSources(navMeshBounds, surfaceMask, navMeshSurface.useGeometry, navMeshSurface.defaultArea, mark, navMeshSources);
         }
 
-        foreach(var volume in cachedVolumeSources)
+        foreach (var volume in cachedVolumeSources)
         {
-            if(VolumeSourceIntersectsBound(volume, navMeshBounds))
+            if (VolumeSourceIntersectsBound(volume, navMeshBounds))
             {
                 navMeshSources.Add(CloneNavMeshBuildSource(volume));
             }
@@ -87,7 +88,7 @@ public class NavMeshBaker : MonoBehaviour
         navMeshSources.RemoveAll(RemoveNavMeshAgentPredicate);
 
         Bounds buildBound = new(player.position, navMeshAreaBakeSize);
-        if(asyncBuild)
+        if (asyncBuild)
         {
             AsyncOperation navMeshUpdateOperation = NavMeshBuilder.UpdateNavMeshDataAsync(navMeshData, navMeshSurface.GetBuildSettings(), navMeshSources, buildBound);
             navMeshUpdateOperation.completed += HandleNavMeshUpdateOperation;
@@ -100,12 +101,12 @@ public class NavMeshBaker : MonoBehaviour
     private void CacheVolumeSources()
     {
         cachedVolumeSources.Clear();
-        var volumes = (navMeshSurface.collectObjects.Equals(CollectObjects.Children)) ? 
+        var volumes = (navMeshSurface.collectObjects.Equals(CollectObjects.Children)) ?
             navMeshSurface.GetComponentsInChildren<NavMeshModifierVolume>() : NavMeshModifierVolume.activeModifiers.ToArray();
 
-        foreach ( var volume in volumes )
+        foreach (var volume in volumes)
         {
-            if(!volume.isActiveAndEnabled)
+            if (!volume.isActiveAndEnabled)
             {
                 continue;
             }

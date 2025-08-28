@@ -7,28 +7,25 @@ using System.Collections.Generic;
 public class NPCController : MonoBehaviour
 {
     public static NPCController Instance;
+
+    private WeaponManager weapon;
+    private TextAsset selectedMessage;
     private enum SpawnMethod { Random, RoundRobin }
 
     private CharacterManager mercenary;
     public List<CharacterManager> npcList = new();
+    public CharacterManager Mercenary => mercenary;
 
     private int spawnedNPCCount;
     private Collider[] npcColliders;
     private const int cnst_tileSize = 10;
     private readonly HashSet<Vector3> spawnedTiles = new();
 
-    private Bounds lastNavMeshBuildBounds;
-    private bool hasLastNavMeshBounds = false;
-
+    private ObjectPool<CharacterManager> mercenaryPool;
     private readonly Dictionary<CharacterManager, ObjectPool<CharacterManager>> npcPools = new();
-    private readonly Dictionary<CharacterManager, ObjectPool<CharacterManager>> mercenaryPools = new();
 
-    public CharacterManager player;
-
-    [Space]
-    [Header("Debug Parameters")]
-    [SerializeField] private bool drawLastNavMeshBounds = true;
-    [SerializeField] private Color lastNavMeshBoundsColor = Color.yellow;
+    public CharacterManager Player { get; private set; }
+    public PlayerCompanion Companion { get; private set; }
 
     [Header("Parameters")]
     [SerializeField] private bool showRadius;
@@ -37,21 +34,26 @@ public class NPCController : MonoBehaviour
     [SerializeField] private float spawnRadius = 2f;
     [SerializeField] private LayerMask characterLayer;
 
+    [Header("Objects To Spawn")]
+    [SerializeField] private CharacterManager[] npcsArray;
+    [SerializeField] private CharacterManager mercenaryPrefab;
+    [SerializeField] private Vector3Int navMeshSize = new(40, 10, 40);
+
     [Header("Spawn Tools")]
     [SerializeField] private Vector3 spawnPosition;
     [SerializeField] private Transform spawnParent;
     [SerializeField] private float spawnDensityPerTile = 0.5f;
     [SerializeField] private SpawnMethod spawnMethod = SpawnMethod.RoundRobin;
 
-    [Header("Objects To Spawn")]
-    [SerializeField] private CharacterManager[] Npcs;
-    [SerializeField] private CharacterManager[] mercenaries;
-    [SerializeField] private Vector3Int navMeshSize = new(40, 10, 40);
+    [Header("Mercenary Parameters")]
+    public bool spawnMercenary;
+    [SerializeField] private TextAsset[] messages;
+    [SerializeField] private WeaponManager[] possibleMercenaryWeapons;
 
     // internal helpers
     private int roundRobinCounter = 0;
     private const int maxSampleAttemptsPerSpawn = 5;
-    public Transform PlayerTransform => player.transform;
+    public Transform PlayerTransform => Player.transform;
 
 
     private void Awake()
@@ -68,13 +70,19 @@ public class NPCController : MonoBehaviour
     {
         npcColliders = new Collider[maxNPCCount];
 
-        CreateNewPool(30, 35, Npcs, npcPools);
-        CreateNewPool(3, 5, mercenaries, mercenaryPools);
+        CreateNewPool();
+        mercenaryPool = CharacterPool(3, 5, true, mercenaryPrefab);
 
         if (GameObjectTool.TryFindFirstObject<NavMeshBaker>(out var navMeshBuilder))
         {
             navMeshBuilder.OnNavMeshBuild += HandleSpawnUpdater;
         }
+    }
+
+    public void SetPlayerAndCompanion(CharacterManager p, PlayerCompanion c)
+    {
+        Player = p;
+        Companion = c;
     }
 
     /// <summary>
@@ -83,8 +91,6 @@ public class NPCController : MonoBehaviour
     /// </summary>
     public void HandleSpawnUpdater(Bounds bounds)
     {
-        hasLastNavMeshBounds = true;
-        lastNavMeshBuildBounds = bounds;
         int countFound = Physics.OverlapBoxNonAlloc(bounds.center, bounds.extents, npcColliders, Quaternion.identity, characterLayer);
 
         var nearCharacters = new List<CharacterManager>(countFound);
@@ -96,7 +102,7 @@ public class NPCController : MonoBehaviour
                 continue;
             }
 
-            if(npcColliders[i].TryGetComponent<CharacterManager>(out var character) && character != player)
+            if(npcColliders[i].TryGetComponent<CharacterManager>(out var character) && character != Player)
             {
                 nearCharacters.Add(character);
             }
@@ -112,7 +118,7 @@ public class NPCController : MonoBehaviour
                 continue;
             }
 
-            if(present.Contains(npc) != true)
+            if(present.Contains(npc) != true || npc.isDead)
             {
                 npcList.Remove(npc);
                 npc.mySpawnPool?.Release(npc);
@@ -120,7 +126,23 @@ public class NPCController : MonoBehaviour
             }
         }
 
-        Transform playerTransform = player.transform;
+        if(mercenary != null && mercenary.isDead)
+        {
+            mercenary = null;
+        }
+        HandleSpawn(true);
+
+        spawnMercenary = (Random.Range(0, 100) > 80);
+        if (spawnMercenary && mercenary == null) 
+        {
+            HandleSpawn(false);
+        }
+        Companion.mentalState = (mercenary != null) ? CombatMentalState.High_Alert : CombatMentalState.Friendly;
+    }
+
+    private void HandleSpawn(bool isNPC)
+    {
+        Transform playerTransform = Player.transform;
         Vector3 currentTilePosition = new
         (
             Mathf.FloorToInt(playerTransform.position.x) / cnst_tileSize,
@@ -132,179 +154,215 @@ public class NPCController : MonoBehaviour
         {
             spawnedTiles.Add(currentTilePosition);
         }
-        HandleSpawn(currentTilePosition, true);
+        HandleSpawn(currentTilePosition, isNPC);
     }
 
     private void HandleSpawn(Vector3 currentTilePosition, bool isNPC)
     {
-        CharacterManager[] characters;
-        Dictionary<CharacterManager, ObjectPool<CharacterManager>> dictionary;
-
-        if (isNPC)
-        {
-            characters = Npcs;
-            dictionary = npcPools;
-        }
-        else
-        {
-            characters = mercenaries;
-            dictionary = mercenaryPools;
-        }
-        if (characters == null || characters.Length == 0 || dictionary == null || dictionary.Count == 0)
-            return;
-
-        if (isNPC && spawnedNPCCount >= maxNPCCount)
-            return;
         if (!isNPC && mercenary != null)
+        {
             return;
-        SpawnMesh(isNPC, currentTilePosition, characters, dictionary);
+        }
+        if (isNPC && spawnedNPCCount >= maxNPCCount)
+        {
+            return;
+        }
+        SpawnMesh(isNPC, currentTilePosition);
     }
 
-    private void SpawnMesh(bool isNPC, Vector3 currentTilePosition, CharacterManager[] characters,
-        Dictionary<CharacterManager, ObjectPool<CharacterManager>> dictionary)
+    private void SpawnMesh(bool isNPC, Vector3 currentTilePosition)
     {
         int navMeshCalc = (navMeshSize.x / cnst_tileSize) / 2;
         for (int x = -navMeshCalc; x < navMeshCalc; x++)
         {
             for (int z = -navMeshCalc; z < navMeshCalc; z++)
             {
-                if (isNPC && spawnedNPCCount >= maxNPCCount)
-                    return;
-
                 Vector3 tilePosition = new(currentTilePosition.x + x, currentTilePosition.y, currentTilePosition.z + z);
-
-                if (spawnedTiles.Contains(tilePosition))
-                    continue;
-
-                int enemiesSpawnedPerTile = 0;
-                spawnedTiles.Add(tilePosition);
-
-                int rndCount = Random.Range(7, maxNPCCount);
-                while((!isNPC || spawnedNPCCount < rndCount))
+                if(isNPC)
                 {
-                    int spawnIndex;
-                    int length = characters.Length;
-                    if (spawnMethod == SpawnMethod.RoundRobin)
-                    {
-                        spawnIndex = roundRobinCounter % length;
-                        roundRobinCounter++;
-                    }
-                    else
-                    {
-                        spawnIndex = Random.Range(0, length);
-                    }
-
-                    bool spawnSucceeded = false;
-                    CharacterManager prefab = characters[spawnIndex];
-                    for (int attempt = 0; attempt < maxSampleAttemptsPerSpawn && (!isNPC || spawnedNPCCount < maxNPCCount); attempt++)
-                    {
-                        if (SpawnObjectOnNavmesh(tilePosition, prefab, dictionary, isNPC))
-                        {
-                            enemiesSpawnedPerTile++;
-                            spawnedNPCCount++;
-                            spawnSucceeded = true;
-                            break;
-                        }
-                    }
-
-                    if (!spawnSucceeded)
-                    {
-                        break;
-                    }
+                    NPC_SpawnMesh(tilePosition);
+                    continue;
                 }
+                Mercenary_SpawnMesh(tilePosition);
             }
         }
+    }
+
+    private void NPC_SpawnMesh(Vector3 tilePosition)
+    {
+        if (spawnedNPCCount >= maxNPCCount || spawnedTiles.Contains(tilePosition))
+        {
+            return;
+        }
+
+        int enemiesSpawnedPerTile = 0;
+        spawnedTiles.Add(tilePosition);
+
+        int rndCount = Random.Range(7, maxNPCCount);
+        while ((spawnedNPCCount < rndCount))
+        {
+            int spawnIndex;
+            int length = npcsArray.Length;
+            if (spawnMethod == SpawnMethod.RoundRobin)
+            {
+                spawnIndex = roundRobinCounter % length;
+                roundRobinCounter++;
+            }
+            else
+            {
+                spawnIndex = Random.Range(0, length);
+            }
+
+            bool spawnSucceeded = false;
+            CharacterManager prefab = npcsArray[spawnIndex];
+            for (int attempt = 0; attempt < maxSampleAttemptsPerSpawn && (spawnedNPCCount < maxNPCCount); attempt++)
+            {
+                if (SpawnNPCOnNavmesh(tilePosition, prefab))
+                {
+                    enemiesSpawnedPerTile++;
+                    spawnedNPCCount++;
+                    spawnSucceeded = true;
+                    break;
+                }
+            }
+
+            if (!spawnSucceeded)
+            {
+                break;
+            }
+        }
+    }
+
+    private void Mercenary_SpawnMesh(Vector3 tilePos)
+    {
+        if (mercenary != null)
+        {
+            return;
+        }
+
+        int walkableIndex = NavMesh.GetAreaFromName("Walkable");
+        int walkableAreaMask = (walkableIndex >= 0) ? (1 << walkableIndex) : NavMesh.AllAreas;
+
+        Vector3 randomPos = new(Random.Range(-27.5f, 27.5f), 0.0f, Random.Range(-27.5f, 27.5f));
+        Vector3 samplePos = tilePos * cnst_tileSize + randomPos;
+
+        if (NavMesh.SamplePosition(samplePos, out NavMeshHit hit, spawnRadius, walkableAreaMask))
+        {
+            spawnPosition = hit.position;
+            CharacterManager spawn = mercenaryPool.Get();
+            if(spawn != null)
+            {
+                mercenary = spawn;
+                spawn.mySpawnPool = mercenaryPool;
+            }
+        }
+
     }
 
     /// <summary>
     /// Try to sample a walkable position inside the tile and spawn an NPC from the pool.
     /// Returns true if spawn succeeded (pooled object is positioned, activated and added).
     /// </summary>
-    private bool SpawnObjectOnNavmesh(Vector3 tilePos, CharacterManager prefab,
-        Dictionary<CharacterManager, ObjectPool<CharacterManager>> dictionary, bool isNPC = true)
+    private bool SpawnNPCOnNavmesh(Vector3 tilePos, CharacterManager prefab)
     {
-        if (prefab == null || dictionary == null || !dictionary.ContainsKey(prefab))
+        if (prefab == null)
         {
             return false;
         }
-        int walkableArea = 1 << NavMesh.GetAreaFromName("Walkable");
+
+        int walkableIndex = NavMesh.GetAreaFromName("Walkable");
+        int walkableAreaMask = (walkableIndex >= 0) ? (1 << walkableIndex) : NavMesh.AllAreas;
+
         Vector3 randomPos = new(Random.Range(-27.5f, 27.5f), 0.0f, Random.Range(-27.5f, 27.5f));
         Vector3 samplePos = tilePos * cnst_tileSize + randomPos;
 
-        if (NavMesh.SamplePosition(samplePos, out NavMeshHit hit, spawnRadius, walkableArea))
+        if (NavMesh.SamplePosition(samplePos, out NavMeshHit hit, spawnRadius, walkableAreaMask))
         {
             spawnPosition = hit.position;
-            CharacterManager spawnedNPC = dictionary[prefab].Get();
-            if (spawnedNPC == null)
-            {
-                return false;
-            }
-            spawnedNPC.mySpawnPool = dictionary[prefab];
+            CharacterManager spawn = npcPools[prefab].Get();
+            if (spawn == null) return false;
 
-            if (isNPC)
+            spawn.mySpawnPool = npcPools[prefab];
+
+            if (!npcList.Contains(spawn))
             {
-                if (!npcList.Contains(spawnedNPC))
-                {
-                    npcList.Add(spawnedNPC);
-                }
-            }
-            else
-            {
-                mercenary = spawnedNPC;
+                npcList.Add(spawn);
             }
             return true;
         }
         return false;
     }
 
-    private void OnDrawGizmos()
-    {
-        if (!drawLastNavMeshBounds || !hasLastNavMeshBounds) return;
-
-        Gizmos.color = lastNavMeshBoundsColor;
-        // DrawWireCube expects the full size (not extents)
-        Gizmos.DrawWireCube(lastNavMeshBuildBounds.center, lastNavMeshBuildBounds.size);
-    }
 
     #region Object Pool
 
     private CharacterManager CreateObject(CharacterManager objToSpawn)
     {
         CharacterManager spawn = Instantiate(objToSpawn, spawnParent);
-        // ensure the pooled object starts inactive and in a neutral state
         spawn.gameObject.SetActive(false);
         spawn.canUpdate = false;
         return spawn;
     }
 
-    private void GetObject(CharacterManager spawnedObject)
+    private void GetObject(CharacterManager spawnedObject, bool isMercenary)
     {
-        StartCoroutine(PrepareGetObject(spawnedObject));
+        StartCoroutine(PrepareGetObject(spawnedObject, isMercenary));
     }
 
-    private IEnumerator PrepareGetObject(CharacterManager spawnedObject)
+    private IEnumerator PrepareGetObject(CharacterManager spawnedObject, bool isMercenary)
     {
-        Transform spawnTransform = spawnedObject.transform;
-
         spawnedObject.canUpdate = false;
+        Transform spawnTransform = spawnedObject.transform;
         spawnTransform.SetPositionAndRotation(spawnPosition, Quaternion.identity);
-        yield return new WaitUntil(() => spawnTransform.position == spawnPosition);
 
-        if(GameObjectTool.TryGetComponentInChildren(spawnTransform, out RandomSkinSelector rss))
+        yield return null;
+        if (GameObjectTool.TryGetComponentInChildren(spawnTransform, out RandomSkinSelector rss))
         {
             rss.RandomSkin();
         }
 
-        yield return null;
+        spawnedObject.StatsManager.ResetStats();
+        PrepareMercenary(isMercenary, spawnedObject);
         spawnedObject.gameObject.SetActive(true);
+
+        var agent = spawnedObject.Agent;
+        if (agent != null)
+        {
+            agent.enabled = true;
+            agent.Warp(spawnPosition);
+            agent.ResetPath();
+        }
+
+        yield return null;
         spawnedObject.canUpdate = true;
     }
 
-    private ObjectPool<CharacterManager> CharacterPool(int min, int max, CharacterManager objToSpawn)
+
+    private void PrepareMercenary(bool isMercenary, CharacterManager mercenary)
+    {
+        if(isMercenary != true)
+        {
+            return;
+        }
+        mercenary.SetTarget(Player);
+        mercenary.hasAssignment = true;
+        mercenary.mentalState = CombatMentalState.High_Alert;
+
+        mercenary.Assignment.AddListener(() => NewAssignment(mercenary));
+        mercenary.CombatManager.CreateEnemyWeapons(weapon, possibleMercenaryWeapons);
+    }
+
+    private void NewAssignment(CharacterManager mercenary)
+    {
+        selectedMessage = GameObjectTool.GetRandomExcluding(selectedMessage, messages);
+        DialogueManager.Instance.HandleDialogue(selectedMessage, mercenary);
+    }
+
+    private ObjectPool<CharacterManager> CharacterPool(int min, int max, bool isMercenary, CharacterManager objToSpawn)
     {
         ObjectPool<CharacterManager> objectPool = new(
             () => CreateObject(objToSpawn),              // create
-            spawn => { GetObject(spawn); }, // onGet
+            spawn => { GetObject(spawn, isMercenary); }, // onGet
             spawn => { spawn.gameObject.SetActive(false); spawn.canUpdate = false; }, // onRelease
             spawn => { if (spawn != null) GameObject.Destroy(spawn.gameObject); },   // onDestroy
             false, min, max
@@ -312,18 +370,16 @@ public class NPCController : MonoBehaviour
         return objectPool;
     }
 
-    private void CreateNewPool(int min, int max, CharacterManager[] characters, Dictionary<CharacterManager, ObjectPool<CharacterManager>> dictionary)
+    private void CreateNewPool()
     {
-        if (characters == null || characters.Length == 0) return;
-
-        foreach (var character in characters)
+        foreach (var character in npcsArray)
         {
             if (character == null) continue;
-            if (dictionary.ContainsKey(character))
+            if (npcPools.ContainsKey(character))
             {
                 continue;
             }
-            dictionary[character] = CharacterPool(min, max, character);
+            npcPools[character] = CharacterPool(30, 35, false, character);
         }
     }
     #endregion
