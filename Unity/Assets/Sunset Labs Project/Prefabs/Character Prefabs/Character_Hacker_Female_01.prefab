@@ -851,7 +851,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 0}
   damageCollider: {fileID: 0}
-  attackRadius: 0.175
+  attackRadius: 0.3
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 2048
@@ -2095,7 +2095,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 0}
   damageCollider: {fileID: 0}
-  attackRadius: 0.175
+  attackRadius: 0.3
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 2048
@@ -3498,7 +3498,7 @@ GameObject:
   - component: {fileID: 8438902816715355348}
   - component: {fileID: 2969840805768058366}
   - component: {fileID: 8732775155849761839}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Character_Hacker_Female_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}

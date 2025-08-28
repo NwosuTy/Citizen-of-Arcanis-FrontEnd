@@ -1374,7 +1374,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 0}
   damageCollider: {fileID: 0}
-  attackRadius: 0.175
+  attackRadius: 0.3
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 2048
@@ -1737,7 +1737,7 @@ GameObject:
   - component: {fileID: 596948700809654805}
   - component: {fileID: 7899395925601427260}
   - component: {fileID: 7127653190465420887}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Character_Hologram_Female_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2317,7 +2317,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 0}
   damageCollider: {fileID: 0}
-  attackRadius: 0.175
+  attackRadius: 0.3
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 2048

@@ -367,7 +367,7 @@ public class CharacterCombat : MonoBehaviour
             if (exclude == null)
             {
                 Debug.LogError("No weapon found");
-                return;
+                break;
             }
             Transform holder = WeaponHolder(exclude);
             WeaponManager spawnedItem = Instantiate(exclude, holder);

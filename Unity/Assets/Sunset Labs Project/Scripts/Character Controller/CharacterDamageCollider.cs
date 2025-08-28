@@ -33,7 +33,7 @@ public class CharacterDamageCollider : MonoBehaviour
     {
         if(rigidBody == null)
         {
-            collidersArray = new Collider[10];
+            collidersArray = new Collider[15];
         }
     }
 

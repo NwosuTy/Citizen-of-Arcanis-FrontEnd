@@ -553,7 +553,7 @@ GameObject:
   - component: {fileID: 749272413947192472}
   - component: {fileID: 4151843837724810875}
   - component: {fileID: 3088014838347231436}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Character_Medical_Male_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1328,7 +1328,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 0}
   damageCollider: {fileID: 0}
-  attackRadius: 0.175
+  attackRadius: 0.3
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 2048
@@ -2392,7 +2392,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 0}
   damageCollider: {fileID: 0}
-  attackRadius: 0.175
+  attackRadius: 0.3
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 2048

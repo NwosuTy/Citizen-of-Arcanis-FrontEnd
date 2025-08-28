@@ -146,9 +146,12 @@ public class CharacterManager : MonoBehaviour
             return;
         }
 
-        if (DialogueManager.Instance != null && DialogueManager.Instance.dialogueIsPlaying == true)
+        if(characterType == CharacterType.Player)
         {
-            return;
+            if (DialogueManager.Instance != null && DialogueManager.Instance.dialogueIsPlaying == true)
+            {
+                return;
+            }
         }
 
         if (canUpdate != true && characterType == CharacterType.AI)

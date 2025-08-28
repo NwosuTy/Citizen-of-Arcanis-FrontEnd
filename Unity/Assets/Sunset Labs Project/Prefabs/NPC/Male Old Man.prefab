@@ -222,7 +222,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 0}
   damageCollider: {fileID: 0}
-  attackRadius: 0.175
+  attackRadius: 0.25
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 2048
@@ -996,7 +996,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 0}
   damageCollider: {fileID: 0}
-  attackRadius: 0.175
+  attackRadius: 0.25
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 2048
@@ -2430,13 +2430,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4436896352434568041}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.13358429, y: -0.5424042, z: 0.824768, w: -0.08781068}
-  m_LocalPosition: {x: 0.0083, y: 0.0096, z: 0.0121}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalRotation: {x: 0.093301155, y: -0.7956639, z: -0.12692201, w: 0.5848972}
+  m_LocalPosition: {x: 0.00032, y: -0.00003, z: 0.00009}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2522780410219437879}
-  m_LocalEulerAnglesHint: {x: -240.605, y: 220.017, z: 36.182007}
+  m_LocalEulerAnglesHint: {x: -5.327, y: -106.547, z: -17.352}
 --- !u!1 &4457999160199859024
 GameObject:
   m_ObjectHideFlags: 0

@@ -446,7 +446,7 @@ GameObject:
   - component: {fileID: 4385813509576109071}
   - component: {fileID: 846410660995781860}
   - component: {fileID: 4298568641951183825}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Character_Muscle_Male_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -967,7 +967,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 0}
   damageCollider: {fileID: 0}
-  attackRadius: 0.175
+  attackRadius: 0.3
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 2048
@@ -2875,7 +2875,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 0}
   damageCollider: {fileID: 0}
-  attackRadius: 0.175
+  attackRadius: 0.3
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 2048
