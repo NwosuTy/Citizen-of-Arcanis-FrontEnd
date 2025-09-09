@@ -43,3 +43,20 @@ public class AerialWayPointEditor : Editor
     }
 }
 
+[CustomEditor(typeof(PropsSpawner))]
+public class PropsSpawnerEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+
+        PropsSpawner spawner = (PropsSpawner)target;
+
+        EditorGUILayout.Space();
+        if(GUILayout.Button("Spawn New Props"))
+        {
+            spawner.HandleSpawn();
+        }
+    }
+}
+

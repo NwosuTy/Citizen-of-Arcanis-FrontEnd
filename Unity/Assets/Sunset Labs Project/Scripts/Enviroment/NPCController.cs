@@ -273,7 +273,8 @@ public class NPCController : MonoBehaviour
         int walkableIndex = NavMesh.GetAreaFromName("Walkable");
         int walkableAreaMask = (walkableIndex >= 0) ? (1 << walkableIndex) : NavMesh.AllAreas;
 
-        Vector3 randomPos = new(Random.Range(-27.5f, 27.5f), 0.0f, Random.Range(-27.5f, 27.5f));
+        int div = cnst_tileSize / 2;
+        Vector3 randomPos = new(Random.Range(-div, div), Random.Range(-div, div));
         Vector3 samplePos = tilePos * cnst_tileSize + randomPos;
 
         if (NavMesh.SamplePosition(samplePos, out NavMeshHit hit, spawnRadius, walkableAreaMask))

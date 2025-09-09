@@ -13,8 +13,8 @@ public class CombatManager : MonoBehaviour
     public PickableObject[] MercenaryWeapons { get; private set; }
 
     public static CombatManager Instance { get; private set; }
-    [field: SerializeField] public CharacterManager PlayerCombatPrefab { get; private set; }
-    [field: SerializeField] public CharacterManager OppositionCombatPrefab { get; private set; }
+    [field: SerializeField] public CharacterData PlayerCombatPrefab { get; private set; }
+    [field: SerializeField] public CharacterData OppositionCombatPrefab { get; private set; }
 
     public event DuelStateChanged OnDuelStateChanged;
     public delegate void DuelStateChanged(DuelState newState);
@@ -99,7 +99,7 @@ public class CombatManager : MonoBehaviour
         return DuelState.OnGoing;
     }
 
-    public void AssignPlayer(CharacterManager player)
+    public void AssignPlayer(CharacterData player)
     {
         PlayerCombatPrefab = player;
     }
@@ -125,7 +125,7 @@ public class CombatManager : MonoBehaviour
         else if(mental == CombatMentalState.Friendly)
         {
             newScene = true;
-            OppositionCombatPrefab = npc.CombatManager.CombatCharacter.characterManager;
+            OppositionCombatPrefab = npc.CombatManager.CombatData;
             StartCoroutine(LoadCombatScene());
         }    
     }

@@ -134,9 +134,13 @@ public class CharacterManager : MonoBehaviour
     }
 
     //Character Type Based Components
-    public void SetCharacterType(CharacterType type)
+    public void SetCharacterDetails(CharacterType type, Sprite sprite = null)
     {
         characterType = type;
+        if(sprite != null)
+        {
+            CharacterImage = sprite;
+        }
     }
 
     private void Update()
@@ -144,14 +148,6 @@ public class CharacterManager : MonoBehaviour
         if(isDead)
         {
             return;
-        }
-
-        if(characterType == CharacterType.Player)
-        {
-            if (DialogueManager.Instance != null && DialogueManager.Instance.dialogueIsPlaying == true)
-            {
-                return;
-            }
         }
 
         if (canUpdate != true && characterType == CharacterType.AI)
@@ -166,6 +162,12 @@ public class CharacterManager : MonoBehaviour
         if (characterType == CharacterType.Player)
         {
             PlayerInput.InputManager_Update();
+            if (DialogueManager.Instance != null && DialogueManager.Instance.dialogueIsPlaying == true)
+            {
+                isMoving = false;
+                return;
+            }
+
             InteractionScript.InteractionUpdate();
             isLockedIn = CombatManager.HasGun() && PlayerInput.lockedInput;
         }

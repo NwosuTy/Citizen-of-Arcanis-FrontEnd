@@ -139,7 +139,7 @@ public class CharacterInventoryManager : MonoBehaviour
         if (existingItem != null)
         {
             existingItem.itemCount += addItem.itemCount;
-            Panel.HandleSlotInitialization(addItem);
+            existingItem.SlotUI.UpdateSlotUI(1.0f);
             return;
         }
         AddUnExistingItem(addItem);

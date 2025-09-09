@@ -1948,7 +1948,7 @@ MonoBehaviour:
   currentAction: {fileID: 0}
   GunWeaponHolder: {fileID: 6548440642802848912}
   MeleeWeaponHolder: {fileID: 4165542621447821259}
-  <CombatCharacter>k__BackingField: {fileID: 11400000, guid: f52a9ef98b5abce42bbd370857cf23d1, type: 2}
+  <CombatData>k__BackingField: {fileID: 11400000, guid: 6617f908404488348a13b839403ad9f1, type: 2}
 --- !u!114 &7899395925601427260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3475,7 +3475,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4141076119843352300}
   - component: {fileID: 791731875516012664}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Character_Hologram_Female_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}

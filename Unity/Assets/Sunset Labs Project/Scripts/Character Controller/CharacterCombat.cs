@@ -47,7 +47,7 @@ public class CharacterCombat : MonoBehaviour
     public AttackActions currentAction;
     [SerializeField] private Transform GunWeaponHolder;
     [SerializeField] private Transform MeleeWeaponHolder;
-    [field: SerializeField] public CharacterCombatData CombatCharacter { get; private set; }
+    [field: SerializeField] public CharacterData CombatData { get; private set; }
 
     private void Awake()
     {
@@ -251,7 +251,7 @@ public class CharacterCombat : MonoBehaviour
         {
             return;
         }
-        CombatManager.Instance.AssignPlayer(CombatCharacter.characterManager);
+        CombatManager.Instance.AssignPlayer(CombatData);
     }
 
     public void SetDamageColliders()

@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 191813b72a90e98448414fd4cae54414, type: 3}
+  m_Name: Male Doctor
+  m_EditorClassIdentifier: 
+  characterName: Dr Gelling
+  <DisplayImage>k__BackingField: {fileID: 21300000, guid: b97e74e1edd0ccd448501305691e1f0d, type: 3}
+  <PlayableCharacter>k__BackingField: {fileID: 1443591176463633309, guid: 15bdc2f3db09bfc43aaea5a4012eec74, type: 3}
+  <DisplayedCharacter>k__BackingField: {fileID: 0}

@@ -104,14 +104,14 @@ public class TrafficNode : MonoBehaviour
 
     public void DisplayNodeGizmos()
     {
-        if(pathController == null)
-        {
-            pathController = GetComponentInParent<TrafficPathController>();
-        }
+        pathController = GetComponentInParent<TrafficPathController>();
 
-        Gizmos.color = pathController.sphereColor;
-        Gizmos.DrawSphere(transform.position, pathController.sphereRadius);
+        bool hasController = (pathController != null);
+        float radius = (hasController) ? pathController.sphereRadius : 1.5f;
+        Color color = (hasController) ? pathController.sphereColor : Color.blue;
 
+        Gizmos.color = color;
+        Gizmos.DrawSphere(transform.position, radius);
         connectedNodes.RemoveAll(x => x == null);
         for (int i = 0; i < connectedNodes.Count; i++)
         {
@@ -119,8 +119,8 @@ public class TrafficNode : MonoBehaviour
             Vector3 pos = connectedNodes[i].transform.position;
             Gizmos.DrawLine(transform.position, pos);
 
-            Gizmos.color = pathController.sphereColor;
-            Gizmos.DrawSphere(pos, pathController.sphereRadius);
+            Gizmos.color = color;
+            Gizmos.DrawSphere(pos, radius);
         }
     }
 }

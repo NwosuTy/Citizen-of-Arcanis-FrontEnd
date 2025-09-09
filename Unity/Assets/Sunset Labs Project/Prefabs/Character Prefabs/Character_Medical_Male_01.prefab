@@ -764,7 +764,7 @@ MonoBehaviour:
   currentAction: {fileID: 0}
   GunWeaponHolder: {fileID: 796088259032555091}
   MeleeWeaponHolder: {fileID: 2496857320704176106}
-  <CombatCharacter>k__BackingField: {fileID: 11400000, guid: 082fc1e6bd550eb4a9df651762acb346, type: 2}
+  <CombatData>k__BackingField: {fileID: 11400000, guid: adc07485ec4bab243a27adb548b9c207, type: 2}
 --- !u!114 &4151843837724810875
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1468,7 +1468,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4586433803648937274}
   - component: {fileID: 2786468025825709750}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Character_Medical_Male_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}

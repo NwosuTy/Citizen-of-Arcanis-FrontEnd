@@ -16,7 +16,6 @@ public class TrafficVehicle : MonoBehaviour
     private bool isParked;
     public bool canUpdate;
     private bool hasSetParkDuration;
-    public ObjectPool<TrafficVehicle> MySpawnPool { get; private set; }
 
     [Header("Status")]
     [SerializeField] private WayPointPath assignedPath = new();
@@ -102,7 +101,7 @@ public class TrafficVehicle : MonoBehaviour
     {
         foreach(var wheel in wheelTransforms)
         {
-            wheel.Rotate(Vector3.right.normalized * moveSpeed * 1f * delta);
+            wheel.Rotate(1f * delta * moveSpeed * Vector3.right.normalized);
         }
     }
 

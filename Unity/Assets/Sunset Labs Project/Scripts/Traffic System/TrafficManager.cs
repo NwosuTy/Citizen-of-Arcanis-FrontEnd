@@ -10,21 +10,20 @@ public class TrafficManager : MonoBehaviour
     private Vector3 lastCameraPosition;
     private List<TrafficVehicle> activeVehicles = new();
 
-    [Header("Spawn")]
-    [SerializeField] private int index;
-    [SerializeField] private TrafficVehicle[] vehicles;
-
     [Header("Parameters")]
-    [SerializeField] private Transform spawnParent;
     [SerializeField] private float cullDistance = 100f;
     [SerializeField] private float distanceThreshold = 20.0f;
+
+    [field: Header("Path Controllers")]
+    [field: SerializeField] public TrafficPathController LeftController { get; private set; }
+    [field: SerializeField] public TrafficPathController RightController { get; private set; }
 
     private void Awake()
     {
         mainCamera = Camera.main;
         cameraTransform = mainCamera.transform;
         cullDistanceSQ = MathPhysics_Helper.Square(cullDistance);
-        activeVehicles = new(spawnParent.GetComponentsInChildren<TrafficVehicle>());
+        activeVehicles = new(GetComponentsInChildren<TrafficVehicle>());
     }
 
     private void Start()
@@ -42,35 +41,6 @@ public class TrafficManager : MonoBehaviour
         {
             vehicle.TrafficVehicle_Update();
         }
-    }
-
-    public void SpawnVehicle()
-    {
-        TrafficPathController[] pathController = GetComponentsInChildren<TrafficPathController>();
-        foreach(var control in pathController)
-        {
-            if(index >= control.WaypointCount)
-            {
-                continue;
-            }
-            Vector3 spawnPosition = control.WayPointNodes[index].NodePosition;
-            TrafficVehicle vehicle = vehicles[Random.Range(0, vehicles.Length)];
-
-            TrafficVehicle spawn = Instantiate(vehicle, spawnParent);
-            spawnPosition = spawnParent.InverseTransformPoint(spawnPosition);
-            spawn.transform.SetLocalPositionAndRotation(spawnPosition, Quaternion.identity);
-            spawn.SetController(control);
-            activeVehicles.Add(spawn);
-        }
-    }
-
-    public void ClearSpawn()
-    {
-        foreach (var item in activeVehicles)
-        {
-            DestroyImmediate(item.gameObject);
-        }
-        activeVehicles.Clear();
     }
 
     private void PrepareVehicles(TrafficVehicle vehicle)
@@ -97,5 +67,11 @@ public class TrafficManager : MonoBehaviour
                 activeVehicles[i].gameObject.SetActive(false);
             }
         }
+    }
+
+    public void ClearWaypoint()
+    {
+        LeftController.ClearPath();
+        RightController.ClearPath();
     }
 }

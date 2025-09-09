@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9161403196631381587}
   - component: {fileID: 2074011282511290137}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Mustache
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -528,7 +528,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5859666173566960025}
   - component: {fileID: 7507268675791306418}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Jacket_Doctor_Short
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -717,7 +717,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2593806038635609324}
   - component: {fileID: 5986116715989948349}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: BaseBody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1100,7 +1100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 73875592072035543}
   - component: {fileID: 5232498363289609131}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Gloves
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1440,7 +1440,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9130126430722197811}
   - component: {fileID: 2214927252640984401}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Shirt_LongSleeve_Doctor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1831,7 +1831,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2022504639594697335}
   - component: {fileID: 6836114925806463131}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Shoe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1936,7 +1936,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6157129870943604062}
   - component: {fileID: 5496429013203279382}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Pants_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3165,7 +3165,7 @@ MonoBehaviour:
   currentAction: {fileID: 0}
   GunWeaponHolder: {fileID: 5400658216103250574}
   MeleeWeaponHolder: {fileID: 8235892363101260690}
-  <CombatCharacter>k__BackingField: {fileID: 11400000, guid: 49696c00b13098d45ba1f7c49c0c6857, type: 2}
+  <CombatData>k__BackingField: {fileID: 11400000, guid: d68fb331aa3c8a34797854751cb39e88, type: 2}
 --- !u!114 &3558621891804240519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3391,7 +3391,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6191947253604776917}
   - component: {fileID: 2083735766400586004}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: HairStyle_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3550,7 +3550,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7029822731184178732}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Skinned Meshes
   m_TagString: Untagged
   m_Icon: {fileID: 0}

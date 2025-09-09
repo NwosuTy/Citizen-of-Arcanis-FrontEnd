@@ -7,7 +7,7 @@ public class TrafficPathController : MonoBehaviour
 
     [Header("Debug")]
     public Color sphereColor = Color.cyan;
-    [Range(0.5f, 3.0f)]public float sphereRadius = 2.0f;
+    [Range(0.5f, 15.0f)]public float sphereRadius = 2.0f;
 
     [Header("Parameters")]
     [SerializeField] private bool isLoop = true;
@@ -32,6 +32,26 @@ public class TrafficPathController : MonoBehaviour
             {
                 waypoints.Add(node);
             }
+        }
+    }
+
+    public void ClearPath()
+    {
+        for(int i = 0; i < transform.childCount; i++)
+        {
+            Transform child = transform.GetChild(i);
+            DestroyImmediate(child.gameObject);
+        }
+        waypoints.Clear();
+    }
+
+    public void InitializeNode(TrafficNode node)
+    {
+        node.transform.SetParent(transform);
+        node.ConnectedNodes.ForEach(x => x.AddNewNode(node));
+        if (waypoints.Contains(node) != true)
+        {
+            waypoints.Add(node);
         }
     }
 

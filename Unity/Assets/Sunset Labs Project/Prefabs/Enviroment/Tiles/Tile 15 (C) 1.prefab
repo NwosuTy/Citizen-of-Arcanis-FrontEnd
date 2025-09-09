@@ -25,8 +25,8 @@ Transform:
   m_GameObject: {fileID: 1834962672921811569}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -4.8, y: 0, z: 0}
-  m_LocalScale: {x: 2.15, y: 1.25, z: 1}
+  m_LocalPosition: {x: -18, y: 0, z: 0}
+  m_LocalScale: {x: 7.75, y: 7.75, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 330765046178237269}
@@ -116,14 +116,14 @@ MonoBehaviour:
   <TypeOfTile>k__BackingField: 2
   <Boundary>k__BackingField:
     forceFour: 1
-    <Left>k__BackingField: 2
-    <Right>k__BackingField: 0
-    <South>k__BackingField: 2
-    <North>k__BackingField: 0
-  possibleProps: []
-  possibleBuildings: []
-  props_SpawnPoint: []
-  building_SpawnPoint: []
+    West: 2
+    East: 0
+    North: 0
+    South: 2
+  leftNode: {fileID: 0}
+  rightNode: {fileID: 0}
+  leftVehicle: {fileID: 0}
+  rightVehicle: {fileID: 0}
 --- !u!1 &7175847760843641715
 GameObject:
   m_ObjectHideFlags: 0
@@ -153,7 +153,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3.75, y: 1, z: 3.75}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 918527170462676834}
@@ -254,8 +254,8 @@ Transform:
   m_GameObject: {fileID: 8834812368385774552}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -4.8}
-  m_LocalScale: {x: 2.15, y: 1.25, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -18}
+  m_LocalScale: {x: 7.75, y: 7.75, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2420679570589898223}

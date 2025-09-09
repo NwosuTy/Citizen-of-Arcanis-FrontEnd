@@ -2577,7 +2577,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4170046806708471880}
   - component: {fileID: 8516643755876350914}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Character_Hacker_Female_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3709,7 +3709,7 @@ MonoBehaviour:
   currentAction: {fileID: 0}
   GunWeaponHolder: {fileID: 389282561175534598}
   MeleeWeaponHolder: {fileID: 6528076691919701695}
-  <CombatCharacter>k__BackingField: {fileID: 11400000, guid: c49a9ae85625c5c40b2673d515f1cd3d, type: 2}
+  <CombatData>k__BackingField: {fileID: 11400000, guid: 55ddb5930de4cc749885be7f1bf7c87d, type: 2}
 --- !u!114 &2969840805768058366
 MonoBehaviour:
   m_ObjectHideFlags: 0

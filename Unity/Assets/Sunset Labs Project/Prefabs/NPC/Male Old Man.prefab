@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8292976666106776118}
   - component: {fileID: 7940414908117840501}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: HairStyle_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -483,7 +483,7 @@ GameObject:
   m_Component:
   - component: {fileID: 689030882065312049}
   - component: {fileID: 4743778681731565779}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Glasses_ 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -620,7 +620,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8612117770543175680}
   - component: {fileID: 9155492793379836826}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Jacket_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -840,7 +840,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7488358010445219511}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Skinned Meshes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1160,7 +1160,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4591032661501124628}
   - component: {fileID: 8835905034865624877}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Gloves_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1530,7 +1530,7 @@ GameObject:
   m_Component:
   - component: {fileID: 131246881095910850}
   - component: {fileID: 6599838143735256366}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Hat_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1719,7 +1719,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1213407392224453451}
   - component: {fileID: 5305559952546328942}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: BaseBody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1874,7 +1874,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4446492869523249883}
   - component: {fileID: 2979351400877490206}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Pants_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1979,7 +1979,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1737745100801562264}
   - component: {fileID: 6369759468279095660}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Shoe_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2336,7 +2336,7 @@ MonoBehaviour:
   currentAction: {fileID: 0}
   GunWeaponHolder: {fileID: 5150664360440299478}
   MeleeWeaponHolder: {fileID: 80023574882426319}
-  <CombatCharacter>k__BackingField: {fileID: 11400000, guid: 4cb5a36c02f732144bcc9a049ac47907, type: 2}
+  <CombatData>k__BackingField: {fileID: 11400000, guid: 2978a9b470a646c44a5c946fb7549196, type: 2}
 --- !u!114 &5096618540161046319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2479,7 +2479,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1203186536226864319}
   - component: {fileID: 7708835065698714920}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Shirt_LongSleeve
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3042,7 +3042,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2090706156014087954}
   - component: {fileID: 1220175440476902828}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Mustache_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}

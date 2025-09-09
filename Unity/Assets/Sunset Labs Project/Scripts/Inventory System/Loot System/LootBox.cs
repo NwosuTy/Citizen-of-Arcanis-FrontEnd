@@ -114,39 +114,48 @@ public class LootBox : MonoBehaviour, IInteractable
     {
         ItemClasses.Clear();
         excludedObjects.Clear();
-        int itemCount = Random.Range(0, 4);
 
+        PickableObject[] objs;
+        int itemCount = Random.Range(0, 4);
         while(ItemClasses.Count < itemCount)
         {
-            ItemType itemType;
-            PickableObject[] objs;
-            bool pickCollectible = (Random.Range(0, 3) < 2);
-
-            if(pickCollectible)
-            {
-                itemType = ItemType.Collectible;
-                objs = itemBox.CollectibleItems;
-            }
-            else
-            {
-                itemType = ItemType.Currency;
-                objs = itemBox.CurrencyItems;
-            }
-            int count = RandomItemCount(itemType);
+            int count = GetItemCount(out objs);
             PickableObject pickObj = GetRandomItem(objs, itemBox);
 
+            if (pickObj == null)
+            {
+                break;
+            }
             ItemClass item = new(count, pickObj);
             ItemClasses.Add(item);
         }
 
         while (ItemClasses.Count < 3)
         {
-            int count = RandomItemCount(ItemType.Currency);
-            PickableObject pickObj = GetRandomItem(itemBox.CurrencyItems, itemBox);
+            int count = GetItemCount(out objs);
+            var pickObj = objs[Random.Range(0, objs.Length)];
 
             ItemClass currencyItem = new(count, pickObj);
             ItemClasses.Add(currencyItem);
         }
+    }
+
+    public int GetItemCount(out PickableObject[] objs)
+    {
+        ItemType itemType;
+        bool pickCollectible = (Random.Range(0, 3) < 2);
+
+        if (pickCollectible)
+        {
+            itemType = ItemType.Collectible;
+            objs = itemBox.CollectibleItems;
+        }
+        else
+        {
+            itemType = ItemType.Currency;
+            objs = itemBox.CurrencyItems;
+        }
+        return RandomItemCount(itemType);
     }
 
     public ItemBox GetRandomBox(int maxRate, ItemBox[] itemBoxes)

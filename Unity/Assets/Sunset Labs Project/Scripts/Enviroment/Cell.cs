@@ -1,5 +1,7 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
+using static UnityEditor.UIElements.ToolbarMenu;
 
 public class Cell : MonoBehaviour
 {
@@ -7,8 +9,6 @@ public class Cell : MonoBehaviour
     public Cell Right { get; private set; }
     public Cell North { get; private set; }
     public Cell South { get; private set; }
-
-    [TextArea] public string DebugMessage;
 
     [field: SerializeField] public int TotalNeighborEntropies { get; private set; }
     private CornerBoundary cornerBoundaryType = CornerBoundary.None;
@@ -26,6 +26,7 @@ public class Cell : MonoBehaviour
     [SerializeField] private FloorTile selectedTile;
     [SerializeField] private Vector2Int cellDimensions;
     [field: SerializeField] public FloorTile[] TileObjects { get; private set; }
+    public FloorTile SelectedTile => selectedTile;
 
     public int TemporaryTilesCount() => TemporaryTilesList.Count;
 
@@ -48,7 +49,6 @@ public class Cell : MonoBehaviour
 
     public void InitializeCell(int x, int y, bool hasCollapsed, int dimensions)
     {
-        DebugMessage = "Start: ";
         neighboringCells.Clear();
 
         cellDimensions.x = x;
@@ -115,8 +115,6 @@ public class Cell : MonoBehaviour
         validList.Clear();
         foreach (var variant in neighbor.TemporaryTilesList)
         {
-            string message = $"{neighbor} is checking if variant: {variant.Prefab} matches {selectedTile}";
-            DebugMessage += message;
             if (IsValidForNeighbor(neighbor, variant) != true)
             {
                 continue;
@@ -193,8 +191,6 @@ public class Cell : MonoBehaviour
             return false;
         }
 
-        //Is Bordering Cell
-        //Check If Tile Wall Is Not Facing Direction
         if (Tiles_Helper.BoundedCell(variant.Boundary, cell.BoundaryType) != 2)
         {
             return false;
@@ -203,5 +199,35 @@ public class Cell : MonoBehaviour
         bool validTilePiece = (corner == TileDirection.Ignore) ? (tileType == TileType.Fence) :
             (tileType == TileType.CornerPiece && Tiles_Helper.BoundedCell(variant.Boundary, corner) == 2);
         return validTilePiece;
+    }
+
+    public void ConnectWayPoints()
+    {
+        foreach(var neighbor in neighboringCells)
+        {
+            FloorTile neighborTile = neighbor.selectedTile;
+            TileDirection toNeighbor = Tiles_Helper.GetDirectionToNeighbor(this, neighbor);
+            TileDirection fromNeighbor = Tiles_Helper.GetOppositeDirection(toNeighbor);
+
+            int selfSide = Tiles_Helper.BoundedCell(selectedTile.Boundary, toNeighbor);
+            int neighborSide = Tiles_Helper.BoundedCell(neighborTile.Boundary, fromNeighbor);
+
+            if(selfSide == 1 && neighborSide == 1)
+            {
+                selectedTile.leftNode.AddNewNode(neighborTile.leftNode);
+                selectedTile.rightNode.AddNewNode(neighborTile.rightNode);
+
+                if(GameObjectTool.TryGetComponentInParent(transform, out TrafficManager tm))
+                {
+                    TrafficPathController left = tm.LeftController;
+                    TrafficPathController right = tm.RightController;
+
+                    left.InitializeNode(selectedTile.leftNode);
+                    right.InitializeNode(selectedTile.rightNode);
+                    if (selectedTile.leftVehicle != null) selectedTile.leftVehicle.SetController(left);
+                    if (selectedTile.rightVehicle != null) selectedTile.rightVehicle.SetController(right);
+                }
+            }
+        }
     }
 }

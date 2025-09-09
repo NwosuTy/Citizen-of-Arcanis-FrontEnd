@@ -77,12 +77,13 @@ public class DuelManager : MonoBehaviour
         characterManager.CombatManager.CreateEnemyWeapons(weapon, weaponManagers);
     }
 
-    private void SetObject(Transform parent, CharacterManager character, CharacterType characterType)
+    private void SetObject(Transform parent, CharacterData characterData, CharacterType characterType)
     {
-        CharacterManager newCharacter = Instantiate(character, parent);
+        CharacterManager newCharacter = Instantiate(characterData.PlayableCharacter, parent);
 
         newCharacter.combatMode = true;
-        newCharacter.SetCharacterType(characterType);
+        newCharacter.name = characterData.characterName;
+        newCharacter.SetCharacterDetails(characterType, characterData.DisplayImage);
 
         if (characterType == CharacterType.AI)
         {

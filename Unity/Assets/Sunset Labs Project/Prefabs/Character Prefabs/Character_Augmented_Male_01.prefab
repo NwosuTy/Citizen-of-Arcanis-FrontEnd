@@ -697,7 +697,7 @@ MonoBehaviour:
   currentAction: {fileID: 0}
   GunWeaponHolder: {fileID: 2465627095880991289}
   MeleeWeaponHolder: {fileID: 4443756605338930213}
-  <CombatCharacter>k__BackingField: {fileID: 11400000, guid: e9f5b33311803884ebe5e0e9c29be230, type: 2}
+  <CombatData>k__BackingField: {fileID: 11400000, guid: 6cb37a6881f0d0948a82252a1e1fe005, type: 2}
 --- !u!114 &6281366068720303019
 MonoBehaviour:
   m_ObjectHideFlags: 0

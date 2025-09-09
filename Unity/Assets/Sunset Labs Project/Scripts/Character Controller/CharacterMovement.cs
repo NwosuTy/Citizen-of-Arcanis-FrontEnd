@@ -53,7 +53,7 @@ public class CharacterMovement : MonoBehaviour
         bool isLockedIn = (characterManager.isLockedIn && combat.HasGun());
 
         HandleMovement(delta, isLockedIn);
-        HandleRotation(delta, isLockedIn);
+        HandleRotation(delta);
     }
 
     private void HandleGravity(float delta)
@@ -83,14 +83,14 @@ public class CharacterMovement : MonoBehaviour
         characterManager.Controller.Move(verticalVelocity * delta);
     }
 
-    private void HandleRotation(float delta, bool isLockedIn)
+    private void HandleRotation(float delta)
     {
-        transform.rotation = SetTargetRotation(delta, isLockedIn);
+        transform.rotation = SetTargetRotation(delta);
     }
 
-    private Quaternion SetTargetRotation(float delta, bool isLockedIn)
+    private Quaternion SetTargetRotation(float delta)
     {
-        Quaternion targetRotation = Quaternion.identity;
+        Quaternion targetRotation;
         bool hasGun = characterManager.CombatManager.HasGun();
 
         if(hasGun != true)
@@ -142,7 +142,6 @@ public class CharacterMovement : MonoBehaviour
         {
             characterController.Move(delta * walkingSpeed * moveDirection);
         }
-
         float horizontalKey = (isLockedIn) ? horizontalInput : 0.0f;
         float verticalKey = (isLockedIn) ? verticalInput : input.moveAmount;
         characterManager.AnimatorManagaer.SetBlendTreeParameter(verticalKey, horizontalKey, characterManager.isSprinting, delta);

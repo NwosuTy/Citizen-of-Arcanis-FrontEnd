@@ -97,7 +97,8 @@ public class PatrolState : AIState
 
     private void SetDestination(CharacterManager characterManager)
     {
-        Vector3 offsetDirection = Random.insideUnitSphere.normalized * 7.0f;
+        float random = Random.Range(-25.0f, 40.0f);
+        Vector3 offsetDirection = Random.insideUnitSphere.normalized * random;
         Vector3 offsetPosition = characterManager.transform.position + offsetDirection;
         Vector3 randomPoint = Random.insideUnitSphere * sphereRadius + offsetPosition;
 

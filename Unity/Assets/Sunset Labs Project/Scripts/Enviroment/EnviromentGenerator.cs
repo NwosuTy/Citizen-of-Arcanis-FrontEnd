@@ -202,6 +202,7 @@ public class EnviromentGenerator : MonoBehaviour
         if(count == 0)
         {
             generationComplete = true;
+            ConnectPaths();
             return;
         }
         int random = Random.Range(0, count);
@@ -212,4 +213,19 @@ public class EnviromentGenerator : MonoBehaviour
         collapseQueue.Enqueue(cellToCollapse);
         PropagateCollapse();
     }
+
+    private void ConnectPaths()
+    {
+        if(TryGetComponent(out TrafficManager traffic))
+        {
+            traffic.ClearWaypoint();
+        }
+
+        print(cellList);
+        foreach(var cell in cellList)
+        {
+            print(5);
+            cell.ConnectWayPoints();
+        }
+    }    
 }

@@ -73,7 +73,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7079259538014566497}
   - component: {fileID: 7716855130878953593}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Character_Garbage_Male_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -519,7 +519,7 @@ MonoBehaviour:
   currentAction: {fileID: 0}
   GunWeaponHolder: {fileID: 1562298034538281532}
   MeleeWeaponHolder: {fileID: 5690883304028966068}
-  <CombatCharacter>k__BackingField: {fileID: 11400000, guid: b7dc4ba50d888a14cb6e8273baf99905, type: 2}
+  <CombatData>k__BackingField: {fileID: 11400000, guid: 3b03334335ba0f84681076f3069ff7c5, type: 2}
 --- !u!114 &7848755005137114371
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1268,7 +1268,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3985455759191268213}
   - component: {fileID: 2548510624668991808}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Character_Junky_Female_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1487,7 +1487,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3558240251836885707}
   - component: {fileID: 2069329474316755563}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Character_Rich_Male_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3321,7 +3321,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3371812750296182874}
   - component: {fileID: 4842045526733081543}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Character_Muscle_Male_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3671,7 +3671,7 @@ GameObject:
   m_Component:
   - component: {fileID: 194237494888953436}
   - component: {fileID: 6724731162030463525}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Character_Monk_Male_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3837,7 +3837,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7359694826229850020}
   - component: {fileID: 5481245386511904148}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Character_Cop_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4078,7 +4078,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2707737090469538618}
   - component: {fileID: 6554086188857397691}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Character_Junky_Male_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4212,7 +4212,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5365091650981308890}
   - component: {fileID: 8882781807760956734}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Skinned Meshes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4355,7 +4355,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1502184298272147974}
   - component: {fileID: 8950810778864059180}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Character_Rich_Female_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}

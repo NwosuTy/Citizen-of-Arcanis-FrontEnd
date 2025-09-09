@@ -1,13 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Pool;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using Serializable = System.SerializableAttribute;
 
 #region Structs
 
-[System.Serializable]
+[Serializable]
 public struct Boundary
 {
     public float minValue;
@@ -20,7 +21,7 @@ public struct Boundary
     }
 }
 
-[System.Serializable]
+[Serializable]
 public struct TileVariant
 {
     public FloorTile Prefab;   // the original
@@ -35,28 +36,26 @@ public struct TileVariant
     }
 }
 
-[System.Serializable]
+[Serializable]
 public struct TilesBoundary
 {
     [SerializeField] private bool forceFour;
-    [field: Tooltip("0 Means Floor, 1 Means Road, 2 Means Fence")]
-    [field: SerializeField][field: Range(0, 2)] public int Left { get; private set; }
-    [field: Tooltip("0 Means Floor, 1 Means Road, 2 Means Fence")]
-    [field: SerializeField][field: Range(0, 2)] public int Right { get; private set; }
-    [field: Tooltip("0 Means Floor, 1 Means Road, 2 Means Fence")]
-    [field: SerializeField][field: Range(0, 2)] public int South { get; private set; }
-    [field: Tooltip("0 Means Floor, 1 Means Road, 2 Means Fence")]
-    [field: SerializeField][field: Range(0, 2)] public int North { get; private set; }
+
+    [Header("Parameters")]
+    public int West;
+    public int East;
+    public int North;
+    public int South;
 
     public TilesBoundary(int l, int r, int s, int n, bool force)
     {
         forceFour = force;
-        Left = l; Right = r; South = s; North = n;
+        West = l; East = r; South = s; North = n;
     }
 
     private readonly TilesBoundary Rotated90()
     {
-        return new(l: South, r: North, s: Right, n: Left, force: forceFour);
+        return new(l: South, r: North, s: East, n: West, force: forceFour);
     }
 
     public readonly TilesBoundary Rotated(int steps)
@@ -79,13 +78,13 @@ public struct TilesBoundary
             return 4;
         }
 
-        bool allEqual = (Left == Right) && (Right == South) && (South == North);
+        bool allEqual = (West == East) && (East == South) && (South == North);
         if (allEqual)
         {
             return 1;
         }
 
-        bool oppEqual = (Left == Right) && (North == South);
+        bool oppEqual = (West == East) && (North == South);
         if (oppEqual)
         {
             return 2;
@@ -94,7 +93,7 @@ public struct TilesBoundary
     }
 }
 
-[System.Serializable]
+[Serializable]
 public struct BoundInt
 {
     [Range(1, 360)] public int minValue;
@@ -107,7 +106,7 @@ public struct BoundInt
     }
 }
 
-[System.Serializable]
+[Serializable]
 public struct BoundFloat
 {
     [Range(-10, 10)] public float minValue;
@@ -241,15 +240,15 @@ public static class GameObjectTool
         return objectList[indexList[rnd]];
     }
 
-    public static bool TryGetComponentInParent<T>(Transform parent, out T result) where T : Component
+    public static bool TryGetComponentInParent<T>(Transform objTransform, out T result) where T : Component
     {
-        result = parent.GetComponentInParent<T>();
+        result = objTransform.GetComponentInParent<T>();
         return (result != null);
     }
 
-    public static bool TryGetComponentInChildren<T>(Transform parent, out T result) where T : Component
+    public static bool TryGetComponentInChildren<T>(Transform objTransform, out T result) where T : Component
     {
-        result = parent.GetComponentInChildren<T>();
+        result = objTransform.GetComponentInChildren<T>();
         return (result != null);
     }
 
@@ -426,8 +425,8 @@ public static class Tiles_Helper
     {
         return tileDir switch
         {
-            TileDirection.Left => tileBound.Left,
-            TileDirection.Right => tileBound.Right,
+            TileDirection.Left => tileBound.West,
+            TileDirection.Right => tileBound.East,
             TileDirection.North => tileBound.North,
             TileDirection.South => tileBound.South,
             _ => -1

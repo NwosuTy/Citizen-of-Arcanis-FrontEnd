@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3767005307571327511}
   - component: {fileID: 3783936247239887689}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Jacket
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1204,7 +1204,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2660445400051447434}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Skinned Meshes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1409,7 +1409,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5455967076016413513}
   - component: {fileID: 9084922694225734725}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: HairStyle_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1767,7 +1767,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7345721048041544178}
   - component: {fileID: 6679466688297567810}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Shoe_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2610,7 +2610,7 @@ MonoBehaviour:
   currentAction: {fileID: 0}
   GunWeaponHolder: {fileID: 1307145407092419956}
   MeleeWeaponHolder: {fileID: 8371907487213262401}
-  <CombatCharacter>k__BackingField: {fileID: 11400000, guid: c119e11ce38f171468a82e69bcf2ca13, type: 2}
+  <CombatData>k__BackingField: {fileID: 11400000, guid: 37170da85a450df43a1f17635bbc732a, type: 2}
 --- !u!114 &4971694069633035027
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2741,7 +2741,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7067407199063938185}
   - component: {fileID: 8637340196790355189}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: BaseBody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3394,7 +3394,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5915355631059973779}
   - component: {fileID: 6217921730076277882}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Pants_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3547,7 +3547,7 @@ GameObject:
   m_Component:
   - component: {fileID: 650765870852297322}
   - component: {fileID: 666222755368415483}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Shirt_LongSleeve
   m_TagString: Untagged
   m_Icon: {fileID: 0}

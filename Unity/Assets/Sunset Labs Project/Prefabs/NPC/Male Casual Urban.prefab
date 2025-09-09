@@ -302,7 +302,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1991451571215313430}
   - component: {fileID: 6999887617959599737}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Hat_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -608,7 +608,7 @@ GameObject:
   m_Component:
   - component: {fileID: 754602279933895974}
   - component: {fileID: 2782485708801742373}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Jacket_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -713,7 +713,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3702536560505493667}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Skinned Meshes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1011,7 +1011,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7335032843183530649}
   - component: {fileID: 3819151196114987205}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: HairStyle_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1681,7 +1681,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4937382520016840245}
   - component: {fileID: 1486028459428267184}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Pants_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2481,7 +2481,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3857616639851180448}
   - component: {fileID: 6655306141081123757}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Shirt_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2847,7 +2847,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3189362850036479798}
   - component: {fileID: 6504800361783350201}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: BaseBody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3520,7 +3520,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5247302786327359601}
   - component: {fileID: 7529296371736003648}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Shoe_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3879,7 +3879,7 @@ MonoBehaviour:
   currentAction: {fileID: 0}
   GunWeaponHolder: {fileID: 7140418736028765842}
   MeleeWeaponHolder: {fileID: 6775948346608397621}
-  <CombatCharacter>k__BackingField: {fileID: 11400000, guid: 01549fbff62dae542b24d831e721cca6, type: 2}
+  <CombatData>k__BackingField: {fileID: 11400000, guid: f3833da0b003515499c3793e1f8a5ec6, type: 2}
 --- !u!114 &2516632715420525542
 MonoBehaviour:
   m_ObjectHideFlags: 0

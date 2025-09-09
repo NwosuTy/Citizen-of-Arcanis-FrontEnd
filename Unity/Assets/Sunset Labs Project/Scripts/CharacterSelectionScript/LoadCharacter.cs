@@ -42,7 +42,7 @@ public class LoadCharacter : MonoBehaviour
         CharacterManager spawnedCharacter = Instantiate(CharacterDatas[selectedIndex].PlayableCharacter, spawnPoint);
 
         spawnedCharacter.name = CharacterDatas[selectedIndex].characterName;
-        spawnedCharacter.SetCharacterType(CharacterType.Player);
+        spawnedCharacter.SetCharacterDetails(CharacterType.Player);
         CreateDroneObject(spawnedCharacter, out PlayerCompanion companion);
 
         if (NPCController.Instance != null)
