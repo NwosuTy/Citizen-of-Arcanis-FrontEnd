@@ -201,22 +201,7 @@ public class CharacterMovement : MonoBehaviour
             }
             return;
         }
-
-        characterManager.navMeshPath ??= new NavMeshPath();
-        if (characterManager.navMeshPath.status != NavMeshPathStatus.PathComplete)
-        {
-            characterManager.navMeshPath.ClearCorners();
-        }
-        if (!NavMesh.SamplePosition(destination, out var destinationHit, 1.0f, areaMask))
-        {
-            return;
-        }
-        if (agent.CalculatePath(destinationHit.position, characterManager.navMeshPath))
-        {
-            agent.SetPath(characterManager.navMeshPath);
-        }
-        Vector3 moveDirection = agent.desiredVelocity;
-        characterManager.Controller.Move(speed * Time.deltaTime * moveDirection);
+        MercenaryMovement(speed, destination, agent);
     }
 
     public void HandleRotationWhileAttacking(CharacterManager characterManager)
